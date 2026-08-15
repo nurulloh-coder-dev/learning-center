@@ -1,61 +1,61 @@
-
-
-spring:
-  application:
-    name: CRM
-    frontUrl: ${FRONT_URL}
-  servlet:
-    multipart:
-      max-file-size: ${MAX_FILE_SIZE:10MB}
-      max-request-size: ${MAX_REQUEST_SIZE:10MB}
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-aws:
-  s3:
-    bucket: learning-center-uploads
-    region: eu-north-1
-    access-key: ${AWS_ACCESS_KEY}
-    secret-key: ${AWS_SECRET_KEY}
-
-
-jwt:
-  access:
-    token:
-      secretKey: ${JWT_ACCESS_SECRET_KEY}
-      expire:
-        date: 900
-  refresh:
-    token:
-      secretKey: ${JWT_REFRESH_SECRET_KEY}
-      expire:
-        date: 604800
-
-springdoc:
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-
-server:
-  port: ${PORT}
+#
+#
+#spring:
+#  application:
+#    name: CRM
+#    frontUrl: ${FRONT_URL}
+#  servlet:
+#    multipart:
+#      max-file-size: ${MAX_FILE_SIZE:10MB}
+#      max-request-size: ${MAX_REQUEST_SIZE:10MB}
+#  datasource:
+#    url: ${DB_URL}
+#    username: ${DB_USERNAME}
+#    password: ${DB_PASSWORD}
+#    driver-class-name: org.postgresql.Driver
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#    database: postgresql
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#aws:
+#  s3:
+#    bucket: learning-center-uploads
+#    region: eu-north-1
+#    access-key: ${AWS_ACCESS_KEY}
+#    secret-key: ${AWS_SECRET_KEY}
+#
+#
+#jwt:
+#  access:
+#    token:
+#      secretKey: ${JWT_ACCESS_SECRET_KEY}
+#      expire:
+#        date: 900
+#  refresh:
+#    token:
+#      secretKey: ${JWT_REFRESH_SECRET_KEY}
+#      expire:
+#        date: 604800
+#
+#springdoc:
+#  swagger-ui:
+#    enabled: true
+#    path: /swagger-ui.html
+#
+#server:
+#  port: ${PORT}
 
 spring:
   application:
     name: CRM
     frontUrl: http://localhost:5173
   profiles:
-    default: dev
+    default: prod
   servlet:
     multipart:
       max-file-size: 10MB

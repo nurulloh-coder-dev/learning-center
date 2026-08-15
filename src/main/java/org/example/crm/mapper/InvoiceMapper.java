@@ -7,6 +7,7 @@ import org.example.crm.entity.dto.InvoiceUpdateDto;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.user.UserDto;
 import org.example.crm.entity.enums.InvoiceStatus;
+import org.example.crm.entity.enums.InvoiceType;
 import org.example.crm.entity.model.Invoice;
 import org.example.crm.entity.model.Student;
 import org.example.crm.projection.InvoiceProjection;

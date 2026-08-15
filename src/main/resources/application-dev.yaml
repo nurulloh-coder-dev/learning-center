@@ -6,10 +6,10 @@ spring:
 
 aws:
   s3:
-    bucket: learning-center-uploads
-    region: eu-north-1
-    access-key: AKIA5SE3DSUARHE423RL
-    secret-key: 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
+    bucket: hello-bucket
+    region: hello-region
+    access-key: accessKey123
+    secret-key: secretKey123
 
 jwt:
   access:
