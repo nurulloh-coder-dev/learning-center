@@ -46,7 +46,9 @@ public enum ErrorType {
     BRANCH_NOT_FOUND("branch.not.found"),
     BRANCH_ALREADY_EXISTS("branch.already.exists"),
     ORGANIZATION_NOT_FOUND("organization.not.found"),
-    ORGANIZATION_ALREADY_EXISTS("organization.already.exists");
+    ORGANIZATION_ALREADY_EXISTS("organization.already.exists"),
+    GROUP_NOT_FOUND_OR_NOT_RELATED_TO_ORGANIZATION("group.not.found.or.not.related.to.organization"),
+    ORGANIZATION_ID_MISMATCH("organization.id.mismatch"),;
 
 
     private final String key;

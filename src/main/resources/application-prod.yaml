@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: ${DB-URL}
+    username: ${DB-USERNAME}
+    password: ${DB-PASSWORD}
+
+aws:
+  s3:
+    bucket: ${AWS-BUCKET:learning-center-uploads}
+    region: ${AWS-REGION:eu-north-1}
+    access-key: ${AWS-ACCESS-KEY}
+    secret-key: ${AWS-SECRET-KEY}
+
+jwt:
+  access:
+    token:
+      secretKey: ${JWT-ACCESS-SECRET-KEY}
+      expire:
+        date: ${JWT-ACCESS-EXPIRE-DATE:900}
+  refresh:
+    token:
+      secretKey: ${JWT-REFRESH-SECRET-KEY}
+      expire:
+        date: ${JWT-REFRESH-EXPIRE-DATE:604800}
+
+
+server:
+  port: ${PORT}

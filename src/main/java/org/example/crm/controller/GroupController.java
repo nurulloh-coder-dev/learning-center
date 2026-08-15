@@ -29,9 +29,10 @@ public class GroupController {
                                                        @RequestParam(defaultValue = "0") int page,
                                                        @RequestParam(defaultValue  = "20") int size,
                                                        @RequestParam(required = false) GroupStatus status,
-                                                       @RequestParam(required = false) GroupLevel level) {
+                                                       @RequestParam(required = false) GroupLevel level,
+                                                       @RequestParam String organizationId) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(service.getAll(pageable, search, status,level));
+        return ResponseEntity.ok(service.getAll(pageable, search, status,level,organizationId));
     }
 
     @GetMapping("/{id}")
@@ -40,8 +41,8 @@ public class GroupController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Integer> getCount() {
-        Integer count = service.getCount();
+    public ResponseEntity<Integer> getCount(@RequestParam String organizationId) {
+        Integer count = service.getCount(organizationId);
         return ResponseEntity.ok(count);
     }
 

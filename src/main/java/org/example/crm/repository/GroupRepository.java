@@ -33,6 +33,8 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                     COUNT(l.id) AS lessonsCount
                 FROM Group g
                 LEFT JOIN Lesson l ON l.group = g and l.level=:level
+                JOIN g.branch b
+                JOIN Organization o ON o.id = :organizationId
                 WHERE (:status IS NULL OR g.status = :status)
                   AND (:level IS NULL OR g.level = :level)
                   AND (:search IS NULL
@@ -45,8 +47,8 @@ public interface GroupRepository extends JpaRepository<Group, String> {
             Pageable pageable,
             @Param("status") GroupStatus status,
             @Param("level") GroupLevel level,
-            @Param("search") String search
-    );
+            @Param("search") String search,
+            String organizationId);
 
     @Query("""
                     update Group g
@@ -56,8 +58,14 @@ public interface GroupRepository extends JpaRepository<Group, String> {
     @Modifying
     void updateDeleted(String id);
 
-    @Query(value = "select count(id) from groups where deleted=false", nativeQuery = true)
-    Optional<Integer> getCount();
+    @Query("""
+            SELECT COUNT(g.id)
+            FROM Group g
+            JOIN g.branch b
+            JOIN Organization o ON o.id = :organizationId
+            WHERE g.deleted = false
+""")
+    Optional<Integer> getCount(String organizationId);
 
     @Query("""
             SELECT g.id as id, g.name as name, g.timeTable.dayType as dayType
@@ -70,4 +78,14 @@ public interface GroupRepository extends JpaRepository<Group, String> {
 
     @Query("SELECT g FROM Group g WHERE g.teacher.user.id = :userId AND g.status = 'ONGOING' and g.deleted = false")
     List<Group> findAllByTeacherUserId(@Param("userId") String userId);
+
+
+    @Query("""
+            SELECT g FROM Group g
+            join g.branch b
+            join Organization o on o.id = :organizationId
+            WHERE g.id = :id
+            AND g.deleted = false
+""")
+    Optional<Group> findByIdAndOrganizationId(String id, String organizationId);
 }

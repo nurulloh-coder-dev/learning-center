@@ -33,20 +33,23 @@ public class TeacherController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Map<String, Long>> count() {
-        Long count = teacherService.getAllCount();
+    public ResponseEntity<Map<String, Long>> count(@RequestParam String organizationId) {
+        Long count = teacherService.getAllCount(organizationId);
         return ResponseEntity.ok(Map.of("count",count));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TeacherDto> getById(@PathVariable String id) {
-        TeacherDto teacher = teacherService.get(id);
+    public ResponseEntity<TeacherDto> getById(@PathVariable String id,
+                                              @RequestParam String organizationId) {
+        TeacherDto teacher = teacherService.get(id,organizationId);
         return ResponseEntity.ok(teacher);
     }
 
     @PostMapping
-    public ResponseEntity<TeacherDto> create(@Valid @RequestBody TeacherCreateDto createDto) {
-        TeacherDto createdTeacher = teacherService.create(createDto);
+    public ResponseEntity<TeacherDto> create(@Valid @RequestBody TeacherCreateDto createDto,
+                                             @RequestParam String organizationId) {
+
+        TeacherDto createdTeacher = teacherService.create(createDto,organizationId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTeacher);
     }
 

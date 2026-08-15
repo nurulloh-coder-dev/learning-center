@@ -72,4 +72,17 @@ public class InvoiceMapper {
         if (updateDto.status() != null)
             invoice.setPaymentStatus(updateDto.status());
     }
+
+
+    public Invoice toEntityReturn(String studentId) {
+        Student student = studentValidator.validateIdAndGet(studentId);
+        Invoice invoice = new Invoice();
+        invoice.setInvoiceNumber(invoiceNumberService.generateInvoiceNumber());
+        invoice.setAmount(student.getBalance());
+        invoice.setPaymentStatus(InvoiceStatus.PAID);
+        invoice.setType(InvoiceType.RETURNED);
+        invoice.setIssuedAt(LocalDateTime.now());
+        invoice.setStudent(student);
+        return invoice;
+    }
 }

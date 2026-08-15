@@ -53,4 +53,24 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     @Query("select exists (select s.id from Student s where s.id =:id)")
     Optional<Boolean> checkId(@Param("id") String id);
+
+
+
+    @Query("""
+        select s from Student s
+        join User u on s.user.id = u.id and u.organization.id = :organizationId
+        where s.deleted = false
+        and u.deleted = false
+        and (:search IS NULL OR :search = '' OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')))
+    """)
+    Page<StudentProjection> searchStudentsByOrganization(String search, String organizationId, Pageable pageable);
+
+    @Query("""
+        select count(s.id)
+        from Student s
+        join Enrollment e on s.id = e.student.id
+        where e.group.id = :groupId
+        and s.deleted = false
+""")
+    Long countStudentsByGroupId(String groupId);
 }

@@ -24,4 +24,10 @@ public class GroupValidator {
         return repository.findById(id).orElseThrow(() ->
                 new RestException(ErrorType.GROUP_NOT_FOUND, ErrorCodes.NotFound));
     }
+
+
+    public Group validateIdOrgAndGet(String id, String organizationId) {
+        return repository.findByIdAndOrganizationId(id, organizationId).orElseThrow(() ->
+                new RestException(ErrorType.GROUP_NOT_FOUND_OR_NOT_RELATED_TO_ORGANIZATION, ErrorCodes.NotFound));
+    }
 }

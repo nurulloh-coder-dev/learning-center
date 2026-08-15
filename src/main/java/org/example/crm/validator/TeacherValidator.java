@@ -23,4 +23,9 @@ public class TeacherValidator {
     public void validate() {
 
     }
+
+    public Teacher validateIdAndGetOrg(String id, String organizationId) {
+        return teacherRepository.findTeacherByIdAndOrg(id, organizationId)
+                .orElseThrow(()-> new RestException(ErrorType.TEACHER_NOT_FOUND, ErrorCodes.NotFound));
+    }
 }

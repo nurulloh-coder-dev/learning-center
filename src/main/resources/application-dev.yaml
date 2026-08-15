@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/learning_center
+    username: postgres
+    password: root123
+
+aws:
+  s3:
+    bucket: learning-center-uploads
+    region: eu-north-1
+    access-key: AKIA5SE3DSUARHE423RL
+    secret-key: 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
+
+jwt:
+  access:
+    token:
+      secretKey: 4f6162315a6b324d6731336c56417a426e4d3538426a76386d4e7751525a334e
+      expire:
+        date: 900
+  refresh:
+    token:
+      secretKey: 62354b526d4c6d645161394a46587042594a574768344d5a71314e3658564232
+      expire:
+        date: 604800

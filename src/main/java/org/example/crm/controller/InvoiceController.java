@@ -42,6 +42,14 @@ public class InvoiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(createDto));
     }
 
+    @PostMapping("/return")
+    public ResponseEntity<InvoiceDto> returnInvoice(@RequestParam String studentId) {
+        return ResponseEntity.ok(service.returnInvoice(studentId));
+    }
+
+
+
+
     @PutMapping("/{id}")
     public ResponseEntity<InvoiceDto> updateInvoice(@PathVariable String id, @RequestBody InvoiceUpdateDto updateDto) {
         return ResponseEntity.ok(service.update(updateDto, id));

@@ -77,4 +77,9 @@ public class InvoiceService extends AbstractService<
         Page<InvoiceProjection> projectionPage = repository.getAllInvoicesByFilter(wrapSearch(search), from, to, status, pageable);
         return projectionPage.map(mapper::toDtoFromProjection);
     }
+
+    public InvoiceDto returnInvoice(String studentId) {
+        Invoice invoice = mapper.toEntityReturn(studentId);
+        return mapper.toDto(repository.save(invoice));
+    }
 }

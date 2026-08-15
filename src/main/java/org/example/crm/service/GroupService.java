@@ -62,8 +62,8 @@ public class GroupService extends AbstractService<
         return null;
     }
 
-    public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status, GroupLevel level) {
-        Page<GroupProjection> groups = repository.getAllByFilter(pageable, status, level, search);
+    public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status, GroupLevel level, String organizationId) {
+        Page<GroupProjection> groups = repository.getAllByFilter(pageable, status, level, search,organizationId);
         return groups.
                 map(mapper::toDtoFromProjection);
 
@@ -72,6 +72,11 @@ public class GroupService extends AbstractService<
     @Override
     public GroupDto get(String id) {
         Group group = validator.validateIdAndGet(id);
+        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
+        return mapper.toDto(group, lessonsCount);
+    }
+    public GroupDto get(String id, String organizationId) {
+        Group group = validator.validateIdOrgAndGet(id,organizationId);
         Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
         return mapper.toDto(group, lessonsCount);
     }
@@ -95,6 +100,13 @@ public class GroupService extends AbstractService<
         return mapper.toDto(repository.save(group), lessonsCount);
     }
 
+    public GroupDto update(GroupUpdateDto updateDto, String id, String organizationId) {
+        Group group = validator.validateIdOrgAndGet(id, organizationId);
+        mapper.mapUpdate(group, updateDto);
+        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
+        return mapper.toDto(repository.save(group), lessonsCount);
+    }
+
     @Override
     @Transactional
     public void delete(String id) {
@@ -103,8 +115,15 @@ public class GroupService extends AbstractService<
 
     }
 
-    public Integer getCount() {
-        Optional<Integer> count = repository.getCount();
+
+    @Transactional
+    public void delete(String id, String organizationId) {
+        Group group = validator.validateIdOrgAndGet(id, organizationId);
+        repository.updateDeleted(group.getId());
+    }
+
+    public Integer getCount(String organizationId) {
+        Optional<Integer> count = repository.getCount(organizationId);
         return count.orElse(0);
     }
 

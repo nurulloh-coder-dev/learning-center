@@ -60,8 +60,8 @@ public class StudentService extends AbstractService<
         repository.save(student);
     }
 
-    public Long getAllCount() {
-        return repository.countStudentsByDeleted(false);
+    public Long getAllCount(String groupId) {
+        return repository.countStudentsByGroupId(groupId);
     }
 
     public List<StudentDto> getStudentsByGroupId(String groupId) {
@@ -78,5 +78,10 @@ public class StudentService extends AbstractService<
                 .stream()
                 .map(mapper::toDto)
                 .toList();
+    }
+
+    public Page<StudentDto> getAll(Pageable pageable, String search, String organizationId) {
+        Page<StudentProjection> all = repository.searchStudentsByOrganization(search, organizationId, pageable);
+        return all.map(mapper::toDtoProj);
     }
 }

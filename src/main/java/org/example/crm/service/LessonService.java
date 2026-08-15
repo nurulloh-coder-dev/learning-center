@@ -88,8 +88,8 @@ public class LessonService extends AbstractService<
         repository.save(lesson);
     }
 
-    public Long getAllCount() {
-        return repository.countLessonsByDeleted(false);
+    public Long getAllCount(String groupId) {
+        return repository.countLessonsByGroupIdAndDeleted(groupId);
     }
 
 
