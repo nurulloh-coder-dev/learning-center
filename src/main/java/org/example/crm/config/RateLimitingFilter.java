@@ -21,28 +21,49 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class RateLimitingFilter extends OncePerRequestFilter {
+
     private final Cache<String, Bucket> buckets = Caffeine.newBuilder()
             .expireAfterAccess(1, TimeUnit.HOURS)
             .maximumSize(10_000)
             .build();
 
     private Bucket createNewBucket() {
-        // Allows 100 requests per minute per IP address
-        Bandwidth limit = Bandwidth.classic(10, Refill.greedy(100, Duration.ofMinutes(1)));
+        // Set total capacity to 100, refilling 100 tokens per 1 minute
+        Bandwidth limit = Bandwidth.classic(100, Refill.greedy(100, Duration.ofMinutes(1)));
         return Bucket.builder().addLimit(limit).build();
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+
+        // 1. Bypass HTTP OPTIONS pre-flight requests
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
+        // 2. Bypass Swagger UI, OpenAPI docs, and static web assets
+        return path.startsWith("/v3/api-docs")
+                || path.startsWith("/swagger-ui")
+                || path.endsWith(".css")
+                || path.endsWith(".js")
+                || path.endsWith(".png")
+                || path.endsWith(".ico")
+                || path.endsWith(".html");
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        log.info("RateLimitingFilter intercepting path: {}", request.getServletPath());
+        log.info("RateLimitingFilter evaluating rate limit for path: {}", request.getServletPath());
         String clientIp = getClientIP(request);
         Bucket bucket = buckets.get(clientIp, k -> createNewBucket());
 
         if (bucket.tryConsume(1)) {
             filterChain.doFilter(request, response);
         } else {
+            log.warn("Rate limit exceeded for IP: {} on path: {}", clientIp, request.getServletPath());
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             response.setContentType("application/json");
             response.getWriter().write("{\"error\": \"Too many requests. Please try again later.\"}");
@@ -54,6 +75,6 @@ public class RateLimitingFilter extends OncePerRequestFilter {
         if (xfHeader == null || xfHeader.isEmpty()) {
             return request.getRemoteAddr();
         }
-        return xfHeader.split(",")[0];
+        return xfHeader.split(",")[0].trim();
     }
 }
