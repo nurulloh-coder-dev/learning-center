@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.crm.entity.enums.*;
 import org.example.crm.entity.model.*;
 import org.example.crm.repository.*;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ import java.time.LocalTime;
 
 @Component
 @RequiredArgsConstructor ////implements CommandLineRunner
-public class DataInitializer{
+public class DataInitializer implements CommandLineRunner {
 
     final UserRepository userRepository;
     final TeacherRepository teacherRepository;
@@ -29,7 +30,7 @@ public class DataInitializer{
     final PasswordEncoder passwordEncoder;
     final EntityManager entityManager;
 //
-//    @Override
+    @Override
     @Transactional
     public void run(String... args) {
 //        if (userRepository.count() > 0) return;

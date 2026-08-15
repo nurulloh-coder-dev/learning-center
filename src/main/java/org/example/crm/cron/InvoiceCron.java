@@ -25,7 +25,6 @@ public class InvoiceCron {
     final GroupRepository groupRepository;
     final StudentRepository studentRepository;
     final InvoiceRepository invoiceRepository;
-    @Value("${spring.application.invoiceAmount}")
     private BigDecimal invoiceAmount;
 
     @Scheduled(cron = "0 0 7 * * *", zone = "Asia/Tashkent")
