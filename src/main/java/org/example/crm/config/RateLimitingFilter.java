@@ -9,6 +9,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -18,6 +19,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Slf4j
 public class RateLimitingFilter extends OncePerRequestFilter {
     private final Cache<String, Bucket> buckets = Caffeine.newBuilder()
             .expireAfterAccess(1, TimeUnit.HOURS)
@@ -34,6 +36,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        log.info("RateLimitingFilter intercepting path: {}", request.getServletPath());
         String clientIp = getClientIP(request);
         Bucket bucket = buckets.get(clientIp, k -> createNewBucket());
 
