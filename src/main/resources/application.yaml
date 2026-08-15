@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: learningCenter
+    frontUrl: http://localhost:5173
+  servlet:
+    multipart:
+      max-file-size: ${MAX-FILE-SIZE:10MB}
+      max-request-size: ${MAX-REQUEST-SIZE:10MB}
+  datasource:
+    url: ${DB-URL}
+    username: ${DB-USERNAME}
+    password: ${DB-PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+aws:
+  s3:
+    bucket: learning-center-uploads
+    region: eu-north-1
+    access-key: ${AWS-ACCESS-KEY}
+    secret-key: ${AWS-SECRET-KEY}
+
+
+jwt:
+  access:
+    token:
+      secretKey: ${JWT-ACCESS-SECRET-KEY}
+      expire:
+        date: 900
+  refresh:
+    token:
+      secretKey: ${JWT-REFRESH-SECRET-KEY}
+      expire:
+        date: 604800
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
