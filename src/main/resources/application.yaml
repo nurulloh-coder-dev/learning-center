@@ -1,15 +1,17 @@
+
+
 spring:
   application:
     name: CRM
     frontUrl: ${FRONT_URL}
   servlet:
     multipart:
-      max-file-size: ${MAX-FILE-SIZE:10MB}
-      max-request-size: ${MAX-REQUEST-SIZE:10MB}
+      max-file-size: ${MAX_FILE_SIZE:10MB}
+      max-request-size: ${MAX_REQUEST_SIZE:10MB}
   datasource:
-    url: ${DB-URL}
-    username: ${DB-USERNAME}
-    password: ${DB-PASSWORD}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -24,19 +26,19 @@ aws:
   s3:
     bucket: learning-center-uploads
     region: eu-north-1
-    access-key: ${AWS-ACCESS-KEY}
-    secret-key: ${AWS-SECRET-KEY}
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
 
 
 jwt:
   access:
     token:
-      secretKey: ${JWT-ACCESS-SECRET-KEY}
+      secretKey: ${JWT_ACCESS_SECRET_KEY}
       expire:
         date: 900
   refresh:
     token:
-      secretKey: ${JWT-REFRESH-SECRET-KEY}
+      secretKey: ${JWT_REFRESH_SECRET_KEY}
       expire:
         date: 604800
 
@@ -44,3 +46,6 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui.html
+
+server:
+  port: ${PORT}
