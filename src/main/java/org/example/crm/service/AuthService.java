@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.crm.config.JwtUtils;
 import org.example.crm.entity.dto.user.UserDto;
 import org.example.crm.entity.login.LoginRequest;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -46,6 +48,7 @@ public class AuthService {
 
 
     public LoginResponse getLoginResponseResponseEntity(LoginRequest request,HttpServletResponse response) {
+        log.info("{} is trying to log in", request.getPhone());
         String phone = request.getPhone();
 
         User user = userRepository.findByPhoneAndDeletedFalse(phone)
