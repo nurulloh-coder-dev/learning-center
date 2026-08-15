@@ -8,7 +8,7 @@ import org.example.crm.entity.model.Organization;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface OrganizationMapper {
 
     OrganizationDto toDto(Organization organization);
