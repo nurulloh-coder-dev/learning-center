@@ -18,10 +18,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Branch  extends BaseEntity {
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Organization organization;
-
     private BigDecimal chargeForMonth;
 
     @Column(nullable = false)

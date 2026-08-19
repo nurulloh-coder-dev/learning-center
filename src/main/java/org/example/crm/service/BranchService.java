@@ -45,7 +45,7 @@ public class BranchService extends AbstractService<
     public BranchDto get(String id) {
         Branch branch = validator.validateIdAndGet(id);
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        organizationValidator.validateOrganizationMatch(branch.getOrganization().getId(), organizationId);
+        organizationValidator.validateOrganizationMatch(branch.getOrganizationId(), organizationId);
         return mapper.toDto(branch);
     }
 
@@ -65,7 +65,7 @@ public class BranchService extends AbstractService<
         Branch branch = validator.validateIdAndGet(id);
         validator.validate(updateDto.name());
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        organizationValidator.validateOrganizationMatch(branch.getOrganization().getId(), organizationId);
+        organizationValidator.validateOrganizationMatch(branch.getOrganizationId(), organizationId);
         mapper.updateEntity(branch, updateDto);
         Branch save = repository.save(branch);
         return mapper.toDto(save);

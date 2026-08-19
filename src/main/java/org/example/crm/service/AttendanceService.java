@@ -123,4 +123,8 @@ public class AttendanceService extends AbstractService<
         List<AttendanceProjection> byStudentId = repository.getByStudentId(studentId);
         return null;
     }
+
+    public List<AttendanceDto> getByGroup(String groupId) {
+        return null;
+    }
 }

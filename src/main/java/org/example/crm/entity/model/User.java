@@ -37,7 +37,4 @@ public class User extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Organization organization;
 }

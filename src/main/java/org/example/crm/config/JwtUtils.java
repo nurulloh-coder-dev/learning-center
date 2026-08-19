@@ -60,8 +60,8 @@ public class JwtUtils {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());
         claims.put("role", user.getRole().name());
-        if (user.getOrganization() != null) {
-            claims.put("organizationId", user.getOrganization().getId());
+        if (user.getOrganizationId() != null) {
+            claims.put("organizationId", user.getOrganizationId());
         }
         return claims;
     }
