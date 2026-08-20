@@ -3,13 +3,17 @@ spring:
     url: jdbc:postgresql://localhost:5432/learning_center
     username: postgres
     password: root123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 
 aws:
   s3:
     bucket: hello-bucket
     region: hello-region
-    access-key: accessKey123
-    secret-key: secretKey123
+    access-key: ${AWS_ACCESS_KEY:dev-access-key}
+    secret-key: ${AWS_SECRET_KEY:dev-secret-key}
 
 jwt:
   access:

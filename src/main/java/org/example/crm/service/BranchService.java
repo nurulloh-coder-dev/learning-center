@@ -52,9 +52,7 @@ public class BranchService extends AbstractService<
     @Override
     public BranchDto create(BranchCreateDto createDto) {
         validator.validate(createDto.name());
-        String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Organization organization = organizationValidator.validateAndGetId(organizationId);
-        Branch branch = mapper.toEntity(createDto, organization);
+        Branch branch = mapper.toEntity(createDto);
         Branch save = repository.save(branch);
         return mapper.toDto(save);
     }
