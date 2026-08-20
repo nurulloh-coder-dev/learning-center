@@ -58,12 +58,12 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     @Query("""
         select s from Student s
-        join User u on s.user.id = u.id and u.organization.id = :organizationId
-        where s.deleted = false
+        join User u on s.user.id = u.id
+        where s.organizationId=: orgId and s.deleted = false
         and u.deleted = false
         and (:search IS NULL OR :search = '' OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')))
     """)
-    Page<StudentProjection> searchStudentsByOrganization(String search, String organizationId, Pageable pageable);
+    Page<StudentProjection> searchStudentsByOrganization(@Param("search") String search, @Param("orgId") String organizationId, Pageable pageable);
 
     @Query("""
         select count(s.id)
