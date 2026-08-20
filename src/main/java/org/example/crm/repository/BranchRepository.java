@@ -18,7 +18,7 @@ public interface BranchRepository extends JpaRepository<Branch, String> {
     @Query("""
                         select b from Branch b
                         where b.deleted = false and
-                        b.organization.id = :orgId and
+                        b.organizationId = :orgId and
                         (:search is null
                         or b.name ilike concat('%', :search, '%')
                         or b.address ilike concat('%', :search, '%'))
@@ -29,7 +29,7 @@ public interface BranchRepository extends JpaRepository<Branch, String> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE Branch b SET b.deleted = true WHERE b.id = :id and b.organization.id =:organizationId")
+    @Query("UPDATE Branch b SET b.deleted = true WHERE b.id = :id and b.organizationId =:organizationId")
     int deleteByIdFalse(@Param("id") String id, @Param("organizationId") String organizationId);
 
     @Query("select exists (select b.id from Branch b where b.id=:id)")

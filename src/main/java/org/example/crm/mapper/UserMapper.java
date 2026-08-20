@@ -17,7 +17,6 @@ public abstract class UserMapper {
 
     @IgnoreAuditFields
     @Mapping(target = "branch", ignore = true)
-    @Mapping(target = "organization", ignore = true)
     public abstract User toEntity(UserCreateDto createDto);
 
     @IgnoreAuditFields

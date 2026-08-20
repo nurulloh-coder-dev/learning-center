@@ -21,7 +21,6 @@ public interface BranchMapper {
     BranchDto toDto(Branch branch);
 
 
-    @Mapping(target = "organization", source = "organization")
     @Mapping(target = "chargeForMonth", source = "createDto.chargeForMonth")
     @Mapping(target = "name", source = "createDto.name")
     @Mapping(target = "address", source = "createDto.address")
@@ -29,7 +28,7 @@ public interface BranchMapper {
     @Mapping(target = "latitude", source = "createDto.latitude")
     @Mapping(target = "longitude", source = "createDto.longitude")
     @Mapping(target = "googleMapsUrl", source = "createDto.googleMapsUrl")
-    Branch toEntity(BranchCreateDto createDto, Organization organization);
+    Branch toEntity(BranchCreateDto createDto);
 
 
     void updateEntity(@MappingTarget Branch branch, BranchUpdateDto updateDto);

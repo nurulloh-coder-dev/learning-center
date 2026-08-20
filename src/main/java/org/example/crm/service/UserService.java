@@ -51,12 +51,9 @@ public class UserService extends AbstractService<
     @Override
     public UserDto create(UserCreateDto createDto) {
         validator.validate(createDto);
-        String organizationId = validator.authenticateAndGetOrganizationId();
         User entity = mapper.toEntity(createDto);
         Branch branch = branchValidator.validateIdAndGet(createDto.branchId());
-        Organization organization = organizationValidator.validateAndGetId(organizationId);
         entity.setBranch(branch);
-        entity.setOrganization(organization);
         User save = repository.save(entity);
         return mapper.toDto(save);
     }
@@ -65,7 +62,7 @@ public class UserService extends AbstractService<
     public UserDto update(UserUpdateDto updateDto, String id) {
         User user = validator.validateIdAndGet(id);
         String organizationId = validator.authenticateAndGetOrganizationId();
-        organizationValidator.validateOrganizationMatch(user.getOrganization().getId(), organizationId);
+        organizationValidator.validateOrganizationMatch(user.getOrganizationId(), organizationId);
         mapper.mapUpdate(user, updateDto);
         return mapper.toDto(repository.save(user));
     }

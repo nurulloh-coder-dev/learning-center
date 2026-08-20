@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/attendance")
 public class AttendanceController {
@@ -43,6 +45,12 @@ public class AttendanceController {
     public ResponseEntity<AttendanceDto> getByStudentId(@PathVariable String studentId) {
         AttendanceDto attendance = service.getByStudentId(studentId);
         return ResponseEntity.ok(attendance);
+    }
+
+    @GetMapping("/group/{groupId}")
+    public ResponseEntity<List<AttendanceDto>> getByGroup(@PathVariable String groupId) {
+        List<AttendanceDto> byGroup = service.getByGroup(groupId);
+        return ResponseEntity.ok(byGroup);
     }
 
     @GetMapping("/count")
