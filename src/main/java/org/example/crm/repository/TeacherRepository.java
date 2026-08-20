@@ -24,12 +24,12 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
         SELECT COUNT(t.id)
         from Teacher t
         join t.user u
-        where u.organization.id =:organizationId and t.deleted = false""")
+        where u.organizationId =:organizationId and t.deleted = false""")
     Long countTeachersByDeletedAndOrg(@Param("organizationId") String organizationId);
 
     @Query("""
         select t from Teacher t
-        join User u on t.user.id = u.id and u.organization.id =:organizationId
+        join User u on t.user.id = u.id and u.organizationId =:organizationId
         where t.id =:id
 """)
     Optional<Teacher> findTeacherByIdAndOrg(String id, String organizationId);
