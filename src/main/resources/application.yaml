@@ -1,7 +1,7 @@
 spring:
   application:
     name: CRM
-    frontUrl: ${FRONT_URL}
+    frontUrl: ${FRONT_URL:http://localhost:5173}
   servlet:
     multipart:
       max-file-size: ${MAX_FILE_SIZE:10MB}

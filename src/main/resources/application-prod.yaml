@@ -2,28 +2,28 @@ spring:
   application:
     frontUrl: ${FRONT_URL}
   datasource:
-    url: ${DB-URL}
-    username: ${DB-USERNAME}
-    password: ${DB-PASSWORD}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
 aws:
   s3:
-    bucket: ${AWS-BUCKET:learning-center-uploads}
-    region: ${AWS-REGION:eu-north-1}
-    access-key: ${AWS-ACCESS-KEY}
-    secret-key: ${AWS-SECRET-KEY}
+    bucket: ${AWS_BUCKET:learning-center-uploads}
+    region: ${AWS_REGION:eu-north-1}
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
 
 jwt:
   access:
     token:
-      secretKey: ${JWT-ACCESS-SECRET-KEY}
+      secretKey: ${JWT_ACCESS_SECRET_KEY}
       expire:
-        date: ${JWT-ACCESS-EXPIRE-DATE:900}
+        date: ${JWT_ACCESS_EXPIRE_DATE:900}
   refresh:
     token:
-      secretKey: ${JWT-REFRESH-SECRET-KEY}
+      secretKey: ${JWT_REFRESH_SECRET_KEY}
       expire:
-        date: ${JWT-REFRESH-EXPIRE-DATE:604800}
+        date: ${JWT_REFRESH_EXPIRE_DATE:604800}
 
 server:
-  port: ${PORT}
+  port: ${PORT:8080}
