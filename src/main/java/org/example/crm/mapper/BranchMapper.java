@@ -5,7 +5,6 @@ import org.example.crm.entity.dto.branch.BranchCreateDto;
 import org.example.crm.entity.dto.branch.BranchDto;
 import org.example.crm.entity.dto.branch.BranchUpdateDto;
 import org.example.crm.entity.model.Branch;
-import org.example.crm.entity.model.Organization;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
