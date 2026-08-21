@@ -32,23 +32,24 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                     g.currentMonth AS currentMonth,
                     COUNT(l.id) AS lessonsCount
                 FROM Group g
-                LEFT JOIN Lesson l ON l.group = g and l.level=:level
+                LEFT JOIN Lesson l ON l.group = g AND (:level IS NULL OR l.level = :level)
                 JOIN g.branch b
-                JOIN Organization o ON o.id = :organizationId
                 WHERE (:status IS NULL OR g.status = :status)
                   AND (:level IS NULL OR g.level = :level)
                   AND (:search IS NULL
-                       OR g.name ILIKE CONCAT('%', CAST(:search AS string), '%')
-                       OR g.room ILIKE CONCAT('%', CAST(:search AS string), '%')
-                       OR (g.teacher IS NOT NULL AND g.teacher.user.fullName ILIKE CONCAT('%', CAST(:search AS string), '%')))
+                       OR g.name ILIKE CONCAT('%', :search, '%')
+                       OR g.room ILIKE CONCAT('%', :search, '%')
+                       OR (g.teacher IS NOT NULL AND g.teacher.user.fullName ILIKE CONCAT('%', :search, '%')))
+                  AND b.organizationId = :organizationId
                 GROUP BY g.id, g.name, g.room, g.teacher, g.timeTable, g.status, g.level, g.currentMonth
             """)
     Page<GroupProjection> getAllByFilter(
-            Pageable pageable,
+            @Param("organizationId") String organizationId,
             @Param("status") GroupStatus status,
-            @Param("level") GroupLevel level,
+            @Param("level") GroupLevel level, // Keep as Enum type
             @Param("search") String search,
-            String organizationId);
+            Pageable pageable
+    );
 
     @Query("""
                     update Group g
@@ -59,12 +60,12 @@ public interface GroupRepository extends JpaRepository<Group, String> {
     void updateDeleted(String id);
 
     @Query("""
-            SELECT COUNT(g.id)
-            FROM Group g
-            JOIN g.branch b
-            JOIN Organization o ON o.id = :organizationId
-            WHERE g.deleted = false
-""")
+                        SELECT COUNT(g.id)
+                        FROM Group g
+                        JOIN g.branch b
+                        JOIN Organization o ON o.id = :organizationId
+                        WHERE g.deleted = false
+            """)
     Optional<Integer> getCount(String organizationId);
 
     @Query("""
@@ -81,11 +82,11 @@ public interface GroupRepository extends JpaRepository<Group, String> {
 
 
     @Query("""
-            SELECT g FROM Group g
-            join g.branch b
-            join Organization o on o.id = :organizationId
-            WHERE g.id = :id
-            AND g.deleted = false
-""")
+                        SELECT g FROM Group g
+                        join g.branch b
+                        join Organization o on o.id = :organizationId
+                        WHERE g.id = :id
+                        AND g.deleted = false
+            """)
     Optional<Group> findByIdAndOrganizationId(String id, String organizationId);
 }

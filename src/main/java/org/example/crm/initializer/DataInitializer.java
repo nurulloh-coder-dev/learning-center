@@ -17,7 +17,7 @@ import java.time.LocalTime;
 
 @Component
 @RequiredArgsConstructor ////implements CommandLineRunner
-public class DataInitializer {
+public class DataInitializer{
 
     final UserRepository userRepository;
     final TeacherRepository teacherRepository;
@@ -30,6 +30,7 @@ public class DataInitializer {
     final PasswordEncoder passwordEncoder;
     final EntityManager entityManager;
 //
+
 //    @Override
     @Transactional
     public void run(String... args) {
