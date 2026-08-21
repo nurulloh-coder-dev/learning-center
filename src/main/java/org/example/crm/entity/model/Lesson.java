@@ -29,5 +29,6 @@ public class Lesson extends BaseEntity {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
+    @Enumerated(EnumType.STRING)
     private GroupLevel level;
 }
