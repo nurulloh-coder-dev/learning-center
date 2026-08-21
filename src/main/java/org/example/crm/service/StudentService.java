@@ -9,6 +9,7 @@ import org.example.crm.projection.StudentProjection;
 import org.example.crm.projection.StudentShowProjection;
 import org.example.crm.repository.StudentRepository;
 import org.example.crm.validator.StudentValidator;
+import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,14 +23,18 @@ public class StudentService extends AbstractService<
         StudentValidator> implements CrudService<StudentCreateDto, StudentUpdateDto, StudentDto, String> {
 
     final UserService userService;
-    protected StudentService(StudentRepository repository, StudentMapper mapper, StudentValidator validator, UserService userService) {
+    private final UserValidator userValidator;
+
+    protected StudentService(StudentRepository repository, StudentMapper mapper, StudentValidator validator, UserService userService, UserValidator userValidator) {
         super(repository, mapper, validator);
         this.userService = userService;
+        this.userValidator = userValidator;
     }
 
     @Override
     public Page<StudentDto> getAll(Pageable pageable, String search) {
-        Page<StudentProjection> all = repository.searchStudents(search, pageable);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Page<StudentProjection> all = repository.searchStudentsByOrganization(search, organizationId, pageable);
         return all.map(mapper::toDtoProj);
     }
 
@@ -78,10 +83,5 @@ public class StudentService extends AbstractService<
                 .stream()
                 .map(mapper::toDto)
                 .toList();
-    }
-
-    public Page<StudentDto> getAll(Pageable pageable, String search, String organizationId) {
-        Page<StudentProjection> all = repository.searchStudentsByOrganization(search, organizationId, pageable);
-        return all.map(mapper::toDtoProj);
     }
 }

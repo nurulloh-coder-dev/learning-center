@@ -1,7 +1,10 @@
 spring:
+  profiles:
+    default: dev
   application:
     name: CRM
     frontUrl: ${FRONT_URL:http://localhost:5173}
+
   servlet:
     multipart:
       max-file-size: ${MAX_FILE_SIZE:10MB}
@@ -18,3 +21,4 @@ springdoc:
 
 server:
   port: ${PORT:8080}
+

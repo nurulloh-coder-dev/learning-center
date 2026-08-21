@@ -33,4 +33,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
         where t.id =:id
 """)
     Optional<Teacher> findTeacherByIdAndOrg(String id, String organizationId);
+
+    @Query("SELECT t from Teacher t where (:search is null or t.user.fullName ilike :search) and t.organizationId= :orgId")
+    Page<Teacher> findAllBySearch(@Param("orgId") String organizationId, @Param("search") String search, Pageable pageable);
 }

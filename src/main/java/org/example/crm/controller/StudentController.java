@@ -27,10 +27,9 @@ public class StudentController {
     @GetMapping
     public ResponseEntity<Page<StudentDto>> getAll(
             Pageable pageable,
-            @RequestParam(required = false) String search,
-            @RequestParam String organizationId
+            @RequestParam(required = false) String search
     ) {
-        Page<StudentDto> students = studentService.getAll(pageable, search, organizationId);
+        Page<StudentDto> students = studentService.getAll(pageable, search);
         return ResponseEntity.ok(students);
     }
 
