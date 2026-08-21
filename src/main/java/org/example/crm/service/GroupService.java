@@ -64,7 +64,7 @@ public class GroupService extends AbstractService<
 
     public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status, GroupLevel level) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Page<GroupProjection> groups = repository.getAllByFilter(pageable, status, level, search, organizationId);
+        Page<GroupProjection> groups = repository.getAllByFilter(organizationId,status, level, search,pageable);
         return groups.
                 map(mapper::toDtoFromProjection);
 
