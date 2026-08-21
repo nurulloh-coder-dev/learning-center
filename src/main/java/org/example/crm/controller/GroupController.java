@@ -29,10 +29,9 @@ public class GroupController {
                                                        @RequestParam(defaultValue = "0") int page,
                                                        @RequestParam(defaultValue  = "20") int size,
                                                        @RequestParam(required = false) GroupStatus status,
-                                                       @RequestParam(required = false) GroupLevel level,
-                                                       @RequestParam String organizationId) {
+                                                       @RequestParam(required = false) GroupLevel level) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(service.getAll(pageable, search, status,level,organizationId));
+        return ResponseEntity.ok(service.getAll(pageable, search, status,level));
     }
 
     @GetMapping("/{id}")

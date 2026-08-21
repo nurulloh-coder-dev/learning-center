@@ -14,7 +14,8 @@ public enum ErrorCodes {
     NotFound(404),
     InternalServerError(500),
     AlreadyExists(409),
-    TooManyRequests(429);
+    TooManyRequests(429),
+    AccessDenied(403);
 
     private final int statusCode;
 }
