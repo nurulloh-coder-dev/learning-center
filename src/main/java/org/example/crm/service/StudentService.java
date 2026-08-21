@@ -1,5 +1,6 @@
 package org.example.crm.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
 import org.example.crm.entity.dto.student.StudentCreateDto;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Slf4j
 public class StudentService extends AbstractService<
         StudentRepository,
         StudentMapper,
@@ -34,7 +36,9 @@ public class StudentService extends AbstractService<
     @Override
     public Page<StudentDto> getAll(Pageable pageable, String search) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
+        log.info("org id of current user {}", organizationId);
         Page<StudentProjection> all = repository.searchStudentsByOrganization(search, organizationId, pageable);
+        System.out.println(all);
         return all.map(mapper::toDtoProj);
     }
 
