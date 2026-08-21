@@ -2,6 +2,7 @@ package org.example.crm.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.example.crm.entity.dto.lead.LeadCreateDto;
+import org.example.crm.entity.dto.lead.LeadUpdateDto;
 import org.example.crm.entity.model.Lead;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
@@ -21,6 +22,18 @@ public class LeadValidator {
 
     public void validate(LeadCreateDto createDto) {
 
+
+    }
+
+    public void validate(LeadUpdateDto updateDto) {
+
+    }
+
+    public void validateId(String id) {
+        Boolean exists = repository.checkId(id).orElse(false);
+        if (!exists){
+            throw new RestException(ErrorType.LEAD_NOT_FOUND,ErrorCodes.NotFound);
+        }
 
     }
 }
