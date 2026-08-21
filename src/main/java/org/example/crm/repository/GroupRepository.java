@@ -37,10 +37,12 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                 WHERE b.organizationId = :organizationId
                   AND (:status IS NULL OR g.status = :status)
                   AND (:level IS NULL OR g.level = :level)
-                  AND (:search IS NULL
-                       OR g.name ILIKE CONCAT('%', :search, '%')
-                       OR g.room ILIKE CONCAT('%', :search, '%')
-                       OR (g.teacher IS NOT NULL AND g.teacher.user.fullName ILIKE CONCAT('%', :search, '%')))
+                  AND (
+                       :search IS NULL 
+                       OR LOWER(g.name) LIKE :search
+                       OR LOWER(g.room) LIKE :search
+                       OR (g.teacher IS NOT NULL AND LOWER(g.teacher.user.fullName) LIKE :search)
+                  )
                 GROUP BY g.id, g.name, g.room, g.teacher, g.timeTable, g.status, g.level, g.currentMonth
             """)
     Page<GroupProjection> getAllByFilter(
