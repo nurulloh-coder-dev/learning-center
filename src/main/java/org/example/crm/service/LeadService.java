@@ -5,6 +5,9 @@ import org.example.crm.entity.dto.lead.LeadDto;
 import org.example.crm.entity.dto.lead.LeadUpdateDto;
 import org.example.crm.entity.enums.LeadStatus;
 import org.example.crm.entity.model.Lead;
+import org.example.crm.exceptions.ErrorCodes;
+import org.example.crm.exceptions.ErrorType;
+import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.LeadMapper;
 import org.example.crm.projection.LeadProjection;
 import org.example.crm.repository.LeadRepository;
@@ -54,12 +57,20 @@ public class LeadService extends AbstractService<
 
     @Override
     public LeadDto update(LeadUpdateDto updateDto, String id) {
-        return null;
+        validator.validate(updateDto);
+        Lead lead = validator.validateIdAndGet(id);
+        mapper.mapUpdate(lead, updateDto);
+        Lead save = repository.save(lead);
+        return mapper.toDto(save);
     }
 
     @Override
     public void delete(String id) {
-
+        validator.validateId(id);
+        Integer integer = repository.softDelete(id);
+        if (integer == 0) {
+            throw new RestException(ErrorType.LEAD_NOT_FOUND, ErrorCodes.NotFound);
+        }
     }
 
     public LeadDto updateStatus(String id, LeadStatus status) {
