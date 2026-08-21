@@ -34,19 +34,19 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                 FROM Group g
                 LEFT JOIN Lesson l ON l.group = g AND (:level IS NULL OR l.level = :level)
                 JOIN g.branch b
-                WHERE (:status IS NULL OR g.status = :status)
+                WHERE b.organizationId = :organizationId
+                  AND (:status IS NULL OR g.status = :status)
                   AND (:level IS NULL OR g.level = :level)
                   AND (:search IS NULL
                        OR g.name ILIKE CONCAT('%', :search, '%')
                        OR g.room ILIKE CONCAT('%', :search, '%')
                        OR (g.teacher IS NOT NULL AND g.teacher.user.fullName ILIKE CONCAT('%', :search, '%')))
-                  AND b.organizationId = :organizationId
                 GROUP BY g.id, g.name, g.room, g.teacher, g.timeTable, g.status, g.level, g.currentMonth
             """)
     Page<GroupProjection> getAllByFilter(
             @Param("organizationId") String organizationId,
             @Param("status") GroupStatus status,
-            @Param("level") GroupLevel level, // Keep as Enum type
+            @Param("level") GroupLevel level,
             @Param("search") String search,
             Pageable pageable
     );
