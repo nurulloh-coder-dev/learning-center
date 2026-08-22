@@ -58,7 +58,7 @@ public class EnrollmentService extends AbstractService<
         Group group = groupValidator.validateIdAndGet(createDto.groupId());
         student.setBalance(student.getBalance().subtract(group.getBranch().getChargeForMonth()));
         studentRepository.save(student);
-        Enrollment enrollment = new Enrollment(student, group, createDto.reason(), null);
+        Enrollment enrollment = new Enrollment(student, group, null);
         return mapper.toDto(repository.save(enrollment));
     }
 
