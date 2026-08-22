@@ -20,8 +20,6 @@ public interface LeadMapper {
     @Mapping(target = "status", source = "status")
     @Mapping(target = "source", source = "source")
     @Mapping(target = "preferredCourse", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
     LeadDto toDto(LeadProjection leadProjection);
 
     @IgnoreAuditFields
