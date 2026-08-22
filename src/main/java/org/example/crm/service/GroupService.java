@@ -65,7 +65,6 @@ public class GroupService extends AbstractService<
     public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status, GroupLevel level) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
 
-        // Format the search parameter with % wildcards in Java
         String searchPattern = (search != null && !search.isBlank())
                 ? "%" + search.trim().toLowerCase() + "%"
                 : null;
