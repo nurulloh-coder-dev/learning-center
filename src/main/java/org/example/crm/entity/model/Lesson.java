@@ -6,7 +6,6 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
-import org.example.crm.entity.enums.GroupLevel;
 
 @Entity
 @Table(name = "lessons")
@@ -29,5 +28,6 @@ public class Lesson extends BaseEntity {
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
-    private GroupLevel level;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Level level;
 }

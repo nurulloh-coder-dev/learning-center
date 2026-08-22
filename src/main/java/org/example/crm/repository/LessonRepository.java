@@ -1,6 +1,5 @@
 package org.example.crm.repository;
 
-import org.example.crm.entity.enums.GroupLevel;
 import org.example.crm.entity.model.Lesson;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +15,14 @@ public interface LessonRepository extends JpaRepository<Lesson,String> {
 
     Long countLessonsByDeleted(Boolean deleted);
 
-    @Query("SELECT COUNT(l.id) from Lesson l where l.group.id =:groupId and l.level =:level")
-    Optional<Integer> findLessonCountByGroupId(@Param("groupId") String id, @Param("level") GroupLevel level);
+    @Query("""
+    SELECT COUNT(l.id)
+     from Lesson l
+     join Group g on g.id = :groupId
+     join g.level gl on gl.name = :name
+      where l.group.id =:groupId
+""")
+    Optional<Integer> findLessonCountByGroupId(@Param("groupId") String id, @Param("name") String name);
 
 
     @Query("SELECT COUNT(l.id) from Lesson l where l.group.id =:groupId and l.deleted = false")

@@ -49,7 +49,11 @@ public enum ErrorType {
     ORGANIZATION_NOT_FOUND("organization.not.found"),
     ORGANIZATION_ALREADY_EXISTS("organization.already.exists"),
     GROUP_NOT_FOUND_OR_NOT_RELATED_TO_ORGANIZATION("group.not.found.or.not.related.to.organization"),
-    ORGANIZATION_ID_MISMATCH("organization.id.mismatch"),;
+    ORGANIZATION_ID_MISMATCH("organization.id.mismatch"),
+    GROUP_LEVEL_NOT_FOUND("group.level.not.found"),
+    GROUP_LEVEL_ORDER_ALREADY_EXISTS("group.level.order.already.exists"),
+    GROUP_LEVEL_NAME_ALREADY_EXISTS("group.level.name.already.exists"),
+    INCORRECT_GROUP_LEVEL_COUNT("incorrect.group.level.count"),;
 
 
     private final String key;

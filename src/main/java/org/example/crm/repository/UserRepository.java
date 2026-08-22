@@ -19,6 +19,13 @@ public interface UserRepository extends JpaRepository<User, String> {
     Page<User> findAll(Pageable pageable, @Param("search") String search);
 
 
+    @Query("""
+                    select u
+                    from User u
+                    left join fetch u.branch
+                    where u.phone = :phone
+                    and u.deleted = false
+""")
     Optional<User> findByPhoneAndDeletedFalse(String phone);
 
 

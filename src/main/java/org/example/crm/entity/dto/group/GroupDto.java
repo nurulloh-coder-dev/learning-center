@@ -2,8 +2,8 @@ package org.example.crm.entity.dto.group;
 
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.timeTable.TimeTableDto;
-import org.example.crm.entity.enums.GroupLevel;
 import org.example.crm.entity.enums.GroupStatus;
+import org.example.crm.entity.model.Level;
 
 public record GroupDto(
         String id,
@@ -12,7 +12,7 @@ public record GroupDto(
         TeacherDto teacher,
         TimeTableDto timeTable,
         GroupStatus status,
-        GroupLevel level,
+        Level level,
         Integer currentMonth,
         Integer lessonsCount
 ) {

@@ -21,31 +21,17 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
             i.id as id,
             i.invoiceNumber as invoiceNumber,
             s.id as studentId,
-            su.id as studentUserId,
             su.imageUrl as studentImageUrl,
+            su.id as studentUserId,
             su.fullName as studentFullName,
             su.phone as studentPhone,
             su.birthDate as studentBirthDate,
             su.role as studentRole,
             s.parentPhone as parentPhone,
-            g.id as groupId,
-            g.name as groupName,
-            g.room as groupRoom,
-            t.id as teacherId,
-            tu.id as teacherUserId,
-            tu.imageUrl as teacherImageUrl,
-            tu.fullName as teacherFullName,
-            tu.phone as teacherPhone,
-            tu.birthDate as teacherBirthDate,
             tu.role as teacherRole,
             i.amount as amount,
             i.issuedAt as issuedAt,
-            i.paymentStatus as status,
-            tt.id as timeTableId,
-            tt.dayType as timeTableDayType,
-            tt.startTime as timeTableStartTime,
-            tt.endTime as timeTableEndTime,
-            g.status as groupStatus
+            i.paymentStatus as status
         from Invoice i
         join i.student s
         join s.user su

@@ -6,8 +6,11 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
-import org.example.crm.entity.enums.GroupLevel;
 import org.example.crm.entity.enums.GroupStatus;
+import org.example.crm.exceptions.ErrorCodes;
+import org.example.crm.exceptions.ErrorType;
+import org.example.crm.exceptions.RestException;
+import org.example.crm.repository.GroupLevelRepository;
 
 @Entity
 @Table(name = "groups")
@@ -33,8 +36,8 @@ public class Group extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private GroupStatus status;
 
-    @Enumerated(EnumType.STRING)
-    private GroupLevel level;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Level level;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
@@ -42,17 +45,20 @@ public class Group extends BaseEntity {
     @Column(name = "current_month", nullable = false)
     private Integer currentMonth = 1;
 
-    public void registerCompletedLesson(Integer lessonsInCurrLevel) {
-        if (lessonsInCurrLevel == 0 || lessonsInCurrLevel % 12 != 0) {
+
+    public void registerCompletedLesson(Integer lessonsInCurrLevel,
+                                        GroupLevelRepository groupLevelRepository) {
+        if (lessonsInCurrLevel == 0 || lessonsInCurrLevel % this.getLevel().getDurationInMonths() != 0) {
             return;
         }
-        if (this.currentMonth >= this.level.getDurationInMonths()) {
-            GroupLevel nextLevel = this.level.getNextLevel();
+        if (this.currentMonth >= this.getLevel().getLessonCount()/this.getLevel().getDurationInMonths()) {
+            Level nextLevel = groupLevelRepository.getNextLevelForGroup(
+                    this.getLevel().getOrderNumber(),this.getOrganizationId()).orElse(null);
             if (nextLevel == null) {
-                this.status = GroupStatus.COMPLETED;
+                this.setStatus(GroupStatus.COMPLETED);
             } else {
-                this.level = nextLevel;
-                this.currentMonth = 1;
+                this.setLevel(nextLevel);
+                this.setCurrentMonth(1);
             }
         } else {
             this.currentMonth++;

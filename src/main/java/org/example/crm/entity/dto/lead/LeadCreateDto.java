@@ -2,8 +2,8 @@ package org.example.crm.entity.dto.lead;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import org.example.crm.entity.enums.GroupLevel;
 import org.example.crm.entity.enums.LeadSource;
+import org.example.crm.entity.model.Level;
 
 public record LeadCreateDto(
         @NotBlank(message = "fullName is required")
@@ -14,5 +14,5 @@ public record LeadCreateDto(
         String phone,
 
         LeadSource source,
-        GroupLevel preferredCourse
+        Level preferredCourse
 ) {}

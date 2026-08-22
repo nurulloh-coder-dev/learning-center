@@ -6,7 +6,6 @@ import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.enums.DayType;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
-import org.example.crm.entity.enums.GroupLevel;
 import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.entity.model.TimeTable;
 import org.example.crm.entity.model.User;
@@ -62,8 +61,8 @@ public class GroupService extends AbstractService<
         return null;
     }
 
-    public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status, GroupLevel level, String organizationId) {
-        Page<GroupProjection> groups = repository.getAllByFilter(pageable, status, level, search,organizationId);
+    public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status, String organizationId) {
+        Page<GroupProjection> groups = repository.getAllByFilter(pageable, status, search, organizationId);
         return groups.
                 map(mapper::toDtoFromProjection);
 
@@ -72,12 +71,12 @@ public class GroupService extends AbstractService<
     @Override
     public GroupDto get(String id) {
         Group group = validator.validateIdAndGet(id);
-        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
+        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         return mapper.toDto(group, lessonsCount);
     }
     public GroupDto get(String id, String organizationId) {
         Group group = validator.validateIdOrgAndGet(id,organizationId);
-        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
+        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         return mapper.toDto(group, lessonsCount);
     }
 
@@ -88,7 +87,7 @@ public class GroupService extends AbstractService<
         User currentUser = userRepository.findByIdAndDeletedFalse(s).orElseThrow(() -> new RestException(ErrorType.USER_NOT_FOUND, ErrorCodes.NotFound));
         Group group = mapper.toEntity(createDto,currentUser.getBranch());
 
-        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
+        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         return mapper.toDto(repository.save(group), lessonsCount);
     }
 
@@ -96,14 +95,14 @@ public class GroupService extends AbstractService<
     public GroupDto update(GroupUpdateDto updateDto, String id) {
         Group group = validator.validateIdAndGet(id);
         mapper.mapUpdate(group, updateDto);
-        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
+        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         return mapper.toDto(repository.save(group), lessonsCount);
     }
 
     public GroupDto update(GroupUpdateDto updateDto, String id, String organizationId) {
         Group group = validator.validateIdOrgAndGet(id, organizationId);
         mapper.mapUpdate(group, updateDto);
-        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
+        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         return mapper.toDto(repository.save(group), lessonsCount);
     }
 
@@ -152,10 +151,10 @@ public class GroupService extends AbstractService<
             if (group == null) {
                 return null;
             }
-            lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
+            lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         } else {
             group = validator.validateIdAndGet(groupId);
-            lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
+            lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         }
         groupDto = mapper.toDto(group, lessonsCount);
         studentsByGroupId = studentService.getStudentsByGroupId(groupDto.id());

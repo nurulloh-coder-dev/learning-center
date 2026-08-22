@@ -16,4 +16,6 @@ public class Level extends BaseEntity {
     private Integer orderNumber;
     @Column(nullable = false)
     private Integer lessonCount;
+    @Column(nullable = false)
+    private Integer durationInMonths;
 }
