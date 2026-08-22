@@ -37,7 +37,9 @@ public class LeadService extends AbstractService<
 
     public Page<LeadDto> getAll(Pageable pageable, String search, LeadStatus status) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        String searchPattern = (search != null && !search.isBlank()) ? "%" + search + "%" : null;
+        String searchPattern = (search != null && !search.isBlank())
+                ? "%" + search.trim().toLowerCase() + "%"
+                : null;
         Page<LeadProjection> all = repository.findAll(organizationId, searchPattern, status, pageable);
         Page<LeadDto> map = all.map(mapper::toDto);
         map.getContent().forEach(l -> System.out.println("lead->" + l));
