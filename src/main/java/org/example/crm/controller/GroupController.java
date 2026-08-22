@@ -27,10 +27,9 @@ public class GroupController {
     public ResponseEntity<Page<GroupDto>> getAllGroups(@RequestParam(required = false) String search,
                                                        @RequestParam(defaultValue = "0") int page,
                                                        @RequestParam(defaultValue  = "20") int size,
-                                                       @RequestParam(required = false) GroupStatus status,
-                                                       @RequestParam String organizationId) {
+                                                       @RequestParam(required = false) GroupStatus status) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(service.getAll(pageable, search, status,organizationId));
+        return ResponseEntity.ok(service.getAll(pageable, search, status));
     }
 
     @GetMapping("/{id}")
