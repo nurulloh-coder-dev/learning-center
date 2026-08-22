@@ -2,6 +2,7 @@ package org.example.crm.service;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.teacher.TeacherCreateDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.teacher.TeacherUpdateDto;
@@ -18,12 +19,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class TeacherService extends AbstractService<
         TeacherRepository,
         TeacherMapper,
-        TeacherValidator> implements CrudService<TeacherCreateDto, TeacherUpdateDto, TeacherDto,String>{
+        TeacherValidator> implements CrudService<TeacherCreateDto, TeacherUpdateDto, TeacherDto, String> {
 
     final UserValidator userValidator;
+
     protected TeacherService(TeacherRepository repository, TeacherMapper mapper, TeacherValidator validator, UserValidator userValidator) {
         super(repository, mapper, validator);
         this.userValidator = userValidator;
@@ -31,7 +34,10 @@ public class TeacherService extends AbstractService<
 
     @Override
     public Page<TeacherDto> getAll(Pageable pageable, String search) {
-        Page<Teacher> all = repository.findAll(pageable, search);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        log.info("orgId of current user {}", organizationId);
+        Page<Teacher> all = repository.findAllBySearch(organizationId, search, pageable);
+        System.out.println(all);
         return all.map(mapper::toDto);
     }
 
@@ -43,7 +49,7 @@ public class TeacherService extends AbstractService<
 
     @Override
     public TeacherDto create(TeacherCreateDto createDto) {
-       validator.validate();
+        validator.validate();
         Teacher entity = mapper.toEntity(createDto);
         return mapper.toDto(repository.save(entity));
     }
@@ -51,7 +57,7 @@ public class TeacherService extends AbstractService<
     @Override
     public TeacherDto update(TeacherUpdateDto updateDto, String id) {
         Teacher teacher = validator.validateIdAndGet(id);
-        mapper.mapUpdate(teacher,updateDto);
+        mapper.mapUpdate(teacher, updateDto);
         return mapper.toDto(repository.save(teacher));
     }
 
@@ -67,7 +73,7 @@ public class TeacherService extends AbstractService<
     }
 
     public TeacherDto get(String id, String organizationId) {
-        Teacher teacher = validator.validateIdAndGetOrg(id,organizationId);
+        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
         return mapper.toDto(teacher);
     }
 
@@ -75,7 +81,7 @@ public class TeacherService extends AbstractService<
 
         String organization = userValidator.authenticateAndGetOrganizationId();
         if (!organization.equals(organizationId)) {
-            throw  new RestException(ErrorType.ORGANIZATION_ID_MISMATCH, ErrorCodes.BadRequest);
+            throw new RestException(ErrorType.ORGANIZATION_ID_MISMATCH, ErrorCodes.BadRequest);
         }
         Teacher entity = mapper.toEntity(createDto);
         return mapper.toDto(repository.save(entity));

@@ -23,7 +23,5 @@ public class Enrollment extends BaseEntity {
     @JoinColumn(name = "group_id")
     private Group group;
 
-    private String studyingReason;
-
     private String leavingReason;
 }

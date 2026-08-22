@@ -1,6 +1,5 @@
-package org.example.crm.annotation;
+package org.example.crm.config;
 
-import org.example.crm.config.CustomUserDetails;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;

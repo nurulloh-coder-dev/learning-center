@@ -1,5 +1,6 @@
 package org.example.crm.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
 import org.example.crm.entity.dto.student.StudentCreateDto;
@@ -9,6 +10,7 @@ import org.example.crm.projection.StudentProjection;
 import org.example.crm.projection.StudentShowProjection;
 import org.example.crm.repository.StudentRepository;
 import org.example.crm.validator.StudentValidator;
+import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,20 +18,27 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Slf4j
 public class StudentService extends AbstractService<
         StudentRepository,
         StudentMapper,
         StudentValidator> implements CrudService<StudentCreateDto, StudentUpdateDto, StudentDto, String> {
 
     final UserService userService;
-    protected StudentService(StudentRepository repository, StudentMapper mapper, StudentValidator validator, UserService userService) {
+    private final UserValidator userValidator;
+
+    protected StudentService(StudentRepository repository, StudentMapper mapper, StudentValidator validator, UserService userService, UserValidator userValidator) {
         super(repository, mapper, validator);
         this.userService = userService;
+        this.userValidator = userValidator;
     }
 
     @Override
     public Page<StudentDto> getAll(Pageable pageable, String search) {
-        Page<StudentProjection> all = repository.searchStudents(search, pageable);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        log.info("org id of current user {}", organizationId);
+        Page<StudentProjection> all = repository.searchStudentsByOrganization(search, organizationId, pageable);
+        System.out.println(all);
         return all.map(mapper::toDtoProj);
     }
 
@@ -78,10 +87,5 @@ public class StudentService extends AbstractService<
                 .stream()
                 .map(mapper::toDto)
                 .toList();
-    }
-
-    public Page<StudentDto> getAll(Pageable pageable, String search, String organizationId) {
-        Page<StudentProjection> all = repository.searchStudentsByOrganization(search, organizationId, pageable);
-        return all.map(mapper::toDtoProj);
     }
 }

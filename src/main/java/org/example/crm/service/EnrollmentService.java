@@ -3,12 +3,10 @@ package org.example.crm.service;
 import org.example.crm.entity.dto.enrollment.EnrollmentCreateDto;
 import org.example.crm.entity.dto.enrollment.EnrollmentDto;
 import org.example.crm.entity.dto.enrollment.EnrollmentUpdateDto;
-import org.example.crm.entity.dto.student.StudentCreateDto;
 import org.example.crm.entity.model.Enrollment;
 import org.example.crm.entity.model.Group;
 import org.example.crm.entity.model.Student;
 import org.example.crm.mapper.EnrollmentMapper;
-import org.example.crm.mapper.StudentMapper;
 import org.example.crm.repository.EnrollmentRepository;
 import org.example.crm.repository.StudentRepository;
 import org.example.crm.validator.EnrollmentValidator;
@@ -26,14 +24,12 @@ public class EnrollmentService extends AbstractService<
 
     private final StudentValidator studentValidator;
     private final GroupValidator groupValidator;
-    private final StudentMapper studentMapper;
     private final StudentRepository studentRepository;
 
-    protected EnrollmentService(EnrollmentRepository repository, EnrollmentMapper mapper, EnrollmentValidator validator, StudentValidator studentValidator, GroupValidator groupValidator, StudentMapper studentMapper, StudentRepository studentRepository) {
+    protected EnrollmentService(EnrollmentRepository repository, EnrollmentMapper mapper, EnrollmentValidator validator, StudentValidator studentValidator, GroupValidator groupValidator, StudentRepository studentRepository) {
         super(repository, mapper, validator);
         this.studentValidator = studentValidator;
         this.groupValidator = groupValidator;
-        this.studentMapper = studentMapper;
         this.studentRepository = studentRepository;
     }
 
@@ -60,7 +56,7 @@ public class EnrollmentService extends AbstractService<
         Group group = groupValidator.validateIdAndGet(createDto.groupId());
         student.setBalance(student.getBalance().subtract(group.getBranch().getChargeForMonth()));
         studentRepository.save(student);
-        Enrollment enrollment = new Enrollment(student, group, createDto.reason(), null);
+        Enrollment enrollment = new Enrollment(student, group, null);
         return mapper.toDto(repository.save(enrollment));
     }
 
@@ -82,12 +78,5 @@ public class EnrollmentService extends AbstractService<
     public void delete(String id, String reason) {
         validator.validateId(id);
         repository.softDelete(reason, id);
-    }
-
-    public EnrollmentDto create(StudentCreateDto createDto, EnrollmentCreateDto enrollmentCreateDto) {
-        Group group = groupValidator.validateIdAndGet(enrollmentCreateDto.groupId());
-        Student student = studentMapper.toEntity(createDto);
-        Enrollment enrollment = new Enrollment(student, group, enrollmentCreateDto.reason(), null);
-        return mapper.toDto(repository.save(enrollment));
     }
 }

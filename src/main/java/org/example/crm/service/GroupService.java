@@ -61,11 +61,21 @@ public class GroupService extends AbstractService<
         return null;
     }
 
-    public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status, String organizationId) {
-        Page<GroupProjection> groups = repository.getAllByFilter(pageable, status, search, organizationId);
-        return groups.
-                map(mapper::toDtoFromProjection);
+    public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status) {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
 
+        String searchPattern = (search != null && !search.isBlank())
+                ? "%" + search.trim().toLowerCase() + "%"
+                : null;
+
+        Page<GroupProjection> groups = repository.getAllByFilter(
+                organizationId,
+                status,
+                searchPattern,
+                pageable
+        );
+
+        return groups.map(mapper::toDtoFromProjection);
     }
 
     @Override
@@ -85,7 +95,7 @@ public class GroupService extends AbstractService<
         validator.createValid(createDto);
         String s = userValidator.authenticateAndGetId();
         User currentUser = userRepository.findByIdAndDeletedFalse(s).orElseThrow(() -> new RestException(ErrorType.USER_NOT_FOUND, ErrorCodes.NotFound));
-        Group group = mapper.toEntity(createDto,currentUser.getBranch());
+        Group group = mapper.toEntity(createDto, currentUser.getBranch());
 
         Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         return mapper.toDto(repository.save(group), lessonsCount);
@@ -112,13 +122,6 @@ public class GroupService extends AbstractService<
         Group group = validator.validateIdAndGet(id);
         repository.updateDeleted(group.getId());
 
-    }
-
-
-    @Transactional
-    public void delete(String id, String organizationId) {
-        Group group = validator.validateIdOrgAndGet(id, organizationId);
-        repository.updateDeleted(group.getId());
     }
 
     public Integer getCount(String organizationId) {

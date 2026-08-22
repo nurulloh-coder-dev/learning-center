@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/learning_center
+    url: jdbc:postgresql://altaria.proxy.rlwy.net:59566/railway
     username: postgres
-    password: root123
+    password: dicKXcgmtTMJMwFnldyOYQWxXqMfocch
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,8 +12,9 @@ aws:
   s3:
     bucket: hello-bucket
     region: hello-region
-    access-key: ${AWS_ACCESS_KEY:dev-access-key}
-    secret-key: ${AWS_SECRET_KEY:dev-secret-key}
+    access-key: ${AWS_ACCESS_KEY:AKIA5SE3DSUARHE423RL}
+    secret-key: ${AWS_SECRET_KEY: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}
+
 
 jwt:
   access:

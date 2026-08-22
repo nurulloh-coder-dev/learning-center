@@ -2,7 +2,7 @@ package org.example.crm.entity.enums;
 
 public enum LeadStatus {
     NEW,
-    CONFIRMED,
+    ENROLLED,
     REJECTED,
     CALL_LATER
 }

@@ -59,7 +59,7 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     @Query("""
         select s from Student s
         join User u on s.user.id = u.id
-        where s.organizationId=: orgId and s.deleted = false
+        where s.organizationId= :orgId and s.deleted = false
         and u.deleted = false
         and (:search IS NULL OR :search = '' OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')))
     """)
