@@ -10,6 +10,7 @@ import org.example.crm.entity.model.Group;
 import org.example.crm.entity.model.Lesson;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.LessonMapper;
+import org.example.crm.repository.GroupLevelRepository;
 import org.example.crm.repository.GroupRepository;
 import org.example.crm.repository.TeacherRepository;
 import org.example.crm.validator.LessonValidator;
@@ -27,13 +28,15 @@ public class LessonService extends AbstractService<
     final TeacherRepository teacherRepository;
     private final GroupRepository groupRepository;
     private final UserValidator userValidator;
+    final GroupLevelRepository groupLevelRepository;
 
 
-    protected LessonService(LessonRepository repository, LessonMapper mapper, LessonValidator validator, TeacherRepository teacherRepository, GroupRepository groupRepository, UserValidator userValidator) {
+    protected LessonService(LessonRepository repository, LessonMapper mapper, LessonValidator validator, TeacherRepository teacherRepository, GroupRepository groupRepository, UserValidator userValidator, GroupLevelRepository groupLevelRepository) {
         super(repository, mapper, validator);
         this.teacherRepository = teacherRepository;
         this.groupRepository = groupRepository;
         this.userValidator = userValidator;
+        this.groupLevelRepository = groupLevelRepository;
     }
 
     @Override
@@ -55,8 +58,8 @@ public class LessonService extends AbstractService<
         Lesson entity = toEntity(createDto);
         Lesson save = repository.save(entity);
         Group group = save.getGroup();
-        Integer lessonsInCurrMonth = repository.findLessonCountByGroupId(group.getId(), group.getLevel()).orElse(0);
-        group.registerCompletedLesson(lessonsInCurrMonth);
+        Integer lessonsInCurrMonth = repository.findLessonCountByGroupId(group.getId(),group.getLevel().getName()).orElse(0);
+        group.registerCompletedLesson(lessonsInCurrMonth,groupLevelRepository);
         groupRepository.save(group);
         return mapper.toDto(save);
     }

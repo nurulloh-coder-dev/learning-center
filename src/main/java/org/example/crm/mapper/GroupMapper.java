@@ -1,7 +1,6 @@
 package org.example.crm.mapper;
 
 import lombok.RequiredArgsConstructor;
-import org.example.crm.entity.enums.GroupLevel;
 import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.entity.model.Branch;
 import org.example.crm.exceptions.ErrorCodes;
@@ -12,6 +11,7 @@ import org.example.crm.entity.dto.group.GroupUpdateDto;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.model.Group;
 import org.example.crm.exceptions.RestException;
+import org.example.crm.repository.GroupLevelRepository;
 import org.example.crm.repository.TeacherRepository;
 import org.example.crm.repository.TimeTableRepository;
 import org.springframework.stereotype.Component;
@@ -23,15 +23,18 @@ public class GroupMapper {
     final TimeTableRepository timeTableRepository;
     final TeacherMapper teacherMapper;
     final TimeTableMapper timeTableMapper;
+    final GroupLevelRepository groupLevelRepository;
 
     public Group toEntity(GroupCreateDto createDto, Branch branch) {
         return new Group(
                 createDto.name(),
                 createDto.room(),
-                teacherRepository.findById(createDto.teacherId()).orElseThrow(() -> new RestException(ErrorType.TEACHER_NOT_FOUND, ErrorCodes.NotFound)),
+                teacherRepository.findById(createDto.teacherId())
+                        .orElseThrow(() -> new RestException(ErrorType.TEACHER_NOT_FOUND, ErrorCodes.NotFound)),
                 timeTableRepository.save(timeTableMapper.toEntity(createDto.timeTable())),
                 GroupStatus.STARTING,
-                GroupLevel.A1,
+                groupLevelRepository.getFirstLevelForGroup(branch.getOrganizationId())
+                        .orElseThrow(() -> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound)),
                 branch,
                 1
 
@@ -60,7 +63,8 @@ public class GroupMapper {
                 teacherMapper.toDto(projection.getTeacher()),
                 timeTableMapper.toDto(projection.getTimeTable()),
                 projection.getStatus(),
-                projection.getLevel(),
+                groupLevelRepository.findById(projection.getLevelId())
+                        .orElseThrow(()-> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound)),
                 projection.getCurrentMonth(),
                 projection.getLessonsCount()
         );

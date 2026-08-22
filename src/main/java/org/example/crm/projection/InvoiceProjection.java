@@ -18,25 +18,7 @@ public interface  InvoiceProjection {
     LocalDate getStudentBirthDate();
     Role getStudentRole();
     String getParentPhone();
-    String getGroupId();
-    String getGroupName();
-    String getGroupRoom();
-    String getTeacherId();
-    String getTeacherImageUrl();
-    String getTeacherUserId();
-    String getTeacherFullName();
-    String getTeacherPhone();
-    LocalDate getTeacherBirthDate();
-    Role getTeacherRole();
     BigDecimal getAmount();
     LocalDateTime getIssuedAt();
     InvoiceStatus getStatus();
-    String getTimeTableId();
-    DayType getTimeTableDayType();
-    LocalTime getTimeTableStartTime();
-    LocalTime getTimeTableEndTime();
-    GroupStatus getGroupStatus();
-    GroupLevel getGroupLevel();
-    Integer getCurrentMonth();
-    String getImageUrl();
 }

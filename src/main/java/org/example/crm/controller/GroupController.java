@@ -6,7 +6,6 @@ import org.example.crm.entity.dto.group.FullGroupDto;
 import org.example.crm.entity.dto.group.GroupCreateDto;
 import org.example.crm.entity.dto.group.GroupDto;
 import org.example.crm.entity.dto.group.GroupUpdateDto;
-import org.example.crm.entity.enums.GroupLevel;
 import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.projection.GroupNameProjection;
 import org.example.crm.service.GroupService;
@@ -28,10 +27,9 @@ public class GroupController {
     public ResponseEntity<Page<GroupDto>> getAllGroups(@RequestParam(required = false) String search,
                                                        @RequestParam(defaultValue = "0") int page,
                                                        @RequestParam(defaultValue  = "20") int size,
-                                                       @RequestParam(required = false) GroupStatus status,
-                                                       @RequestParam(required = false) GroupLevel level) {
+                                                       @RequestParam(required = false) GroupStatus status) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(service.getAll(pageable, search, status,level));
+        return ResponseEntity.ok(service.getAll(pageable, search, status));
     }
 
     @GetMapping("/{id}")

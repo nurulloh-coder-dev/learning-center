@@ -1,6 +1,5 @@
 package org.example.crm.repository;
 
-import org.example.crm.entity.enums.GroupLevel;
 import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.projection.GroupNameProjection;
 import org.example.crm.projection.GroupProjection;
@@ -28,27 +27,26 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                     g.teacher AS teacher,
                     g.timeTable AS timeTable,
                     g.status AS status,
-                    g.level AS level,
+                    lev.id AS levelId,
                     g.currentMonth AS currentMonth,
                     COUNT(l.id) AS lessonsCount
                 FROM Group g
-                LEFT JOIN Lesson l ON l.group = g AND (:level IS NULL OR l.level = :level)
+                LEFT JOIN Lesson l ON l.group = g and l.level=:level
+                JOIN g.level lev
                 JOIN g.branch b
                 WHERE b.organizationId = :organizationId
                   AND (:status IS NULL OR g.status = :status)
-                  AND (:level IS NULL OR g.level = :level)
                   AND (
-                       :search IS NULL 
+                       :search IS NULL
                        OR LOWER(g.name) LIKE :search
                        OR LOWER(g.room) LIKE :search
                        OR (g.teacher IS NOT NULL AND LOWER(g.teacher.user.fullName) LIKE :search)
                   )
-                GROUP BY g.id, g.name, g.room, g.teacher, g.timeTable, g.status, g.level, g.currentMonth
+                GROUP BY g.id, g.name, g.room, g.teacher, g.timeTable, g.status, lev.name, g.currentMonth
             """)
     Page<GroupProjection> getAllByFilter(
             @Param("organizationId") String organizationId,
             @Param("status") GroupStatus status,
-            @Param("level") GroupLevel level,
             @Param("search") String search,
             Pageable pageable
     );
