@@ -39,6 +39,7 @@ public class LeadService extends AbstractService<
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         String searchPattern = (search != null && !search.isBlank()) ? "%" + search + "%" : null;
         Page<LeadProjection> all = repository.findAll(organizationId, searchPattern, status, pageable);
+        all.getContent().forEach(System.out::println);
         return all.map(mapper::toDto);
     }
 
