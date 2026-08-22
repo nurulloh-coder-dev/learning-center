@@ -7,6 +7,7 @@ import lombok.ToString;
 import org.example.crm.entity.base.BaseEntity;
 import org.example.crm.entity.enums.LeadSource;
 import org.example.crm.entity.enums.LeadStatus;
+import org.example.crm.entity.enums.RejectionReason;
 
 import java.time.LocalDateTime;
 
@@ -28,4 +29,11 @@ public class Lead extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private LeadSource source;
     private LocalDateTime callAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rejection_reason", length = 50)
+    private RejectionReason rejectionReason;
+
+    @Column(name = "rejection_note", columnDefinition = "TEXT")
+    private String rejectionNote;
 }

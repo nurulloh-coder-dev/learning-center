@@ -9,6 +9,8 @@ import org.example.crm.exceptions.RestException;
 import org.example.crm.repository.GroupRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 @RequiredArgsConstructor
 public class GroupValidator {
@@ -29,5 +31,13 @@ public class GroupValidator {
     public Group validateIdOrgAndGet(String id, String organizationId) {
         return repository.findByIdAndOrganizationId(id, organizationId).orElseThrow(() ->
                 new RestException(ErrorType.GROUP_NOT_FOUND_OR_NOT_RELATED_TO_ORGANIZATION, ErrorCodes.NotFound));
+    }
+
+    public String validateIdAndGetBranchId(String groupId) {
+        Optional<String> branchId = repository.checkAndGetBranchId(groupId);
+        if (branchId.isEmpty()){
+            throw new RestException(ErrorType.BRANCH_NOT_FOUND,ErrorCodes.NotFound);
+        }
+        return branchId.get();
     }
 }

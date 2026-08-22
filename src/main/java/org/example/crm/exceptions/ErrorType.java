@@ -49,7 +49,9 @@ public enum ErrorType {
     ORGANIZATION_NOT_FOUND("organization.not.found"),
     ORGANIZATION_ALREADY_EXISTS("organization.already.exists"),
     GROUP_NOT_FOUND_OR_NOT_RELATED_TO_ORGANIZATION("group.not.found.or.not.related.to.organization"),
-    ORGANIZATION_ID_MISMATCH("organization.id.mismatch"),;
+    ORGANIZATION_ID_MISMATCH("organization.id.mismatch"),
+    LEAD_ALREADY_ENROLLED("lead.already.enrolled"),
+    LEAD_STATUS_CHANGE_FORBIDDEN("lead.status.change.forbidden");
 
 
     private final String key;

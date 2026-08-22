@@ -91,4 +91,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                         AND g.deleted = false
             """)
     Optional<Group> findByIdAndOrganizationId(String id, String organizationId);
+
+    @Query("select g.branch.id from Group g where g.id=:id and g.deleted=false")
+    Optional<String> checkAndGetBranchId(@Param("id") String groupId);
 }
