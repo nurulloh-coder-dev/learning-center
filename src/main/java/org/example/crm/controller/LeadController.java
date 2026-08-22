@@ -27,7 +27,7 @@ public class LeadController {
 
     @GetMapping
     public ResponseEntity<Page<LeadDto>> getAll(
-            @PageableDefault(size = 10) Pageable pageable,
+            @PageableDefault Pageable pageable,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) LeadStatus status) {
         return ResponseEntity.ok(service.getAll(pageable, search, status));

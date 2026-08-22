@@ -1,7 +1,6 @@
 package org.example.crm.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import org.example.crm.entity.dto.enrollment.EnrollmentCreateDto;
 import org.example.crm.entity.dto.lead.LeadCreateDto;
@@ -13,7 +12,6 @@ import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.user.UserCreateDto;
 import org.example.crm.entity.enums.LeadStatus;
 import org.example.crm.entity.enums.Role;
-import org.example.crm.entity.model.Group;
 import org.example.crm.entity.model.Lead;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
@@ -94,10 +92,6 @@ public class LeadService extends AbstractService<
         if (integer == 0) {
             throw new RestException(ErrorType.LEAD_NOT_FOUND, ErrorCodes.NotFound);
         }
-    }
-
-    public LeadDto updateStatus(String id, LeadStatus status) {
-        return null;
     }
 
     @Transactional
