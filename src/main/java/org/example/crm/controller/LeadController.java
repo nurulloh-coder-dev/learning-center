@@ -23,7 +23,7 @@ public class LeadController {
 
     @GetMapping
     public ResponseEntity<Page<LeadDto>> getAll(
-            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable,
+            @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) LeadStatus status) {
         return ResponseEntity.ok(leadService.getAll(pageable, search, status));
@@ -38,6 +38,12 @@ public class LeadController {
     public ResponseEntity<LeadDto> create(@Valid @RequestBody LeadCreateDto createDto) {
         LeadDto createdLead = leadService.create(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdLead);
+    }
+
+    @PostMapping("willStudy/{id}")
+    public ResponseEntity<Void> willStudy(@PathVariable String id) {
+
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")

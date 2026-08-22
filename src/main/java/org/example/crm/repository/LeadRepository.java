@@ -23,7 +23,8 @@ public interface LeadRepository extends JpaRepository<Lead,String> {
                   l.callAt
                   from Lead l where l.deleted = false and l.organizationId=:orgId
                   and (:search is null or l.fullName ilike :search)
-                  and (:status is null or l.status =:status)""")
+                  and (:status is null or l.status =:status)
+                  order by l.createdAt desc""")
     Page<LeadProjection> findAll(@Param("orgId") String organizationId, @Param("search") String search,@Param("status") LeadStatus status, Pageable pageable);
 
     @Query("select exists (select l.id from Lead l where l.id = :id and l.deleted = false)")

@@ -13,6 +13,15 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface LeadMapper {
 
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "fullName", source = "fullName")
+    @Mapping(target = "phone", source = "phone")
+    @Mapping(target = "callAt", source = "callAt")
+    @Mapping(target = "status", source = "status")
+    @Mapping(target = "source", source = "source")
+    @Mapping(target = "preferredCourse", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     LeadDto toDto(LeadProjection leadProjection);
 
     @IgnoreAuditFields
