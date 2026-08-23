@@ -5,8 +5,8 @@ import org.example.crm.entity.dto.attendance.AttendanceDto;
 import org.example.crm.entity.dto.attendance.AttendanceUpdateDto;
 import org.example.crm.entity.dto.attendance.MonthlyAttendanceDto;
 import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentCreateDto;
-import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentDto;
 import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentUpdateDto;
+import org.example.crm.entity.enums.AttendanceStatus;
 import org.example.crm.entity.model.Attendance;
 import org.example.crm.entity.model.AttendanceStudent;
 import org.example.crm.entity.model.Lesson;
@@ -23,9 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -128,33 +126,32 @@ public class AttendanceService extends AbstractService<
     }
 
     public List<MonthlyAttendanceDto> getByGroup(String groupId, Integer previousMonths) {
-        List<AttendanceProjection> allByGroupIdThisMonth = repository.findAllByGroupIdAndMonth(groupId,previousMonths);
-        if (allByGroupIdThisMonth.isEmpty()) {
+        List<AttendanceProjection> allByGroupIdMonth = repository.findAllByGroupIdAndMonth(groupId, previousMonths);
+        if (allByGroupIdMonth.isEmpty()) {
             return List.of();
         }
-        List<String> attIds = allByGroupIdThisMonth
+        List<String> attIds = allByGroupIdMonth
                 .stream()
                 .map(AttendanceProjection::getId)
                 .toList();
 
-        List<AttendanceStudentProjection> attendanceStudentsByAttId = repository.findAttendanceStudentsByAttId(attIds);
-        Map<String, List<AttendanceStudentDto>> collect = attendanceStudentsByAttId
-                .stream()
+        List<AttendanceStudentProjection> studentAttendances = repository.findAttendanceStudentsByAttId(attIds);
+        Map<String, Map<String, AttendanceStatus>> attendanceByAttId = studentAttendances.stream()
                 .collect(
                         Collectors.groupingBy(AttendanceStudentProjection::getAttendanceId,
-                                Collectors.mapping(p -> new AttendanceStudentDto(
-                                        p.getStudentId(),
-                                        p.getStudentFullName(),
-                                        p.getStudentImageUrl(),
-                                        p.getStatus()
-                                ), Collectors.toList())
-                        ));
-        return allByGroupIdThisMonth.stream()
+                                HashMap::new,
+                                Collectors.toMap(
+                                        AttendanceStudentProjection::getStudentId,
+                                        AttendanceStudentProjection::getStatus,
+                                        (existingStatus, newStatus) -> newStatus)
+                        )
+                );
+        return allByGroupIdMonth.stream()
                 .map(att -> new MonthlyAttendanceDto(
                         att.getId(),
                         att.getLessonTitle(),
                         att.getDate() != null ? att.getDate().toLocalDate() : null,
-                        collect.getOrDefault(att.getId(), List.of())
+                        attendanceByAttId.getOrDefault(att.getId(), Collections.emptyMap())
                 )).toList();
     }
 }

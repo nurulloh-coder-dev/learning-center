@@ -61,8 +61,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
     @Query("""
              select s.id,
                     ast.status,
-                    u.imageUrl,
-                    u.fullName,
                     a.id
              from AttendanceStudent ast
              join ast.student s

@@ -1,10 +1,10 @@
 package org.example.crm.entity.dto.attendance;
 
-import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentDto;
+import org.example.crm.entity.enums.AttendanceStatus;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Map;
 
-public record MonthlyAttendanceDto(String id, String lessonTitle, LocalDate date, List<AttendanceStudentDto> attendanceStudentDtos) {
+public record MonthlyAttendanceDto(String id, String lessonTitle, LocalDate date, Map<String, AttendanceStatus> attendanceStudentMap) {
 
 }
