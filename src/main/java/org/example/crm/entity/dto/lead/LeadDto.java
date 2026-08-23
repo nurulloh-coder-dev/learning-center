@@ -13,8 +13,6 @@ public record LeadDto(
         LocalDateTime callAt,
         LeadStatus status,
         LeadSource source,
-        Level preferredCourse,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        Level preferredCourse
 ) {
 }

@@ -36,6 +36,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                 JOIN g.branch b
                 WHERE b.organizationId = :organizationId
                   AND (:status IS NULL OR g.status = :status)
+                  AND (:level IS NULL OR g.level.name= :level)
                   AND (
                        :search IS NULL
                        OR LOWER(g.name) LIKE :search
@@ -47,6 +48,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
     Page<GroupProjection> getAllByFilter(
             @Param("organizationId") String organizationId,
             @Param("status") GroupStatus status,
+            @Param("level") String level,
             @Param("search") String search,
             Pageable pageable
     );

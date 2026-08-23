@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.example.crm.entity.dto.group.FullGroupDto;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.enums.DayType;
+import org.example.crm.entity.model.Level;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.enums.GroupStatus;
@@ -61,7 +62,7 @@ public class GroupService extends AbstractService<
         return null;
     }
 
-    public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status) {
+    public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status, String level) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
 
         String searchPattern = (search != null && !search.isBlank())
@@ -71,6 +72,7 @@ public class GroupService extends AbstractService<
         Page<GroupProjection> groups = repository.getAllByFilter(
                 organizationId,
                 status,
+                level,
                 searchPattern,
                 pageable
         );
