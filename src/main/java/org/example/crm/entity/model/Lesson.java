@@ -16,7 +16,9 @@ import org.example.crm.entity.base.BaseEntity;
 public class Lesson extends BaseEntity {
 
 
-    private String lessonName;
+    private String title;
+
+    private String topic;
 
     private Boolean isCompleted = false;
 

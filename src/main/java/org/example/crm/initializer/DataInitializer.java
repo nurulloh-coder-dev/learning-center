@@ -157,28 +157,32 @@ public class DataInitializer{
 
         // ============ LESSONS ============
         Lesson lesson1 = new Lesson();
-        lesson1.setLessonName("Algebra Basics");
+        lesson1.setTopic("1.1");
+        lesson1.setTopic("Algebra Basics");
         lesson1.setIsCompleted(true);
         lesson1.setGroup(group1);
         lesson1.setTeacher(teacher1);
         lessonRepository.save(lesson1);
 
         Lesson lesson2 = new Lesson();
-        lesson2.setLessonName("Geometry Intro");
+        lesson2.setTitle("1.2");
+        lesson2.setTopic("Geometry Intro");
         lesson2.setIsCompleted(false);
         lesson2.setGroup(group1);
         lesson2.setTeacher(teacher1);
         lessonRepository.save(lesson2);
 
         Lesson lesson3 = new Lesson();
-        lesson3.setLessonName("Grammar Fundamentals");
+        lesson3.setTitle("1.3");
+        lesson3.setTopic("Grammar Fundamentals");
         lesson3.setIsCompleted(true);
         lesson3.setGroup(group2);
         lesson3.setTeacher(teacher2);
         lessonRepository.save(lesson3);
 
         Lesson lesson4 = new Lesson();
-        lesson4.setLessonName("Reading Comprehension");
+        lesson4.setTitle("1.4");
+        lesson4.setTopic("Reading Comprehension");
         lesson4.setIsCompleted(false);
         lesson4.setGroup(group2);
         lesson4.setTeacher(teacher2);

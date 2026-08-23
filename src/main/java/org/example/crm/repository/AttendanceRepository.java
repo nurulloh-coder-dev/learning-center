@@ -3,6 +3,7 @@ package org.example.crm.repository;
 import jakarta.transaction.Transactional;
 import org.example.crm.entity.model.Attendance;
 import org.example.crm.projection.AttendanceProjection;
+import org.example.crm.projection.AttendanceStudentProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -23,7 +24,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
             "attendanceStudents.student",
             "attendanceStudents.student.user"
     })
-    @Query("select a from Attendance a where a.deleted = false and (:search is null or a.lesson.lessonName ilike :search)")
+    @Query("select a from Attendance a where a.deleted = false and (:search is null or a.lesson.topic ilike :search)")
     Page<Attendance> findAll(Pageable pageable, @Param("search") String search);
 
     @Query("select exists (select t from Attendance t where t.id =:id)")
@@ -44,4 +45,30 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
                    where a_s.student.id=:studentId
             """)
     List<AttendanceProjection> getByStudentId(@Param("studentId") String studentId);
+
+    @Query("""
+            select a.id as id,
+                   a.createdAt as date,
+                   l.title as lessonTitle
+                   from Attendance a
+                   join a.lesson l
+                   join l.group g
+                   where g.id= :groupId and l.title like concat(cast((g.currentMonth-:minusMonths) as string) ,'.%')
+                   order by a.createdAt asc
+            """)
+    List<AttendanceProjection> findAllByGroupIdAndMonth(@Param("groupId") String groupId, @Param("minusMonths") Integer previousMonths);
+
+    @Query("""
+             select s.id,
+                    ast.status,
+                    u.imageUrl,
+                    u.fullName,
+                    a.id
+             from AttendanceStudent ast
+             join ast.student s
+             join s.user u
+             join ast.attendance a
+             where a.id in (:attIds)
+            """)
+    List<AttendanceStudentProjection> findAttendanceStudentsByAttId(@Param("attIds") List<String> id);
 }

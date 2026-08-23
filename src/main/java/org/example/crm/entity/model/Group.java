@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
 import org.example.crm.entity.enums.GroupStatus;
-import org.example.crm.exceptions.ErrorCodes;
-import org.example.crm.exceptions.ErrorType;
-import org.example.crm.exceptions.RestException;
 import org.example.crm.repository.GroupLevelRepository;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "groups")

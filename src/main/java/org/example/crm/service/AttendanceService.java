@@ -3,7 +3,9 @@ package org.example.crm.service;
 import org.example.crm.entity.dto.attendance.AttendanceCreateDto;
 import org.example.crm.entity.dto.attendance.AttendanceDto;
 import org.example.crm.entity.dto.attendance.AttendanceUpdateDto;
+import org.example.crm.entity.dto.attendance.MonthlyAttendanceDto;
 import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentCreateDto;
+import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentDto;
 import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentUpdateDto;
 import org.example.crm.entity.model.Attendance;
 import org.example.crm.entity.model.AttendanceStudent;
@@ -11,6 +13,7 @@ import org.example.crm.entity.model.Lesson;
 import org.example.crm.entity.model.Student;
 import org.example.crm.mapper.AttendanceMapper;
 import org.example.crm.projection.AttendanceProjection;
+import org.example.crm.projection.AttendanceStudentProjection;
 import org.example.crm.repository.AttendanceRepository;
 import org.example.crm.validator.AttendanceValidator;
 import org.example.crm.validator.LessonValidator;
@@ -77,7 +80,7 @@ public class AttendanceService extends AbstractService<
     @Override
     public AttendanceDto update(AttendanceUpdateDto updateDto, String id) {
         Attendance attendance = validator.validateIdAndGet(id);
-        updateStudentAttendances(attendance,updateDto.attendanceStudents());
+        updateStudentAttendances(attendance, updateDto.attendanceStudents());
         Attendance save = repository.save(attendance);
         return mapper.toDto(save);
     }
@@ -124,7 +127,34 @@ public class AttendanceService extends AbstractService<
         return null;
     }
 
-    public List<AttendanceDto> getByGroup(String groupId) {
-        return null;
+    public List<MonthlyAttendanceDto> getByGroup(String groupId, Integer previousMonths) {
+        List<AttendanceProjection> allByGroupIdThisMonth = repository.findAllByGroupIdAndMonth(groupId,previousMonths);
+        if (allByGroupIdThisMonth.isEmpty()) {
+            return List.of();
+        }
+        List<String> attIds = allByGroupIdThisMonth
+                .stream()
+                .map(AttendanceProjection::getId)
+                .toList();
+
+        List<AttendanceStudentProjection> attendanceStudentsByAttId = repository.findAttendanceStudentsByAttId(attIds);
+        Map<String, List<AttendanceStudentDto>> collect = attendanceStudentsByAttId
+                .stream()
+                .collect(
+                        Collectors.groupingBy(AttendanceStudentProjection::getAttendanceId,
+                                Collectors.mapping(p -> new AttendanceStudentDto(
+                                        p.getStudentId(),
+                                        p.getStudentFullName(),
+                                        p.getStudentImageUrl(),
+                                        p.getStatus()
+                                ), Collectors.toList())
+                        ));
+        return allByGroupIdThisMonth.stream()
+                .map(att -> new MonthlyAttendanceDto(
+                        att.getId(),
+                        att.getLessonTitle(),
+                        att.getDate() != null ? att.getDate().toLocalDate() : null,
+                        collect.getOrDefault(att.getId(), List.of())
+                )).toList();
     }
 }

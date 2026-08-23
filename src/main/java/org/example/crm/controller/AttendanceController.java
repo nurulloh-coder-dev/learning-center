@@ -1,9 +1,11 @@
 package org.example.crm.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.example.crm.entity.dto.attendance.AttendanceCreateDto;
 import org.example.crm.entity.dto.attendance.AttendanceDto;
 import org.example.crm.entity.dto.attendance.AttendanceUpdateDto;
+import org.example.crm.entity.dto.attendance.MonthlyAttendanceDto;
 import org.example.crm.service.AttendanceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,14 +49,16 @@ public class AttendanceController {
         return ResponseEntity.ok(attendance);
     }
 
-    @GetMapping("/group/{groupId}")
-    public ResponseEntity<List<AttendanceDto>> getByGroup(@PathVariable String groupId) {
-        List<AttendanceDto> byGroup = service.getByGroup(groupId);
+    @GetMapping("/monthly/{groupId}")
+    public ResponseEntity<List<MonthlyAttendanceDto>> getByGroup(
+            @PathVariable String groupId,
+            @RequestParam(defaultValue = "1") @Min(value = 1, message = "Previous months must be at least 1") Integer previousMonths) {
+        List<MonthlyAttendanceDto> byGroup = service.getByGroup(groupId, previousMonths);
         return ResponseEntity.ok(byGroup);
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Integer> getCount(){
+    public ResponseEntity<Integer> getCount() {
         Integer count = service.getCount();
         return ResponseEntity.ok(count);
     }
