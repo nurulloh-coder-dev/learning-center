@@ -2,6 +2,7 @@ package org.example.crm.repository;
 
 import jakarta.transaction.Transactional;
 import org.example.crm.entity.model.Branch;
+import org.example.crm.projection.AnalyticBranchProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -34,4 +35,13 @@ public interface BranchRepository extends JpaRepository<Branch, String> {
 
     @Query("select exists (select b.id from Branch b where b.id=:id)")
     Optional<Boolean> checkId(@Param("id") String id);
+
+    @Query("""
+        select distinct count(b.id)
+        from Branch b
+        where b.organizationId = :organizationId
+        and b.deleted = false
+        
+""")
+    AnalyticBranchProjection getAnalyticBranch(String organizationId);
 }
