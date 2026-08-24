@@ -1,6 +1,7 @@
 package org.example.crm.repository;
 
 import org.example.crm.entity.model.Student;
+import org.example.crm.projection.AnalyticStudentProjection;
 import org.example.crm.projection.StudentProjection;
 import org.example.crm.projection.StudentShowProjection;
 import org.springframework.data.domain.Page;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,14 +27,12 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     Long countStudentsByDeleted(Boolean deleted);
 
     @Query("""
-        select s
+        select distinct s
         from Student s
         join Enrollment e on s.id = e.student.id
         join Group g on e.group.id = g.id and g.status = 'ONGOING'
-        join Lesson l on l.group.id = g.id and l.isCompleted = true
-         where s.deleted = false
-        group by s
-        having mod(count(l.id), 12) = 0
+         where s.deleted = false and
+         s.balance < 0
 """)
     List<Student> findAllStudentsForInvoice();
 
@@ -73,4 +73,18 @@ public interface StudentRepository extends JpaRepository<Student, String> {
         and s.deleted = false
 """)
     Long countStudentsByGroupId(String groupId);
+
+    @Query("""
+    select
+        count(e.id) as studentCount,
+        count(
+            case
+                when e.createdAt >= :monthAgo then 1
+            end
+        ) as studentsAddedInMonth
+    from Student e
+    where e.organizationId = :organizationId
+      and e.deleted = false
+""")
+    AnalyticStudentProjection getAnalyticStudent(String organizationId, LocalDateTime monthAgo);
 }

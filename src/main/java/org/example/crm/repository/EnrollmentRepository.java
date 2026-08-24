@@ -2,6 +2,7 @@ package org.example.crm.repository;
 
 import jakarta.transaction.Transactional;
 import org.example.crm.entity.model.Enrollment;
+import org.example.crm.projection.AnalyticEnrollmentProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface EnrollmentRepository extends JpaRepository<Enrollment,String> {
@@ -26,4 +28,21 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment,String> {
     @Query("select e from Enrollment e where e.student.user.fullName ilike concat('%',:fullName,'%')")
     Page<Enrollment> findAllBySearch(@Param("fullName") String search, Pageable pageable);
 
+
+    @Query("""
+    select
+        count(e.id) as EnrollmentCount,
+        count(
+            case
+                when e.createdAt >= :monthAgo then 1
+            end
+        ) as EnrollmentCountInAMonth
+    from Enrollment e
+    where e.organizationId = :organizationId
+      and e.deleted = false
+""")
+    AnalyticEnrollmentProjection getAnalyticEnrollment(
+            String organizationId,
+            LocalDateTime monthAgo
+    );
 }

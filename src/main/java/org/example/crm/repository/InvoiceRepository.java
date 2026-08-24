@@ -2,6 +2,7 @@ package org.example.crm.repository;
 
 import org.example.crm.entity.enums.InvoiceStatus;
 import org.example.crm.entity.model.Invoice;
+import org.example.crm.projection.AnalyticInvoiceProjection;
 import org.example.crm.projection.InvoiceProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -68,4 +69,24 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
           and i.issuedAt <= :now
 """)
     long findInvoicesByPaymentStatusAnd2DaysOld(InvoiceStatus oldStatus,InvoiceStatus newStatus, LocalDate now);
+
+
+    @Query("""
+        select
+           coalesce(sum(i.amount), 0) as invoiceAmount,
+                   coalesce(
+                       sum(
+                           case
+                               when i.createdAt >= :monthAgo then i.amount
+                               else 0
+                           end
+                       ),
+                       0
+           ) as invoiceAmountInMonth
+           from Invoice i
+           where i.organizationId = :organizationId
+           and i.deleted = false
+           and i.paymentStatus = 'PAID'
+""")
+    AnalyticInvoiceProjection getAnalyticInvoice(String organizationId, LocalDateTime monthAgo);
 }

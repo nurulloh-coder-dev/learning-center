@@ -1,12 +1,14 @@
 package org.example.crm.repository;
 
 import org.example.crm.entity.model.Teacher;
+import org.example.crm.projection.AnalyticTeacherProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface TeacherRepository extends JpaRepository<Teacher, String> {
@@ -36,4 +38,18 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
 
     @Query("SELECT t from Teacher t where (:search is null or t.user.fullName ilike :search) and t.organizationId= :orgId")
     Page<Teacher> findAllBySearch(@Param("orgId") String organizationId, @Param("search") String search, Pageable pageable);
+
+    @Query("""
+    select
+        count(e.id) as teacherCount,
+        count(
+            case
+                when e.createdAt >= :monthAgo then 1
+            end
+        ) as teachersAddedInMonth
+    from Teacher e
+    where e.organizationId = :organizationId
+      and e.deleted = false
+""")
+    AnalyticTeacherProjection getAnalyticTeacher(String organizationId, LocalDateTime monthAgo);
 }
