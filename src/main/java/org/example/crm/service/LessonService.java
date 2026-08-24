@@ -13,6 +13,7 @@ import org.example.crm.mapper.LessonMapper;
 import org.example.crm.repository.GroupLevelRepository;
 import org.example.crm.repository.GroupRepository;
 import org.example.crm.repository.TeacherRepository;
+import org.example.crm.validator.GroupValidator;
 import org.example.crm.validator.LessonValidator;
 import org.example.crm.repository.LessonRepository;
 import org.example.crm.validator.UserValidator;
@@ -29,14 +30,16 @@ public class LessonService extends AbstractService<
     private final GroupRepository groupRepository;
     private final UserValidator userValidator;
     final GroupLevelRepository groupLevelRepository;
+    private final GroupValidator groupValidator;
 
 
-    protected LessonService(LessonRepository repository, LessonMapper mapper, LessonValidator validator, TeacherRepository teacherRepository, GroupRepository groupRepository, UserValidator userValidator, GroupLevelRepository groupLevelRepository) {
+    protected LessonService(LessonRepository repository, LessonMapper mapper, LessonValidator validator, TeacherRepository teacherRepository, GroupRepository groupRepository, UserValidator userValidator, GroupLevelRepository groupLevelRepository, GroupValidator groupValidator) {
         super(repository, mapper, validator);
         this.teacherRepository = teacherRepository;
         this.groupRepository = groupRepository;
         this.userValidator = userValidator;
         this.groupLevelRepository = groupLevelRepository;
+        this.groupValidator = groupValidator;
     }
 
     @Override
@@ -55,26 +58,26 @@ public class LessonService extends AbstractService<
     @Transactional
     public LessonDto create(LessonCreateDto createDto) {
         validator.validate(createDto);
-        Lesson entity = toEntity(createDto);
+        Group group = groupValidator.validateIdAndGet(createDto.groupId());
+        Integer lessonsInCurrMonth = repository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0) + 1;
+        group.registerCompletedLesson(lessonsInCurrMonth, groupLevelRepository);
+        Lesson entity = toEntity(createDto,String.format("%s.%s",group.getCurrentMonth(),lessonsInCurrMonth),group);
         Lesson save = repository.save(entity);
-        Group group = save.getGroup();
-        Integer lessonsInCurrMonth = repository.findLessonCountByGroupId(group.getId(),group.getLevel().getName()).orElse(0);
-        group.registerCompletedLesson(lessonsInCurrMonth,groupLevelRepository);
         groupRepository.save(group);
         return mapper.toDto(save);
     }
 
-    private Lesson toEntity(LessonCreateDto createDto) {
-        Group group = groupRepository.findById(createDto.groupId())
-                .orElseThrow(() -> new RestException(ErrorType.GROUP_NOT_FOUND, ErrorCodes.NotFound));
+    private Lesson toEntity(LessonCreateDto createDto, String title,Group group) {
         return new Lesson(
-                createDto.lessonName(),
+                title,
+                createDto.topic(),
                 false,
                 group,
-                teacherRepository.findTeacherByUser_Id(userValidator.authenticateAndGetId()),
+                group.getTeacher(),
                 group.getLevel()
         );
     }
+
 
     @Override
     public LessonDto update(LessonUpdateDto updateDto, String id) {

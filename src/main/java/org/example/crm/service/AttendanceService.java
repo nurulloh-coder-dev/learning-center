@@ -3,14 +3,17 @@ package org.example.crm.service;
 import org.example.crm.entity.dto.attendance.AttendanceCreateDto;
 import org.example.crm.entity.dto.attendance.AttendanceDto;
 import org.example.crm.entity.dto.attendance.AttendanceUpdateDto;
+import org.example.crm.entity.dto.attendance.MonthlyAttendanceDto;
 import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentCreateDto;
 import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentUpdateDto;
+import org.example.crm.entity.enums.AttendanceStatus;
 import org.example.crm.entity.model.Attendance;
 import org.example.crm.entity.model.AttendanceStudent;
 import org.example.crm.entity.model.Lesson;
 import org.example.crm.entity.model.Student;
 import org.example.crm.mapper.AttendanceMapper;
 import org.example.crm.projection.AttendanceProjection;
+import org.example.crm.projection.AttendanceStudentProjection;
 import org.example.crm.repository.AttendanceRepository;
 import org.example.crm.validator.AttendanceValidator;
 import org.example.crm.validator.LessonValidator;
@@ -20,9 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,7 +78,7 @@ public class AttendanceService extends AbstractService<
     @Override
     public AttendanceDto update(AttendanceUpdateDto updateDto, String id) {
         Attendance attendance = validator.validateIdAndGet(id);
-        updateStudentAttendances(attendance,updateDto.attendanceStudents());
+        updateStudentAttendances(attendance, updateDto.attendanceStudents());
         Attendance save = repository.save(attendance);
         return mapper.toDto(save);
     }
@@ -124,7 +125,33 @@ public class AttendanceService extends AbstractService<
         return null;
     }
 
-    public List<AttendanceDto> getByGroup(String groupId) {
-        return null;
+    public List<MonthlyAttendanceDto> getByGroup(String groupId, Integer previousMonths) {
+        List<AttendanceProjection> allByGroupIdMonth = repository.findAllByGroupIdAndMonth(groupId, previousMonths);
+        if (allByGroupIdMonth.isEmpty()) {
+            return List.of();
+        }
+        List<String> attIds = allByGroupIdMonth
+                .stream()
+                .map(AttendanceProjection::getId)
+                .toList();
+
+        List<AttendanceStudentProjection> studentAttendances = repository.findAttendanceStudentsByAttId(attIds);
+        Map<String, Map<String, AttendanceStatus>> attendanceByAttId = studentAttendances.stream()
+                .collect(
+                        Collectors.groupingBy(AttendanceStudentProjection::getAttendanceId,
+                                HashMap::new,
+                                Collectors.toMap(
+                                        AttendanceStudentProjection::getStudentId,
+                                        AttendanceStudentProjection::getStatus,
+                                        (existingStatus, newStatus) -> newStatus)
+                        )
+                );
+        return allByGroupIdMonth.stream()
+                .map(att -> new MonthlyAttendanceDto(
+                        att.getId(),
+                        att.getLessonTitle(),
+                        att.getDate() != null ? att.getDate().toLocalDate() : null,
+                        attendanceByAttId.getOrDefault(att.getId(), Collections.emptyMap())
+                )).toList();
     }
 }

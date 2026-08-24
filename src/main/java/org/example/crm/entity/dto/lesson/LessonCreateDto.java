@@ -4,5 +4,5 @@ import jakarta.annotation.Nonnull;
 
 public record LessonCreateDto(
         @Nonnull String groupId,
-        String lessonName) {
+        String topic) {
 }

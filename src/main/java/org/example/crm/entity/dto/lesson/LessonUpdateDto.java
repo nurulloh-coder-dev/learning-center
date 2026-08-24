@@ -1,4 +1,4 @@
 package org.example.crm.entity.dto.lesson;
 
-public record LessonUpdateDto(String lessonName) {
+public record LessonUpdateDto(String topic) {
 }
