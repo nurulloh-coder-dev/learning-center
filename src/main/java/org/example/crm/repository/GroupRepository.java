@@ -31,7 +31,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                     g.currentMonth AS currentMonth,
                     COUNT(l.id) AS lessonsCount
                 FROM Group g
-                LEFT JOIN Lesson l ON l.group = g and l.level=:level
+                LEFT JOIN Lesson l ON l.group = g and l.level.name=:level
                 JOIN g.level lev
                 JOIN g.branch b
                 WHERE b.organizationId = :organizationId

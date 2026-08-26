@@ -7,6 +7,7 @@ import org.example.crm.entity.dto.group.GroupCreateDto;
 import org.example.crm.entity.dto.group.GroupDto;
 import org.example.crm.entity.dto.group.GroupUpdateDto;
 import org.example.crm.entity.enums.GroupStatus;
+import org.example.crm.entity.model.Level;
 import org.example.crm.projection.GroupNameProjection;
 import org.example.crm.service.GroupService;
 import org.springframework.data.domain.Page;
@@ -26,10 +27,11 @@ public class GroupController {
     @GetMapping
     public ResponseEntity<Page<GroupDto>> getAllGroups(@RequestParam(required = false) String search,
                                                        @RequestParam(defaultValue = "0") int page,
-                                                       @RequestParam(defaultValue  = "20") int size,
-                                                       @RequestParam(required = false) GroupStatus status) {
+                                                       @RequestParam(defaultValue = "20") int size,
+                                                       @RequestParam(required = false) GroupStatus status,
+                                                       @RequestParam(required = false) String level) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(service.getAll(pageable, search, status));
+        return ResponseEntity.ok(service.getAll(pageable, search, status, level));
     }
 
     @GetMapping("/{id}")

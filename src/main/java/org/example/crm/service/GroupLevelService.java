@@ -11,6 +11,7 @@ import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.GroupLevelMapper;
 import org.example.crm.repository.GroupLevelRepository;
 import org.example.crm.validator.GroupLevelValidator;
+import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,15 @@ public class GroupLevelService extends AbstractService<
         GroupLevelValidator> implements CrudService<GroupLevelCreateDto, GroupLevelUpdateDto, GroupLevelDto, String> {
 
 
-    protected GroupLevelService(GroupLevelRepository repository, GroupLevelMapper mapper, GroupLevelValidator validator) {
+    private final UserValidator userValidator;
+
+    protected GroupLevelService(GroupLevelRepository repository, GroupLevelMapper mapper, GroupLevelValidator validator, UserValidator userValidator) {
         super(repository, mapper, validator);
+        this.userValidator = userValidator;
     }
 
-    public List<GroupLevelDto> getGroupLevels(String organizationId, String search) {
+    public List<GroupLevelDto> getGroupLevels(String search) {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
         List<Level> level = repository.findAllLevelsByOrganizationIdAndSearch(organizationId,search);
         return mapper.toListDto(level);
     }
@@ -40,7 +45,11 @@ public class GroupLevelService extends AbstractService<
 
     @Override
     public GroupLevelDto get(String id) {
-        return null;
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        validator.validateAndGet(id);
+        Level level = repository.findLevelByIdAndOrganizationId(id, organizationId)
+                .orElseThrow(()-> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound));
+        return mapper.toDto(level);
     }
 
     @Override
@@ -62,13 +71,6 @@ public class GroupLevelService extends AbstractService<
         Level level = validator.validateAndGet(id);
         repository.updateLevelDeleted(level.getId());
     }
-
-    public GroupLevelDto get(String id, String organizationId) {
-        Level level = repository.findLevelByIdAndOrganizationId(id, organizationId)
-                .orElseThrow(()-> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound));
-        return mapper.toDto(level);
-    }
-
     @Transactional
     public List<GroupLevelDto> update(List<GroupLevelUpdateDto> levels) {
         List<Level> updatedLevels = levels.stream().map(levelUpdateDto -> {

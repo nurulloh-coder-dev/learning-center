@@ -22,15 +22,13 @@ public class GroupLevelController {
 
 
     @GetMapping
-    public ResponseEntity<List<GroupLevelDto>> getGroupLevels(@RequestParam(required = false) String organizationId,
-                                                              @RequestParam(required = false) String search) {
-        return ResponseEntity.ok(service.getGroupLevels(organizationId,search));
+    public ResponseEntity<List<GroupLevelDto>> getGroupLevels(@RequestParam(required = false) String search) {
+        return ResponseEntity.ok(service.getGroupLevels(search));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GroupLevelDto> getById(@PathVariable String id,
-                                                 @RequestParam String organizationId) {
-        GroupLevelDto lesson = service.get(id,organizationId);
+    public ResponseEntity<GroupLevelDto> getById(@PathVariable String id) {
+        GroupLevelDto lesson = service.get(id);
         return ResponseEntity.ok(lesson);
     }
 
