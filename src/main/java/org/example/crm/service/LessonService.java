@@ -94,8 +94,9 @@ public class LessonService extends AbstractService<
         repository.save(lesson);
     }
 
-    public Long getAllCount(String groupId) {
-        return repository.countLessonsByGroupIdAndDeleted(groupId);
+    public Long getAllCount() {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        return repository.countLessonsByOrgIdAndDeleted(organizationId);
     }
 
 

@@ -69,8 +69,9 @@ public class StudentService extends AbstractService<
         repository.save(student);
     }
 
-    public Long getAllCount(String groupId) {
-        return repository.countStudentsByGroupId(groupId);
+    public Long getAllCount() {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        return repository.countStudentsByOrganizationId(organizationId);
     }
 
     public List<StudentDto> getStudentsByGroupId(String groupId) {

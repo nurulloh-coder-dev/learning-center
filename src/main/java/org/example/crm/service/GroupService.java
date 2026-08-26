@@ -126,7 +126,8 @@ public class GroupService extends AbstractService<
 
     }
 
-    public Integer getCount(String organizationId) {
+    public Integer getCount() {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
         Optional<Integer> count = repository.getCount(organizationId);
         return count.orElse(0);
     }

@@ -34,8 +34,8 @@ public class StudentController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Map<String, Long>> count(@RequestParam String groupId) {
-        return ResponseEntity.ok(Map.of("count", studentService.getAllCount(groupId)));
+    public ResponseEntity<Map<String, Long>> count() {
+        return ResponseEntity.ok(Map.of("count", studentService.getAllCount()));
     }
 
     @GetMapping("/{id}")

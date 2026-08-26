@@ -33,8 +33,8 @@ public class LessonController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Map<String,Long>> count(@RequestParam String groupId) {
-        Long count = lessonService.getAllCount(groupId);
+    public ResponseEntity<Map<String,Long>> count() {
+        Long count = lessonService.getAllCount();
         return ResponseEntity.ok(Map.of("count",count));
     }
 

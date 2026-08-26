@@ -68,7 +68,8 @@ public class TeacherService extends AbstractService<
         repository.save(teacher);
     }
 
-    public Long getAllCount(String organizationId) {
+    public Long getAllCount() {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
         return repository.countTeachersByDeletedAndOrg(organizationId);
     }
 

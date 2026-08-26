@@ -40,8 +40,8 @@ public class GroupController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Integer> getCount(@RequestParam String organizationId) {
-        Integer count = service.getCount(organizationId);
+    public ResponseEntity<Integer> getCount() {
+        Integer count = service.getCount();
         return ResponseEntity.ok(count);
     }
 

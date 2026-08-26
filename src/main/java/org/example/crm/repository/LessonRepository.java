@@ -25,6 +25,7 @@ public interface LessonRepository extends JpaRepository<Lesson,String> {
     Optional<Integer> findLessonCountByGroupId(@Param("groupId") String id, @Param("name") String name);
 
 
-    @Query("SELECT COUNT(l.id) from Lesson l where l.group.id =:groupId and l.deleted = false")
-    Long countLessonsByGroupIdAndDeleted(@Param("groupId") String groupId);
+    @Query("SELECT COUNT(l.id) from Lesson l where l.organizationId =:orgId and l.deleted = false")
+    Long countLessonsByOrgIdAndDeleted(@Param("orgId") String organizationId);
+
 }
