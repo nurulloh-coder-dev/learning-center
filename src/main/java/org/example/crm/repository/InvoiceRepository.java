@@ -32,7 +32,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
             tu.role as teacherRole,
             i.amount as amount,
             i.issuedAt as issuedAt,
-            i.paymentStatus as status
+            i.paymentStatus as status,
+            i.type as type
         from Invoice i
         join i.student s
         join s.user su
@@ -58,9 +59,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
             @Param("status") InvoiceStatus status,
             Pageable pageable
     );
-    boolean existsByInvoiceNumber(String invoiceNumber);
-
-    List<Invoice> findInvoicesByPaymentStatus(InvoiceStatus paymentStatus);
 
     @Query("""
         update Invoice i

@@ -43,7 +43,8 @@ public class InvoiceMapper {
                 studentMapper.toDto(invoice.getStudent()),
                 invoice.getAmount(),
                 invoice.getIssuedAt(),
-                invoice.getPaymentStatus()
+                invoice.getPaymentStatus(),
+                invoice.getType()
         );
     }
 
@@ -65,7 +66,8 @@ public class InvoiceMapper {
                 ),
                 projection.getAmount(),
                 projection.getIssuedAt(),
-                projection.getStatus()
+                projection.getStatus(),
+                projection.getType()
         );
     }
 

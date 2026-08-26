@@ -21,4 +21,5 @@ public interface  InvoiceProjection {
     BigDecimal getAmount();
     LocalDateTime getIssuedAt();
     InvoiceStatus getStatus();
+    InvoiceType getType();
 }
