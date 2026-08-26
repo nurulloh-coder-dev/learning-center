@@ -1,6 +1,7 @@
 package org.example.crm.repository;
 
 import org.example.crm.entity.model.Level;
+import org.example.crm.projection.LevelNamesProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -88,4 +89,11 @@ public interface GroupLevelRepository extends JpaRepository<Level, String> {
     Optional<Level> getFirstLevelForGroup(
             @Param("organizationId") String organizationId
     );
+
+    @Query("""
+           select l.id as id,
+                  l.name as name from Level l
+                  where l.deleted = false and l.organizationId= :orgId
+                  order by l.orderNumber desc""")
+    List<LevelNamesProjection> getLevelNames(String organizationId);
 }

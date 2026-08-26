@@ -30,6 +30,9 @@ public class Lead extends BaseEntity {
     private LeadSource source;
     private LocalDateTime callAt;
 
+    @ManyToOne
+    private Level preferredCourse;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "rejection_reason", length = 50)
     private RejectionReason rejectionReason;

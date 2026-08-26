@@ -13,12 +13,14 @@ import org.example.crm.entity.dto.user.UserCreateDto;
 import org.example.crm.entity.enums.LeadStatus;
 import org.example.crm.entity.enums.Role;
 import org.example.crm.entity.model.Lead;
+import org.example.crm.entity.model.Level;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.LeadMapper;
 import org.example.crm.projection.LeadProjection;
 import org.example.crm.repository.LeadRepository;
+import org.example.crm.validator.GroupLevelValidator;
 import org.example.crm.validator.GroupValidator;
 import org.example.crm.validator.LeadValidator;
 import org.example.crm.validator.UserValidator;
@@ -38,13 +40,15 @@ public class LeadService extends AbstractService<
     private final EnrollmentService enrollmentService;
     private final StudentService studentService;
     private final GroupValidator groupValidator;
+    private final GroupLevelValidator groupLevelValidator;
 
-    protected LeadService(LeadRepository repository, LeadMapper mapper, LeadValidator validator, UserValidator userValidator, EnrollmentService enrollmentService, StudentService studentService, GroupValidator groupValidator) {
+    protected LeadService(LeadRepository repository, LeadMapper mapper, LeadValidator validator, UserValidator userValidator, EnrollmentService enrollmentService, StudentService studentService, GroupValidator groupValidator, GroupLevelValidator groupLevelValidator) {
         super(repository, mapper, validator);
         this.userValidator = userValidator;
         this.enrollmentService = enrollmentService;
         this.studentService = studentService;
         this.groupValidator = groupValidator;
+        this.groupLevelValidator = groupLevelValidator;
     }
 
     @Override
@@ -73,6 +77,8 @@ public class LeadService extends AbstractService<
     public LeadDto create(LeadCreateDto createDto) {
         validator.validate(createDto);
         Lead entity = mapper.toEntity(createDto);
+        Level level = groupLevelValidator.validateAndGet(createDto.preferredCourseId());
+        entity.setPreferredCourse(level);
         return mapper.toDto(repository.save(entity));
     }
 
@@ -81,6 +87,8 @@ public class LeadService extends AbstractService<
         validator.validate(updateDto);
         Lead lead = validator.validateIdAndGet(id);
         mapper.mapUpdate(lead, updateDto);
+        Level level = groupLevelValidator.validateAndGet(updateDto.preferredCourseId());
+        lead.setPreferredCourse(level);
         Lead save = repository.save(lead);
         return mapper.toDto(save);
     }

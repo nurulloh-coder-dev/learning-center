@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.crm.entity.dto.groupLevel.GroupLevelCreateDto;
 import org.example.crm.entity.dto.groupLevel.GroupLevelDto;
+import org.example.crm.entity.dto.groupLevel.GroupLevelNameDto;
 import org.example.crm.entity.request.GroupLevelList;
 import org.example.crm.service.GroupLevelService;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,11 @@ public class GroupLevelController {
     @GetMapping
     public ResponseEntity<List<GroupLevelDto>> getGroupLevels(@RequestParam(required = false) String search) {
         return ResponseEntity.ok(service.getGroupLevels(search));
+    }
+
+    @GetMapping("/names")
+    public ResponseEntity<List<GroupLevelNameDto>> getGroupLevelsName() {
+        return ResponseEntity.ok(service.getGroupLevelsName());
     }
 
     @GetMapping("/{id}")

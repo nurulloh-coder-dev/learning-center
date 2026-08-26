@@ -14,5 +14,5 @@ public record LeadCreateDto(
         String phone,
 
         LeadSource source,
-        Level preferredCourse
+        String preferredCourseId
 ) {}

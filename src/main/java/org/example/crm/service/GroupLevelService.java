@@ -3,12 +3,14 @@ package org.example.crm.service;
 import jakarta.transaction.Transactional;
 import org.example.crm.entity.dto.groupLevel.GroupLevelCreateDto;
 import org.example.crm.entity.dto.groupLevel.GroupLevelDto;
+import org.example.crm.entity.dto.groupLevel.GroupLevelNameDto;
 import org.example.crm.entity.dto.groupLevel.GroupLevelUpdateDto;
 import org.example.crm.entity.model.Level;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.GroupLevelMapper;
+import org.example.crm.projection.LevelNamesProjection;
 import org.example.crm.repository.GroupLevelRepository;
 import org.example.crm.validator.GroupLevelValidator;
 import org.example.crm.validator.UserValidator;
@@ -83,4 +85,11 @@ public class GroupLevelService extends AbstractService<
     }
 
 
+    public List<GroupLevelNameDto> getGroupLevelsName() {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        List<LevelNamesProjection> levelNames = repository.getLevelNames(organizationId);
+        return levelNames.stream()
+                .map(l->new GroupLevelNameDto(l.getId(),l.getName()))
+                .toList();
+    }
 }

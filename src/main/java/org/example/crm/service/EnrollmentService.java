@@ -12,6 +12,7 @@ import org.example.crm.repository.StudentRepository;
 import org.example.crm.validator.EnrollmentValidator;
 import org.example.crm.validator.GroupValidator;
 import org.example.crm.validator.StudentValidator;
+import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,22 +26,25 @@ public class EnrollmentService extends AbstractService<
     private final StudentValidator studentValidator;
     private final GroupValidator groupValidator;
     private final StudentRepository studentRepository;
+    private final UserValidator userValidator;
 
-    protected EnrollmentService(EnrollmentRepository repository, EnrollmentMapper mapper, EnrollmentValidator validator, StudentValidator studentValidator, GroupValidator groupValidator, StudentRepository studentRepository) {
+    protected EnrollmentService(EnrollmentRepository repository, EnrollmentMapper mapper, EnrollmentValidator validator, StudentValidator studentValidator, GroupValidator groupValidator, StudentRepository studentRepository, UserValidator userValidator) {
         super(repository, mapper, validator);
         this.studentValidator = studentValidator;
         this.groupValidator = groupValidator;
         this.studentRepository = studentRepository;
+        this.userValidator = userValidator;
     }
 
     @Override
     public Page<EnrollmentDto> getAll(Pageable pageable, String search) {
-        Page<Enrollment> allBySearch = repository.findAllBySearch(search, pageable);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Page<Enrollment> allBySearch = repository.findAllBySearch(organizationId, search, pageable);
         return allBySearch.map(mapper::toDto);
     }
 
     public Page<EnrollmentDto> getAll(Pageable pageable, String search, String groupId) {
-        Page<Enrollment> allBySearch = repository.findAllBySearch(search, groupId, pageable);
+        Page<Enrollment> allBySearch = repository.findAllBySearch(groupId, pageable, search);
         return allBySearch.map(mapper::toDto);
     }
 

@@ -14,7 +14,7 @@ public record LeadUpdateDto(
         LeadStatus status,
 
         LeadSource source,
-        String preferredCourseName,
+        String preferredCourseId,
         LocalDateTime callAt
 ) {
 }

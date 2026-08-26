@@ -24,10 +24,13 @@ public interface LeadMapper {
 
     @IgnoreAuditFields
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "preferredCourse", ignore = true)
     Lead toEntity(LeadCreateDto createDto);
 
+    @Mapping(target = "preferredCourse", source = "preferredCourse.name")
     LeadDto toDto(Lead lead);
 
     @IgnoreAuditFields
+    @Mapping(target = "preferredCourse", ignore = true)
     void mapUpdate(@MappingTarget Lead lead, LeadUpdateDto updateDto);
 }
