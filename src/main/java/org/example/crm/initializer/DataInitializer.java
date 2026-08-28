@@ -16,8 +16,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Component
-@RequiredArgsConstructor ////implements CommandLineRunner
-public class DataInitializer implements CommandLineRunner{
+@RequiredArgsConstructor
+////implements CommandLineRunner
+public class DataInitializer {
 
     final UserRepository userRepository;
     final TeacherRepository teacherRepository;
@@ -31,7 +32,7 @@ public class DataInitializer implements CommandLineRunner{
     final EntityManager entityManager;
 //
 
-    @Override
+//    @Override
     @Transactional
     public void run(String... args) {
 //        if (userRepository.count() > 0) return;
@@ -97,7 +98,7 @@ public class DataInitializer implements CommandLineRunner{
 
         // ============ TEACHERS ============
         Teacher teacher1 = new Teacher();
-            teacher1.setUser(teacherUser1);
+        teacher1.setUser(teacherUser1);
         teacherRepository.save(teacher1);
 
         Teacher teacher2 = new Teacher();

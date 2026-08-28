@@ -33,13 +33,12 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                             COUNT(l.id) AS lessonsCount
                         FROM Group g
                         JOIN g.level lev
-                        JOIN g.branch b
                         LEFT JOIN Lesson l ON l.group = g
                              AND (:level IS NULL OR l.level.name = :level)
                         LEFT JOIN g.teacher t
                         LEFT JOIN t.user tu
                         LEFT JOIN g.timeTable tt
-                        WHERE b.organizationId = :organizationId
+                        WHERE g.organizationId = :organizationId
                           AND (:status IS NULL OR g.status = :status)
                           AND (:level IS NULL OR lev.name = :level)
                           AND (
@@ -49,24 +48,24 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                                OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(CAST(:search AS string)))
                           )
                         GROUP BY g.id, g.name, g.room, g.status, lev.id, g.currentMonth, t.id, tt.id
-                    """,
-            countQuery = """
-                        SELECT COUNT(DISTINCT g.id)
-                        FROM Group g
-                        JOIN g.level lev
-                        JOIN g.branch b
-                        LEFT JOIN g.teacher t
-                        LEFT JOIN t.user tu
-                        WHERE b.organizationId = :organizationId
-                          AND (:status IS NULL OR g.status = :status)
-                          AND (:level IS NULL OR lev.name = :level)
-                          AND (
-                               CAST(:search AS string) IS NULL
-                               OR LOWER(g.name) LIKE LOWER(CAST(:search AS string))
-                               OR LOWER(g.room) LIKE LOWER(CAST(:search AS string))
-                               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(CAST(:search AS string)))
-                          )
                     """
+//            countQuery = """
+//                        SELECT COUNT(DISTINCT g.id)
+//                        FROM Group g
+//                        JOIN g.level lev
+//                        JOIN g.branch b
+//                        LEFT JOIN g.teacher t
+//                        LEFT JOIN t.user tu
+//                        WHERE g.organizationId = :organizationId
+//                          AND (:status IS NULL OR g.status = :status)
+//                          AND (:level IS NULL OR lev.name = :level)
+//                          AND (
+//                               CAST(:search AS string) IS NULL
+//                               OR LOWER(g.name) LIKE LOWER(CAST(:search AS string))
+//                               OR LOWER(g.room) LIKE LOWER(CAST(:search AS string))
+//                               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(CAST(:search AS string)))
+//                          )
+//                    """
     )
     Page<GroupProjection> getAllByFilter(
             @Param("organizationId") String organizationId,
