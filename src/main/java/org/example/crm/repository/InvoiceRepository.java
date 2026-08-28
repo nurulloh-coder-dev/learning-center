@@ -21,6 +21,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
         select
             i.id as id,
             i.invoiceNumber as invoiceNumber,
+            tu.branch.id as branchId,
             s.id as studentId,
             su.imageUrl as studentImageUrl,
             su.id as studentUserId,

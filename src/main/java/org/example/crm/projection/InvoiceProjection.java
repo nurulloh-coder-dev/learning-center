@@ -11,6 +11,7 @@ public interface  InvoiceProjection {
     String getId();
     String getInvoiceNumber();
     String getStudentId();
+    String getBranchId();
     String getStudentImageUrl();
     String getStudentUserId();
     String getStudentFullName();
