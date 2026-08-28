@@ -34,7 +34,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                         FROM Group g
                         JOIN g.level lev
                         JOIN g.branch b
-                        LEFT JOIN Lesson l ON l.group = g 
+                        LEFT JOIN Lesson l ON l.group = g
                              AND (:level IS NULL OR l.level.name = :level)
                         LEFT JOIN g.teacher t
                         LEFT JOIN t.user tu
@@ -43,10 +43,10 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                           AND (:status IS NULL OR g.status = :status)
                           AND (:level IS NULL OR lev.name = :level)
                           AND (
-                               CAST(:search AS text) IS NULL
-                               OR LOWER(g.name) LIKE LOWER(CAST(:search AS text))
-                               OR LOWER(g.room) LIKE LOWER(CAST(:search AS text))
-                               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(CAST(:search AS text)))
+                               CAST(:search AS string) IS NULL
+                               OR LOWER(g.name) LIKE LOWER(CAST(:search AS string))
+                               OR LOWER(g.room) LIKE LOWER(CAST(:search AS string))
+                               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(CAST(:search AS string)))
                           )
                         GROUP BY g.id, g.name, g.room, g.status, lev.id, g.currentMonth, t.id, tt.id
                     """,
@@ -61,10 +61,10 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                           AND (:status IS NULL OR g.status = :status)
                           AND (:level IS NULL OR lev.name = :level)
                           AND (
-                               CAST(:search AS text) IS NULL
-                               OR LOWER(g.name) LIKE LOWER(CAST(:search AS text))
-                               OR LOWER(g.room) LIKE LOWER(CAST(:search AS text))
-                               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(CAST(:search AS text)))
+                               CAST(:search AS string) IS NULL
+                               OR LOWER(g.name) LIKE LOWER(CAST(:search AS string))
+                               OR LOWER(g.room) LIKE LOWER(CAST(:search AS string))
+                               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(CAST(:search AS string)))
                           )
                     """
     )
