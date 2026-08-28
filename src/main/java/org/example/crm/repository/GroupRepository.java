@@ -21,52 +21,52 @@ public interface GroupRepository extends JpaRepository<Group, String> {
 
     @Query(
             value = """
-        SELECT
-            g.id AS id,
-            g.name AS name,
-            g.room AS room,
-            g.teacher AS teacher,
-            g.timeTable AS timeTable,
-            g.status AS status,
-            lev.id AS levelId,
-            g.currentMonth AS currentMonth,
-            COUNT(l.id) AS lessonsCount
-        FROM Group g
-        JOIN g.level lev
-        JOIN g.branch b
-        LEFT JOIN Lesson l ON l.group = g 
-             AND (:level IS NULL OR l.level.name = :level)
-        LEFT JOIN g.teacher t
-        LEFT JOIN t.user tu
-        LEFT JOIN g.timeTable tt
-        WHERE b.organizationId = :organizationId
-          AND (:status IS NULL OR g.status = :status)
-          AND (:level IS NULL OR lev.name = :level)
-          AND (
-               :search IS NULL
-               OR LOWER(g.name) LIKE LOWER(:search)
-               OR LOWER(g.room) LIKE LOWER(:search)
-               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(:search))
-          )
-        GROUP BY g.id, g.name, g.room, g.status, lev.id, g.currentMonth, t.id, tt.id
-    """,
+                        SELECT
+                            g.id AS id,
+                            g.name AS name,
+                            g.room AS room,
+                            g.teacher AS teacher,
+                            g.timeTable AS timeTable,
+                            g.status AS status,
+                            lev.id AS levelId,
+                            g.currentMonth AS currentMonth,
+                            COUNT(l.id) AS lessonsCount
+                        FROM Group g
+                        JOIN g.level lev
+                        JOIN g.branch b
+                        LEFT JOIN Lesson l ON l.group = g 
+                             AND (:level IS NULL OR l.level.name = :level)
+                        LEFT JOIN g.teacher t
+                        LEFT JOIN t.user tu
+                        LEFT JOIN g.timeTable tt
+                        WHERE b.organizationId = :organizationId
+                          AND (:status IS NULL OR g.status = :status)
+                          AND (:level IS NULL OR lev.name = :level)
+                          AND (
+                               CAST(:search AS text) IS NULL
+                               OR LOWER(g.name) LIKE LOWER(CAST(:search AS text))
+                               OR LOWER(g.room) LIKE LOWER(CAST(:search AS text))
+                               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(CAST(:search AS text)))
+                          )
+                        GROUP BY g.id, g.name, g.room, g.status, lev.id, g.currentMonth, t.id, tt.id
+                    """,
             countQuery = """
-        SELECT COUNT(DISTINCT g.id)
-        FROM Group g
-        JOIN g.level lev
-        JOIN g.branch b
-        LEFT JOIN g.teacher t
-        LEFT JOIN t.user tu
-        WHERE b.organizationId = :organizationId
-          AND (:status IS NULL OR g.status = :status)
-          AND (:level IS NULL OR lev.name = :level)
-          AND (
-               :search IS NULL
-               OR LOWER(g.name) LIKE LOWER(:search)
-               OR LOWER(g.room) LIKE LOWER(:search)
-               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(:search))
-          )
-    """
+                        SELECT COUNT(DISTINCT g.id)
+                        FROM Group g
+                        JOIN g.level lev
+                        JOIN g.branch b
+                        LEFT JOIN g.teacher t
+                        LEFT JOIN t.user tu
+                        WHERE b.organizationId = :organizationId
+                          AND (:status IS NULL OR g.status = :status)
+                          AND (:level IS NULL OR lev.name = :level)
+                          AND (
+                               CAST(:search AS text) IS NULL
+                               OR LOWER(g.name) LIKE LOWER(CAST(:search AS text))
+                               OR LOWER(g.room) LIKE LOWER(CAST(:search AS text))
+                               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(CAST(:search AS text)))
+                          )
+                    """
     )
     Page<GroupProjection> getAllByFilter(
             @Param("organizationId") String organizationId,
