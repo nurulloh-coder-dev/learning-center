@@ -19,11 +19,7 @@ import java.time.LocalDateTime;
 @Setter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+public abstract class BaseEntity extends IdEntity{
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
