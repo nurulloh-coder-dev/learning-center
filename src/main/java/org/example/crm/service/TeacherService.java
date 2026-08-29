@@ -43,13 +43,14 @@ public class TeacherService extends AbstractService<
 
     @Override
     public TeacherDto get(String id) {
-        Teacher teacher = validator.validateIdAndGet(id);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Teacher teacher = validator.validateIdAndGetOrg(id,organizationId);
         return mapper.toDto(teacher);
     }
 
     @Override
     public TeacherDto create(TeacherCreateDto createDto) {
-        validator.validate();
+        validator.validate(createDto);
         Teacher entity = mapper.toEntity(createDto);
         return mapper.toDto(repository.save(entity));
     }
@@ -63,42 +64,13 @@ public class TeacherService extends AbstractService<
 
     @Override
     public void delete(String id) {
-        Teacher teacher = validator.validateIdAndGet(id);
-        teacher.setDeleted(true);
-        repository.save(teacher);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        validator.validateId(id,organizationId);
+        repository.softDelete(id);
     }
 
     public Long getAllCount() {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         return repository.countTeachersByDeletedAndOrg(organizationId);
-    }
-
-    public TeacherDto get(String id, String organizationId) {
-        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
-        return mapper.toDto(teacher);
-    }
-
-    public TeacherDto create(@Valid TeacherCreateDto createDto, String organizationId) {
-
-        String organization = userValidator.authenticateAndGetOrganizationId();
-        if (!organization.equals(organizationId)) {
-            throw new RestException(ErrorType.ORGANIZATION_ID_MISMATCH, ErrorCodes.BadRequest);
-        }
-        Teacher entity = mapper.toEntity(createDto);
-        return mapper.toDto(repository.save(entity));
-    }
-
-    @Transactional
-    public TeacherDto update(@Valid TeacherUpdateDto updateDto, String id, String organizationId) {
-        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
-        mapper.mapUpdate(teacher, updateDto);
-        return mapper.toDto(repository.save(teacher));
-    }
-
-    @Transactional
-    public void delete(String id, String organizationId) {
-        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
-        teacher.setDeleted(true);
-        repository.save(teacher);
     }
 }

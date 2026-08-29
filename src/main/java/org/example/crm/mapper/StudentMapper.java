@@ -24,12 +24,9 @@ public interface StudentMapper {
     StudentDto toDto(Student student);
 
 
-    @IgnoreAuditFields
-
     @Mapping(source = "userCreateDto", target = "user")
     Student toEntity(StudentCreateDto studentDto);
 
-    @IgnoreAuditFields
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void mapUpdate(@MappingTarget Student student, StudentUpdateDto updateDto);
 
