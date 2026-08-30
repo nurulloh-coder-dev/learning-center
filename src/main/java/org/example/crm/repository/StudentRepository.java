@@ -1,5 +1,6 @@
 package org.example.crm.repository;
 
+import jakarta.transaction.Transactional;
 import org.example.crm.entity.model.Student;
 import org.example.crm.projection.AnalyticStudentProjection;
 import org.example.crm.projection.StudentProjection;
@@ -7,6 +8,7 @@ import org.example.crm.projection.StudentShowProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -72,5 +74,8 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     @Query("select count(s.id) from Student s where s.user.organizationId=:orgId and s.user.deleted = false")
     Long countStudentsByOrganizationId(@Param("orgId") String organizationId);
 
+    @Modifying
+    @Transactional
+    @Query("update Student s set s.user.deleted = true where s.id=:id")
     void softDelete(String id);
 }
