@@ -60,8 +60,6 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
                                                  LocalDateTime nextMonth);
 
 
-    AnalyticTeacherProjection getAnalyticTeacher(String organizationId, LocalDateTime monthAgo);
-
     @Query("select exists (select t.id from Teacher t where t.id =:id and t.user.deleted = false)")
     Optional<Boolean> checkId(String id);
 
