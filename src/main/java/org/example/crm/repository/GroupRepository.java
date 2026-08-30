@@ -93,13 +93,16 @@ public interface GroupRepository extends JpaRepository<Group, String> {
     Optional<Integer> getCount(String organizationId);
 
     @Query("""
-            SELECT g.id as id, g.name as name, g.timeTable.dayType as dayType
-            from Group g
-            left join g.teacher t
-            left join t.user u
-            where u.id = :userId and g.deleted = false
+                SELECT
+                    g.id AS id,
+                    g.name AS name,
+                    tt.dayType AS dayType
+                FROM Group g
+                LEFT JOIN g.timeTable tt
+                WHERE g.teacher.id = :teacherId
+                  AND g.deleted = false
             """)
-    List<GroupNameProjection> findAllGroupNames(@Param("userId") String teacherId);
+    List<GroupNameProjection> findAllGroupNames(@Param("teacherId") String teacherId);
 
     @Query("SELECT g FROM Group g WHERE g.teacher.user.id = :userId AND g.status = 'ONGOING' and g.deleted = false")
     List<Group> findAllByTeacherUserId(@Param("userId") String userId);
