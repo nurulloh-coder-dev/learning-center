@@ -46,8 +46,8 @@ public class AnalyticService {
                 .atStartOfDay();
         AnalyticEnrollmentProjection projection = enrollmentRepository.getAnalyticEnrollment(user.getOrganizationId(),startOfPreviousMonth,startOfMonth,startOfNextMonth);
 
-        Integer current = projection.getEnrollmentCountInMonth();
-        Integer previous = projection.getEnrollmentCountInPreviousMonth();
+        Long current = projection.getEnrollmentCountInMonth();
+        Long previous = projection.getEnrollmentCountInPreviousMonth();
 
         Double difference = 0.0;
 
@@ -113,8 +113,8 @@ public class AnalyticService {
 
 
 
-        Integer current = projection.getLeadCountInMonth();
-        Integer previous = projection.getLeadCountInPrevMonth();
+        Long current = projection.getLeadCountInMonth();
+        Long previous = projection.getLeadCountInPrevMonth();
 
         double difference = 0.0;
 
@@ -148,8 +148,8 @@ public class AnalyticService {
 
 
 
-        Integer current = projection.getStudentsAddedInMonth();
-        Integer previous = projection.getStudentsAddedInPrevMonth();
+        Long current = projection.getStudentsAddedInMonth();
+        Long previous = projection.getStudentsAddedInPrevMonth();
 
         double difference = 0.0;
 
@@ -181,8 +181,8 @@ public class AnalyticService {
         AnalyticTeacherProjection projection = teacherRepository.getAnalyticTeacher(user.getOrganizationId(), startOfPreviousMonth,startOfMonth,startOfNextMonth);
 
 
-        Integer current = projection.getTeachersAddedInMonth();
-        Integer previous = projection.getTeachersAddedInPrevMonth();
+        Long current = projection.getTeachersAddedInMonth();
+        Long previous = projection.getTeachersAddedInPrevMonth();
 
         double difference = 0.0;
 

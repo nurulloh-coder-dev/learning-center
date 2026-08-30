@@ -1,9 +1,9 @@
 package org.example.crm.entity.analyticsRecord;
 
 public record AnalyticTeacher(
-        Integer teacherCount,
-        Integer teachersAddedInMonth,
-        Integer teachersAddedInPrevMonth,
+        Long teacherCount,
+        Long teachersAddedInMonth,
+        Long teachersAddedInPrevMonth,
         double difference
 ) {
 }
