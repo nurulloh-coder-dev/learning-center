@@ -6,6 +6,7 @@ import org.example.crm.entity.enums.AttendanceStatus;
 
 public record AttendanceStudentUpdateDto(
         @NotBlank String studentId,
-        @NotNull AttendanceStatus status
+        @NotNull AttendanceStatus status,
+        String reason
 ) {
 }

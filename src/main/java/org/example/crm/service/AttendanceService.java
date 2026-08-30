@@ -104,12 +104,14 @@ public class AttendanceService extends AbstractService<
             if (existingRecord != null) {
                 // Update existing status
                 existingRecord.setStatus(dto.status());
+                existingRecord.setReason(dto.reason());
             } else {
                 // Add new student record if not previously present
                 Student student = studentValidator.validateIdAndGet(dto.studentId());
                 AttendanceStudent newRecord = new AttendanceStudent();
                 newRecord.setStudent(student);
                 newRecord.setStatus(dto.status());
+                newRecord.setReason(dto.reason());
                 attendance.addStudentAttendance(newRecord);
             }
         }
