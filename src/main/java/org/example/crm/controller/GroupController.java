@@ -62,13 +62,13 @@ public class GroupController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("groups")
+    @GetMapping("/groups")
     public ResponseEntity<List<GroupNameProjection>> getTeacherGroups() {
         List<GroupNameProjection> groupNames = service.getGroupNames();
         return ResponseEntity.ok(groupNames);
     }
 
-    @GetMapping("groupInfo")
+    @GetMapping("/groupInfo")
     public ResponseEntity<FullGroupDto> getGroupWithStudents(@RequestParam(required = false) String groupId) {
         FullGroupDto groupInfo = service.getGroupInfo(groupId);
         return ResponseEntity.ok(groupInfo);
