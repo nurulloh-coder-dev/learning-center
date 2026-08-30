@@ -6,9 +6,11 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.enums.AdministratorPermission;
 import org.example.crm.entity.enums.Role;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -36,4 +38,9 @@ public class User extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Branch branch;
+
+
+    @ElementCollection
+    @Enumerated(EnumType.STRING)
+    private List<AdministratorPermission> permissions;
 }

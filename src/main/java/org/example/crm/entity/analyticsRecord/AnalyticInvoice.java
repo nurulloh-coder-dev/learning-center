@@ -2,6 +2,8 @@ package org.example.crm.entity.analyticsRecord;
 
 public record AnalyticInvoice(
         Double invoiceAmount,
-        Integer invoiceAmountInAMonth
+        Double invoiceAmountInAMonth,
+        Double invoiceAmountInPreviousMonth,
+        Double differenceInPercentage
 ) {
 }

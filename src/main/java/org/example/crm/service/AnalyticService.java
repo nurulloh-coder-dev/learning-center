@@ -8,6 +8,8 @@ import org.example.crm.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.YearMonth;
 
 @Service
 @RequiredArgsConstructor
@@ -20,39 +22,175 @@ public class AnalyticService {
     final TeacherRepository teacherRepository;
 
     public AnalyticBranch getBranch(User user) {
+
         AnalyticBranchProjection projection = branchRepository.getAnalyticBranch(user.getOrganizationId());
         return new AnalyticBranch(projection.getBranchCount());
     }
 
-    public AnalyticEnrollment getEnrollment(User user) {
-        LocalDateTime monthAgo = LocalDateTime.now().minusMonths(1);
-        AnalyticEnrollmentProjection projection = enrollmentRepository.getAnalyticEnrollment(user.getOrganizationId(),monthAgo);
+    public AnalyticEnrollment getEnrollment(User user, Integer year, Month month) {
+        int filterYear = year == null ? LocalDateTime.now().getYear() : year;
+        Month filterMonth = month ==null ? LocalDateTime.now().getMonth() : month;
+        YearMonth yearMonth = YearMonth.of(filterYear, filterMonth);
 
-        return new AnalyticEnrollment(projection.getEnrollmentCount(), projection.getEnrollmentCount());
+        LocalDateTime startOfPreviousMonth = yearMonth
+                .minusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+
+        LocalDateTime startOfMonth = yearMonth
+                .atDay(1)
+                .atStartOfDay();
+
+        LocalDateTime startOfNextMonth = yearMonth.plusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+        AnalyticEnrollmentProjection projection = enrollmentRepository.getAnalyticEnrollment(user.getOrganizationId(),startOfPreviousMonth,startOfMonth,startOfNextMonth);
+
+        Integer current = projection.getEnrollmentCountInMonth();
+        Integer previous = projection.getEnrollmentCountInPreviousMonth();
+
+        Double difference = 0.0;
+
+        if (previous != 0) {
+            difference = ((double) (current - previous) / previous) * 100;
+        }
+
+        return new AnalyticEnrollment(projection.getEnrollmentCount(), current, previous, difference);
     }
 
-    public AnalyticInvoice getInvoice(User user) {
-        LocalDateTime monthAgo = LocalDateTime.now().minusMonths(1);
-        AnalyticInvoiceProjection projection = invoiceRepository.getAnalyticInvoice(user.getOrganizationId(),monthAgo);
-        return new AnalyticInvoice(projection.getInvoiceAmount(),projection.getInvoiceAmountInMonth());
+    public AnalyticInvoice getInvoice(User user, Integer year, Month month) {
+        int filterYear = year == null ? LocalDateTime.now().getYear() : year;
+        Month filterMonth = month ==null ? LocalDateTime.now().getMonth() : month;
+        YearMonth yearMonth = YearMonth.of(filterYear, filterMonth);
+
+
+        LocalDateTime startOfPreviousMonth = yearMonth
+                .minusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+
+        LocalDateTime startOfMonth = yearMonth
+                .atDay(1)
+                .atStartOfDay();
+
+        LocalDateTime startOfNextMonth = yearMonth.plusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+        AnalyticInvoiceProjection projection = invoiceRepository.getAnalyticInvoice(user.getOrganizationId(),startOfPreviousMonth,startOfMonth,startOfNextMonth);
+
+
+        Double current = projection.getInvoiceAmountInMonth();
+        Double previous = projection.getInvoiceAmountInPreviousMonth();
+
+        double difference = 0.0;
+
+        if (previous != 0) {
+            difference = ( (current - previous) / previous) * 100;
+        }
+
+        return new AnalyticInvoice(projection.getInvoiceAmount(),current,previous,difference);
     }
 
-    public AnalyticLead getLead(User user) {
-        LocalDateTime monthAgo = LocalDateTime.now().minusMonths(1);
-        AnalyticLeadProjection projection = leadRepository.getAnalyticLead(user.getOrganizationId(), monthAgo);
-        return new AnalyticLead(projection.getLeadCount(),projection.getLeadCountInAMonth());
+    public AnalyticLead getLead(User user, Integer year, Month month) {
+        int filterYear = year == null ? LocalDateTime.now().getYear() : year;
+        Month filterMonth = month ==null ? LocalDateTime.now().getMonth() : month;
+        YearMonth yearMonth = YearMonth.of(filterYear, filterMonth);
+
+        LocalDateTime startOfPreviousMonth = yearMonth
+                .minusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+
+
+        LocalDateTime startOfMonth = yearMonth
+                .atDay(1)
+                .atStartOfDay();
+
+        LocalDateTime startOfNextMonth = yearMonth.plusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+        AnalyticLeadProjection projection = leadRepository.getAnalyticLead(user.getOrganizationId(),startOfPreviousMonth, startOfMonth,startOfNextMonth);
+
+
+
+        Integer current = projection.getLeadCountInMonth();
+        Integer previous = projection.getLeadCountInPrevMonth();
+
+        double difference = 0.0;
+
+        if (previous != 0) {
+            difference = ((double) (current - previous) / previous) * 100;
+        }
+
+        return new AnalyticLead(projection.getLeadCount(),current, previous,difference);
     }
 
-    public AnalyticStudent getStudent(User user) {
-        LocalDateTime  monthAgo = LocalDateTime.now().minusMonths(1);
-        AnalyticStudentProjection projection = studentRepository.getAnalyticStudent(user.getOrganizationId(),monthAgo);
-        return  new AnalyticStudent(projection.getStudentCount(),projection.getStudentCount());
+    public AnalyticStudent getStudent(User user, Integer year, Month month) {
+        int filterYear = year == null ? LocalDateTime.now().getYear() : year;
+        Month filterMonth = month ==null ? LocalDateTime.now().getMonth() : month;
+        YearMonth yearMonth = YearMonth.of(filterYear, filterMonth);
+
+        LocalDateTime startOfPreviousMonth = yearMonth
+                .minusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+
+
+        LocalDateTime startOfMonth = yearMonth
+                .atDay(1)
+                .atStartOfDay();
+
+        LocalDateTime startOfNextMonth = yearMonth.plusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+        AnalyticStudentProjection projection = studentRepository.getAnalyticStudent(user.getOrganizationId(),startOfPreviousMonth,startOfMonth,startOfNextMonth);
+
+
+
+
+        Integer current = projection.getStudentsAddedInMonth();
+        Integer previous = projection.getStudentsAddedInPrevMonth();
+
+        double difference = 0.0;
+
+        if (previous != 0) {
+            difference = ((double) (current - previous) / previous) * 100;
+        }
+
+        return  new AnalyticStudent(projection.getStudentCount(),current,previous,difference);
     }
 
-    public AnalyticTeacher getTeacher(User user) {
-        LocalDateTime  monthAgo = LocalDateTime.now().minusMonths(1);
-        AnalyticTeacherProjection projection = teacherRepository.getAnalyticTeacher(user.getOrganizationId(),monthAgo);
-        return  new AnalyticTeacher(projection.getTeacherCount(),projection.getTeacherCount());
+    public AnalyticTeacher getTeacher(User user, Integer year, Month month) {
+        int filterYear = year == null ? LocalDateTime.now().getYear() : year;
+        Month filterMonth = month ==null ? LocalDateTime.now().getMonth() : month;
+        YearMonth yearMonth = YearMonth.of(filterYear, filterMonth);
+
+        LocalDateTime startOfPreviousMonth = yearMonth
+                .minusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+
+
+        LocalDateTime startOfMonth = yearMonth
+                .atDay(1)
+                .atStartOfDay();
+
+        LocalDateTime startOfNextMonth = yearMonth.plusMonths(1)
+                .atDay(1)
+                .atStartOfDay();
+        AnalyticTeacherProjection projection = teacherRepository.getAnalyticTeacher(user.getOrganizationId(), startOfPreviousMonth,startOfMonth,startOfNextMonth);
+
+
+        Integer current = projection.getTeachersAddedInMonth();
+        Integer previous = projection.getTeachersAddedInPrevMonth();
+
+        double difference = 0.0;
+
+        if (previous != 0) {
+            difference = ((double) (current - previous) / previous) * 100;
+        }
+
+        return  new AnalyticTeacher(projection.getTeacherCount(),current,previous,difference);
 
     }
 }

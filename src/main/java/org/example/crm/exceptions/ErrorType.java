@@ -55,7 +55,8 @@ public enum ErrorType {
     GROUP_LEVEL_NAME_ALREADY_EXISTS("group.level.name.already.exists"),
     INCORRECT_GROUP_LEVEL_COUNT("incorrect.group.level.count"),
     LEAD_ALREADY_ENROLLED("lead.already.enrolled"),
-    LEAD_STATUS_CHANGE_FORBIDDEN("lead.status.change.forbidden");
+    LEAD_STATUS_CHANGE_FORBIDDEN("lead.status.change.forbidden"),
+    PERMISSION_ONLY_FOR_ADMINISTRATOR("permission.only.for.administrator"),;
 
 
     private final String key;

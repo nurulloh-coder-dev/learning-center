@@ -59,14 +59,22 @@ public interface StudentRepository extends JpaRepository<Student, String> {
                     count(e.id) as studentCount,
                     count(
                         case
-                            when e.createdAt >= :monthAgo then 1
+                            when e.createdAt >= :month and e.createdAt <= :nextMonth then 1
                         end
-                    ) as studentsAddedInMonth
+                    ) as studentsAddedInMonth,
+                    count(
+                        case
+                            when e.createdAt >= :prev and e.createdAt <= :month then 1
+                        end
+                    ) as studentsAddedInPrevMonth
                 from Student e
                 where e.organizationId = :organizationId
                   and e.deleted = false
             """)
-    AnalyticStudentProjection getAnalyticStudent(String organizationId, LocalDateTime monthAgo);
+    AnalyticStudentProjection getAnalyticStudent(String organizationId,
+                                                 LocalDateTime prev,
+                                                 LocalDateTime month,
+                                                 LocalDateTime nextMonth);
 
     @Query("select count(s.id) from Student s where s.organizationId=:orgId and s.deleted = false")
     Long countStudentsByOrganizationId(@Param("orgId") String organizationId);

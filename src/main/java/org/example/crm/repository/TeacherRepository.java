@@ -44,12 +44,20 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
         count(e.id) as teacherCount,
         count(
             case
-                when e.createdAt >= :monthAgo then 1
+                when e.createdAt >= :month and e.createdAt <= :nextMonth then 1
             end
-        ) as teachersAddedInMonth
+        ) as teachersAddedInMonth,
+        count(
+            case
+                when e.createdAt >= :prev and e.createdAt <= :month then 1
+            end
+        ) as teachersAddedInPrevMonth
     from Teacher e
     where e.organizationId = :organizationId
       and e.deleted = false
 """)
-    AnalyticTeacherProjection getAnalyticTeacher(String organizationId, LocalDateTime monthAgo);
+    AnalyticTeacherProjection getAnalyticTeacher(String organizationId,
+                                                 LocalDateTime prev,
+                                                 LocalDateTime month,
+                                                 LocalDateTime nextMonth);
 }

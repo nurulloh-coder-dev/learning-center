@@ -12,7 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Month;
 
 @RestController
 @RequestMapping("api/v1/analytics")
@@ -29,30 +32,40 @@ public class SuperAdminAnalyticsController {
 
     @GetMapping("/enrollment")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<AnalyticEnrollment> enrollment(@CurrentUser User user){
-        return ResponseEntity.ok(service.getEnrollment(user));
+    public ResponseEntity<AnalyticEnrollment> enrollment(@CurrentUser User user,
+                                                 @RequestParam(required = false) Integer year,
+                                                 @RequestParam(required = false) Month month){
+        return ResponseEntity.ok(service.getEnrollment(user,year, month));
     }
 
     @GetMapping("/invoice")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<AnalyticInvoice> invoice(@CurrentUser User user){
-        return ResponseEntity.ok(service.getInvoice(user));
+    public ResponseEntity<AnalyticInvoice> invoice(@CurrentUser User user,
+                                                   @RequestParam(required = false) Integer year,
+                                                   @RequestParam(required = false) Month month){
+        return ResponseEntity.ok(service.getInvoice(user,year, month));
     }
 
     @GetMapping("/lead")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<AnalyticLead> lead(@CurrentUser User user){
-        return ResponseEntity.ok(service.getLead(user));
+    public ResponseEntity<AnalyticLead> lead(@CurrentUser User user,
+                                             @RequestParam(required = false) Integer year,
+                                             @RequestParam(required = false) Month month){
+        return ResponseEntity.ok(service.getLead(user,year, month));
     }
 
     @GetMapping("/student")
-    public ResponseEntity<AnalyticStudent> student(@CurrentUser User user){
-        return ResponseEntity.ok(service.getStudent(user));
+    public ResponseEntity<AnalyticStudent> student(@CurrentUser User user,
+                                                   @RequestParam(required = false) Integer year,
+                                                   @RequestParam(required = false) Month month){
+        return ResponseEntity.ok(service.getStudent(user,year, month));
     }
 
     @GetMapping("/teacher")
-    public ResponseEntity<AnalyticTeacher> teacher(@CurrentUser User user){
-        return ResponseEntity.ok(service.getTeacher(user));
+    public ResponseEntity<AnalyticTeacher> teacher(@CurrentUser User user,
+                                                   @RequestParam(required = false) Integer year,
+                                                   @RequestParam(required = false) Month month){
+        return ResponseEntity.ok(service.getTeacher(user,year, month));
     }
 
 

@@ -2,6 +2,8 @@ package org.example.crm.entity.analyticsRecord;
 
 public record AnalyticEnrollment(
         Integer enrollmentCount,
-        Integer enrollmentCountInAMonth
+        Integer enrollmentCountInMonth,
+        Integer enrollmentCountInPreviousMonth,
+        Double differenceInPercentage
 ) {
 }

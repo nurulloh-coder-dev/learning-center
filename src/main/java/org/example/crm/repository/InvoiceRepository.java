@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, String> {
@@ -76,16 +75,27 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
                    coalesce(
                        sum(
                            case
-                               when i.createdAt >= :monthAgo then i.amount
+                               when i.createdAt >= :month and i.createdAt <=:nextMonth then i.amount
                                else 0
                            end
                        ),
                        0
-           ) as invoiceAmountInMonth
+           ) as invoiceAmountInMonth,
+           coalesce(
+                sum(
+                    case
+                        when i.createdAt >= :prevMonth and i.createdAt <= :month then i.amount
+                        else 0
+                    end
+                )
+           ) as invoiceAmountInPreviousMonth
            from Invoice i
            where i.organizationId = :organizationId
            and i.deleted = false
            and i.paymentStatus = 'PAID'
 """)
-    AnalyticInvoiceProjection getAnalyticInvoice(String organizationId, LocalDateTime monthAgo);
+    AnalyticInvoiceProjection getAnalyticInvoice(String organizationId,
+                                                 LocalDateTime prevMonth,
+                                                 LocalDateTime month,
+                                                 LocalDateTime nextMonth);
 }

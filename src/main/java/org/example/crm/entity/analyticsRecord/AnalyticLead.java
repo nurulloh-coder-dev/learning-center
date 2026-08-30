@@ -2,6 +2,7 @@ package org.example.crm.entity.analyticsRecord;
 
 public record AnalyticLead(
         Integer leadCount,
-        Integer leadCountInAMonth
-) {
+        Integer leadCountPreviousMonth,
+        Integer leadCountInAMonth,
+        double difference) {
 }
