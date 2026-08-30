@@ -41,14 +41,25 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
         count(e.id) as teacherCount,
         count(
             case
-                when u.createdAt >= :monthAgo then 1
+                when u.createdAt >= :month and u.createdAt <= :nextMonth then 1
             end
-        ) as teachersAddedInMonth
+        ) as teachersAddedInMonth,
+        count(
+            case
+                when u.createdAt >= :prev and u.createdAt <= :month then 1
+            end
+        ) as teachersAddedInPrevMonth
     from Teacher e
     join e.user u
     where u.organizationId = :organizationId
       and u.deleted = false
 """)
+    AnalyticTeacherProjection getAnalyticTeacher(String organizationId,
+                                                 LocalDateTime prev,
+                                                 LocalDateTime month,
+                                                 LocalDateTime nextMonth);
+
+
     AnalyticTeacherProjection getAnalyticTeacher(String organizationId, LocalDateTime monthAgo);
 
     @Query("select exists (select t.id from Teacher t where t.id =:id and t.user.deleted = false)")

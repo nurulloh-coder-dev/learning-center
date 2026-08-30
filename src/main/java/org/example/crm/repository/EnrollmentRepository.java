@@ -34,15 +34,21 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, String> 
                     count(e.id) as EnrollmentCount,
                     count(
                         case
-                            when e.createdAt >= :monthAgo then 1
+                            when e.createdAt >= :startMonth and e.createdAt <= :startNextMonth then 1
                         end
-                    ) as EnrollmentCountInAMonth
+                    ) as EnrollmentCountInAMonth,
+                    count(
+                        case
+                                    when :startPreviousMonth <= e.createdAt and e.createdAt <= :startMonth then 1
+                        end
+                    ) as enrollmentCountInPreviousMonth
                 from Enrollment e
                 where e.organizationId = :organizationId
                   and e.deleted = false
             """)
     AnalyticEnrollmentProjection getAnalyticEnrollment(
             String organizationId,
-            LocalDateTime monthAgo
-    );
+            LocalDateTime startPreviousMonth,
+            LocalDateTime startMonth,
+            LocalDateTime startNextMonth);
 }

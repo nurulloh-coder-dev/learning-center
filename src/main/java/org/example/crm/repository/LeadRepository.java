@@ -51,12 +51,21 @@ public interface LeadRepository extends JpaRepository<Lead, String> {
         count(e.id) as leadCount,
         count(
             case
-                when e.createdAt >= :monthAgo then 1
+                when e.createdAt >= :month and e.createdAt <= :nextMonth then 1
             end
-        ) as leadCountInAMonth
+        ) as leadCountInAMonth,
+        count(
+        
+            case
+                when e.createdAt >= :prev and e.createdAt <= :month then 1
+            end
+        ) as LeadCountInPrevMonth
     from Lead e
     where e.organizationId = :organizationId
       and e.deleted = false
 """)
-    AnalyticLeadProjection getAnalyticLead(String organizationId, LocalDateTime monthAgo);
+    AnalyticLeadProjection getAnalyticLead(String organizationId,
+                                           LocalDateTime prev,
+                                           LocalDateTime month,
+                                           LocalDateTime nextMonth);
 }

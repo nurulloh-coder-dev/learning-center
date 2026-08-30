@@ -6,12 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.teacher.TeacherCreateDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.teacher.TeacherUpdateDto;
+import org.example.crm.entity.enums.AdministratorPermission;
 import org.example.crm.entity.model.Teacher;
+import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.TeacherMapper;
 import org.example.crm.repository.TeacherRepository;
+import org.example.crm.repository.UserRepository;
 import org.example.crm.validator.TeacherValidator;
 import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
@@ -26,14 +29,19 @@ public class TeacherService extends AbstractService<
         TeacherValidator> implements CrudService<TeacherCreateDto, TeacherUpdateDto, TeacherDto, String> {
 
     final UserValidator userValidator;
+    final UserRepository userRepository;
 
-    protected TeacherService(TeacherRepository repository, TeacherMapper mapper, TeacherValidator validator, UserValidator userValidator) {
+    protected TeacherService(TeacherRepository repository, TeacherMapper mapper, TeacherValidator validator, UserValidator userValidator, UserRepository userRepository) {
         super(repository, mapper, validator);
         this.userValidator = userValidator;
+        this.userRepository = userRepository;
     }
 
     @Override
     public Page<TeacherDto> getAll(Pageable pageable, String search) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
+
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         log.info("orgId of current user {}", organizationId);
         Page<Teacher> all = repository.findAllBySearch(organizationId, search, pageable);
@@ -43,13 +51,22 @@ public class TeacherService extends AbstractService<
 
     @Override
     public TeacherDto get(String id) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
+
+
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         Teacher teacher = validator.validateIdAndGetOrg(id,organizationId);
+
         return mapper.toDto(teacher);
     }
 
     @Override
     public TeacherDto create(TeacherCreateDto createDto) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
+
+
         validator.validate(createDto);
         Teacher entity = mapper.toEntity(createDto);
         return mapper.toDto(repository.save(entity));
@@ -57,6 +74,10 @@ public class TeacherService extends AbstractService<
 
     @Override
     public TeacherDto update(TeacherUpdateDto updateDto, String id) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
+
+
         Teacher teacher = validator.validateIdAndGet(id);
         mapper.mapUpdate(teacher, updateDto);
         return mapper.toDto(repository.save(teacher));
@@ -64,13 +85,68 @@ public class TeacherService extends AbstractService<
 
     @Override
     public void delete(String id) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
+
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         validator.validateId(id,organizationId);
         repository.softDelete(id);
     }
 
     public Long getAllCount() {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
+
+
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         return repository.countTeachersByDeletedAndOrg(organizationId);
+    }
+
+    public TeacherDto get(String id, String organizationId) {
+
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
+
+
+        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
+        return mapper.toDto(teacher);
+    }
+
+    public TeacherDto create(@Valid TeacherCreateDto createDto, String organizationId) {
+
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
+
+
+
+        String organization = userValidator.authenticateAndGetOrganizationId();
+        if (!organization.equals(organizationId)) {
+            throw new RestException(ErrorType.ORGANIZATION_ID_MISMATCH, ErrorCodes.BadRequest);
+        }
+        Teacher entity = mapper.toEntity(createDto);
+        return mapper.toDto(repository.save(entity));
+    }
+
+    @Transactional
+    public TeacherDto update(@Valid TeacherUpdateDto updateDto, String id, String organizationId) {
+
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
+
+
+        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
+        mapper.mapUpdate(teacher, updateDto);
+        return mapper.toDto(repository.save(teacher));
+    }
+
+    @Transactional
+    public void delete(String id, String organizationId) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
+
+
+        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
+
+        repository.softDelete(teacher.getId());
     }
 }

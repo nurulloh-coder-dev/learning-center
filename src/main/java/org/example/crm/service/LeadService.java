@@ -10,10 +10,12 @@ import org.example.crm.entity.dto.lead.LeadUpdateDto;
 import org.example.crm.entity.dto.student.StudentCreateDto;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.user.UserCreateDto;
+import org.example.crm.entity.enums.AdministratorPermission;
 import org.example.crm.entity.enums.LeadStatus;
 import org.example.crm.entity.enums.Role;
 import org.example.crm.entity.model.Lead;
 import org.example.crm.entity.model.Level;
+import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
@@ -57,6 +59,8 @@ public class LeadService extends AbstractService<
     }
 
     public Page<LeadDto> getAll(Pageable pageable, String search, LeadStatus status) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.LEAD_MANAGEMENT);
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         String searchPattern = (search != null && !search.isBlank())
                 ? "%" + search.trim().toLowerCase() + "%"
@@ -69,12 +73,16 @@ public class LeadService extends AbstractService<
 
     @Override
     public LeadDto get(String id) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.LEAD_MANAGEMENT);
         Lead lead = validator.validateIdAndGet(id);
         return mapper.toDto(lead);
     }
 
     @Override
     public LeadDto create(LeadCreateDto createDto) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.LEAD_MANAGEMENT);
         validator.validate(createDto);
         Lead entity = mapper.toEntity(createDto);
         Level level = groupLevelValidator.validateAndGet(createDto.preferredCourseId());
@@ -84,6 +92,8 @@ public class LeadService extends AbstractService<
 
     @Override
     public LeadDto update(LeadUpdateDto updateDto, String id) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.LEAD_MANAGEMENT);
         validator.validate(updateDto);
         Lead lead = validator.validateIdAndGet(id);
         mapper.mapUpdate(lead, updateDto);
@@ -95,6 +105,8 @@ public class LeadService extends AbstractService<
 
     @Override
     public void delete(String id) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.LEAD_MANAGEMENT);
         validator.validateId(id);
         Integer integer = repository.softDelete(id);
         if (integer == 0) {
@@ -104,12 +116,14 @@ public class LeadService extends AbstractService<
 
     @Transactional
     public LeadDto enroll(String id, String groupId) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.LEAD_MANAGEMENT);
         Lead lead = validator.validateIdAndGet(id);
         if (lead.getStatus().equals(LeadStatus.ENROLLED)) {
             throw new RestException(ErrorType.LEAD_ALREADY_ENROLLED, ErrorCodes.BadRequest);
         }
         String branchId = groupValidator.validateIdAndGetBranchId(groupId);
-        UserCreateDto userCreateDto = new UserCreateDto(lead.getFullName(), lead.getPhone(), null, Role.STUDENT, branchId);
+        UserCreateDto userCreateDto = new UserCreateDto(lead.getFullName(), lead.getPhone(), null, Role.STUDENT, branchId, null);
         StudentDto studentDto = studentService.create(new StudentCreateDto(userCreateDto, null));
         enrollmentService.create(new EnrollmentCreateDto(studentDto.id(), groupId));
         lead.setStatus(LeadStatus.ENROLLED);
@@ -118,6 +132,8 @@ public class LeadService extends AbstractService<
     }
 
     public LeadDto reject(String id, LeadRejectDto dto) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.LEAD_MANAGEMENT);
         Lead lead = validator.validateIdAndGet(id);
         if (lead.getStatus().equals(LeadStatus.ENROLLED)) {
             throw new RestException(ErrorType.LEAD_ALREADY_ENROLLED, ErrorCodes.BadRequest);
@@ -130,6 +146,8 @@ public class LeadService extends AbstractService<
     }
 
     public LeadDto callLater(String id, @Future LocalDateTime callAt) {
+        User user = userValidator.authenticateAndGetUser();
+        userValidator.validateAdministratorPermission(user, AdministratorPermission.LEAD_MANAGEMENT);
         Lead lead = validator.validateIdAndGet(id);
         if (lead.getStatus().equals(LeadStatus.ENROLLED)||
                 lead.getStatus().equals(LeadStatus.REJECTED)){

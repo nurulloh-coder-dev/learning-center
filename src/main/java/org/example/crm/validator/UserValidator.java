@@ -3,6 +3,8 @@ package org.example.crm.validator;
 import lombok.RequiredArgsConstructor;
 import org.example.crm.config.CustomUserDetails;
 import org.example.crm.entity.dto.user.UserCreateDto;
+import org.example.crm.entity.enums.AdministratorPermission;
+import org.example.crm.entity.enums.Role;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.model.User;
@@ -25,6 +27,11 @@ public class UserValidator {
 
     public void validate(UserCreateDto createDto) {
 
+    }
+
+    public User authenticateAndGetUser(){
+        String id = authenticateAndGetId();
+        return repository.findById(id).orElseThrow(() -> new RestException(ErrorType.USER_NOT_FOUND, ErrorCodes.NotFound));
     }
 
     public String authenticateAndGetId() {
@@ -55,6 +62,20 @@ public class UserValidator {
         Boolean exists = repository.checkId(id).orElse(false);
         if (!exists){
             throw new RestException(ErrorType.USER_NOT_FOUND,ErrorCodes.NotFound);
+        }
+    }
+
+    public void validateUserPermission(User entity) {
+        if (entity.getPermissions() != null && !entity.getRole().equals(Role.ADMINISTRATOR)){
+            throw new RestException(ErrorType.PERMISSION_ONLY_FOR_ADMINISTRATOR, ErrorCodes.BadRequest);
+        }
+    }
+
+    public void validateAdministratorPermission(User entity, AdministratorPermission permission) {
+        if (entity.getRole().equals(Role.ADMINISTRATOR)){
+            entity.getPermissions().stream()
+                    .filter(p -> p.equals(permission))
+                    .findFirst().orElseThrow(() -> new RestException(ErrorType.NO_PERMISSION,  ErrorCodes.BadRequest));
         }
     }
 }

@@ -52,6 +52,7 @@ public class UserService extends AbstractService<
     public UserDto create(UserCreateDto createDto) {
         validator.validate(createDto);
         User entity = mapper.toEntity(createDto);
+        validator.validateUserPermission(entity);
         Branch branch = branchValidator.validateIdAndGet(createDto.branchId());
         entity.setBranch(branch);
         User save = repository.save(entity);
