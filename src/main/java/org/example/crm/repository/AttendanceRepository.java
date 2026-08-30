@@ -59,9 +59,10 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
     List<AttendanceProjection> findAllByGroupIdAndMonth(@Param("groupId") String groupId, @Param("minusMonths") Integer previousMonths);
 
     @Query("""
-             select s.id,
-                    ast.status,
-                    a.id
+             select s.id as studentId,
+                    ast.status as status,
+                    a.id as attendanceId,
+                    ast.reason as reason
              from AttendanceStudent ast
              join ast.student s
              join s.user u
