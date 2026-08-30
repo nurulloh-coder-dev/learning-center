@@ -14,6 +14,7 @@ import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.TeacherMapper;
 import org.example.crm.repository.TeacherRepository;
+import org.example.crm.repository.UserRepository;
 import org.example.crm.validator.TeacherValidator;
 import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
@@ -28,10 +29,12 @@ public class TeacherService extends AbstractService<
         TeacherValidator> implements CrudService<TeacherCreateDto, TeacherUpdateDto, TeacherDto, String> {
 
     final UserValidator userValidator;
+    final UserRepository userRepository;
 
-    protected TeacherService(TeacherRepository repository, TeacherMapper mapper, TeacherValidator validator, UserValidator userValidator) {
+    protected TeacherService(TeacherRepository repository, TeacherMapper mapper, TeacherValidator validator, UserValidator userValidator, UserRepository userRepository) {
         super(repository, mapper, validator);
         this.userValidator = userValidator;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -143,7 +146,7 @@ public class TeacherService extends AbstractService<
 
 
         Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
-        teacher.setDeleted(true);
-        repository.save(teacher);
+
+        repository.softDelete(teacher.getId());
     }
 }
