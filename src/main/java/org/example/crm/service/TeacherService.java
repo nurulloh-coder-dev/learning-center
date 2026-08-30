@@ -52,7 +52,9 @@ public class TeacherService extends AbstractService<
         userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
 
-        Teacher teacher = validator.validateIdAndGet(id);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Teacher teacher = validator.validateIdAndGetOrg(id,organizationId);
+
         return mapper.toDto(teacher);
     }
 
@@ -62,7 +64,7 @@ public class TeacherService extends AbstractService<
         userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
 
-        validator.validate();
+        validator.validate(createDto);
         Teacher entity = mapper.toEntity(createDto);
         return mapper.toDto(repository.save(entity));
     }
@@ -83,10 +85,9 @@ public class TeacherService extends AbstractService<
         User user = userValidator.authenticateAndGetUser();
         userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
-
-        Teacher teacher = validator.validateIdAndGet(id);
-        teacher.setDeleted(true);
-        repository.save(teacher);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        validator.validateId(id,organizationId);
+        repository.softDelete(id);
     }
 
     public Long getAllCount() {

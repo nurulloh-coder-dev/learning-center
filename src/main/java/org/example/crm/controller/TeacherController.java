@@ -39,17 +39,14 @@ public class TeacherController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TeacherDto> getById(@PathVariable String id,
-                                              @RequestParam String organizationId) {
-        TeacherDto teacher = teacherService.get(id,organizationId);
+    public ResponseEntity<TeacherDto> getById(@PathVariable String id) {
+        TeacherDto teacher = teacherService.get(id);
         return ResponseEntity.ok(teacher);
     }
 
     @PostMapping
-    public ResponseEntity<TeacherDto> create(@Valid @RequestBody TeacherCreateDto createDto,
-                                             @RequestParam String organizationId) {
-
-        TeacherDto createdTeacher = teacherService.create(createDto,organizationId);
+    public ResponseEntity<TeacherDto> create(@Valid @RequestBody TeacherCreateDto createDto) {
+        TeacherDto createdTeacher = teacherService.create(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTeacher);
     }
 

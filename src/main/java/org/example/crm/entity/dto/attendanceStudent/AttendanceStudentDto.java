@@ -6,5 +6,6 @@ public record AttendanceStudentDto(
         String studentId,
         String studentFullName,
         String studentImageUrl,
-        AttendanceStatus status
+        AttendanceStatus status,
+        String reason
 ) {}

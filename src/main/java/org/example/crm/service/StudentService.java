@@ -85,9 +85,8 @@ public class StudentService extends AbstractService<
         userValidator.validateAdministratorPermission(user, AdministratorPermission.STUDENT_MANAGEMENT);
 
 
-        Student student = validator.validateIdAndGet(id);
-        student.setDeleted(true);
-        repository.save(student);
+        validator.validateId(id);
+        repository.softDelete(id);
     }
 
     public Long getAllCount() {

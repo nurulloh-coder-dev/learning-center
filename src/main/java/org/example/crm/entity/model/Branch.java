@@ -18,8 +18,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Branch  extends BaseEntity {
-    private BigDecimal chargeForMonth;
-
     @Column(nullable = false)
     private String name;
 

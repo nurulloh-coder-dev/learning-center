@@ -6,16 +6,24 @@ import lombok.Getter;
 import lombok.Setter;
 import org.example.crm.entity.base.BaseEntity;
 
+import java.math.BigDecimal;
+
 @Entity
 @Setter
 @Getter
 public class Level extends BaseEntity {
     @Column(nullable = false)
     private String name;
+
     @Column(nullable = false)
     private Integer orderNumber;
+
     @Column(nullable = false)
     private Integer lessonCount;
+
     @Column(nullable = false)
     private Integer durationInMonths;
+
+    @Column(nullable = false)
+    private BigDecimal monthlyFee;
 }

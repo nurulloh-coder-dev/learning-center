@@ -1,5 +1,6 @@
 package org.example.crm.repository;
 
+import jakarta.transaction.Transactional;
 import org.example.crm.entity.model.Student;
 import org.example.crm.projection.AnalyticStudentProjection;
 import org.example.crm.projection.StudentProjection;
@@ -7,6 +8,7 @@ import org.example.crm.projection.StudentShowProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -18,8 +20,7 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     @Query("""
                 SELECT s FROM Student s
                 JOIN s.user u
-                WHERE s.deleted = false
-                  AND u.deleted = false
+                WHERE u.deleted = false
                   AND (:search IS NULL OR :search = '' OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')))
             """)
     Page<StudentProjection> searchStudents(@Param("search") String search, Pageable pageable);
@@ -28,8 +29,9 @@ public interface StudentRepository extends JpaRepository<Student, String> {
                     select distinct s
                     from Student s
                     join Enrollment e on s.id = e.student.id
+                    join s.user u
                     join Group g on e.group.id = g.id and g.status = 'ONGOING'
-                     where s.deleted = false and
+                     where u.deleted = false and
                      s.balance < 0
             """)
     List<Student> findAllStudentsForInvoice();
@@ -38,7 +40,7 @@ public interface StudentRepository extends JpaRepository<Student, String> {
             "(SELECT e.student.id FROM Enrollment e WHERE e.group.id = :groupId)")
     List<StudentShowProjection> getStudentShowByGroupId(String groupId);
 
-    @Query("select s from Student s where s.user.phone like :phone and s.deleted = false")
+    @Query("select s from Student s join s.user u where u.phone like :phone and u.deleted = false")
     List<Student> getStudentByPhone(@Param("phone") String phone);
 
     @Query("select exists (select s.id from Student s where s.id =:id)")
@@ -47,8 +49,8 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     @Query("""
                 select s from Student s
-                join User u on s.user.id = u.id
-                where s.organizationId= :orgId and s.deleted = false
+                join s.user u
+                where u.organizationId= :orgId and u.deleted = false
                 and u.deleted = false
                 and (:search IS NULL OR :search = '' OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')))
             """)
@@ -59,23 +61,29 @@ public interface StudentRepository extends JpaRepository<Student, String> {
                     count(e.id) as studentCount,
                     count(
                         case
-                            when e.createdAt >= :month and e.createdAt <= :nextMonth then 1
+                            when u.createdAt >= :month and u.createdAt <= :nextMonth then 1
                         end
                     ) as studentsAddedInMonth,
                     count(
                         case
-                            when e.createdAt >= :prev and e.createdAt <= :month then 1
+                            when u.createdAt >= :prev and u.createdAt <= :month then 1
                         end
                     ) as studentsAddedInPrevMonth
                 from Student e
-                where e.organizationId = :organizationId
-                  and e.deleted = false
+                join e.user u
+                where u.organizationId = :organizationId
+                  and u.deleted = false
             """)
     AnalyticStudentProjection getAnalyticStudent(String organizationId,
                                                  LocalDateTime prev,
                                                  LocalDateTime month,
                                                  LocalDateTime nextMonth);
 
-    @Query("select count(s.id) from Student s where s.organizationId=:orgId and s.deleted = false")
+    @Query("select count(s.id) from Student s where s.user.organizationId=:orgId and s.user.deleted = false")
     Long countStudentsByOrganizationId(@Param("orgId") String organizationId);
+
+    @Modifying
+    @Transactional
+    @Query("update Student s set s.user.deleted = true where s.id=:id")
+    void softDelete(String id);
 }

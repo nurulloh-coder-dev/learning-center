@@ -1,10 +1,12 @@
 package org.example.crm.repository;
 
+import jakarta.transaction.Transactional;
 import org.example.crm.entity.model.Teacher;
 import org.example.crm.projection.AnalyticTeacherProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -17,26 +19,21 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
             nativeQuery = true)
     Page<Teacher> findAll(Pageable pageable, String search);
 
-    Long countTeachersByDeleted(Boolean deleted);
-
-    Teacher findTeacherByUser_Id(String userId);
-
-
     @Query("""
         SELECT COUNT(t.id)
         from Teacher t
         join t.user u
-        where u.organizationId =:organizationId and t.deleted = false""")
+        where u.organizationId =:organizationId and u.deleted = false""")
     Long countTeachersByDeletedAndOrg(@Param("organizationId") String organizationId);
 
     @Query("""
-        select t from Teacher t
-        join User u on t.user.id = u.id and u.organizationId =:organizationId
-        where t.id =:id
-""")
+                    select t from Teacher t
+                    join t.user u
+                    where t.id =:id and u.organizationId=:organizationId
+            """)
     Optional<Teacher> findTeacherByIdAndOrg(String id, String organizationId);
 
-    @Query("SELECT t from Teacher t where (:search is null or t.user.fullName ilike :search) and t.organizationId= :orgId")
+    @Query("SELECT t from Teacher t join t.user u where (:search is null or u.fullName ilike :search) and u.organizationId= :orgId")
     Page<Teacher> findAllBySearch(@Param("orgId") String organizationId, @Param("search") String search, Pageable pageable);
 
     @Query("""
@@ -44,20 +41,35 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
         count(e.id) as teacherCount,
         count(
             case
-                when e.createdAt >= :month and e.createdAt <= :nextMonth then 1
+                when u.createdAt >= :month and u.createdAt <= :nextMonth then 1
             end
         ) as teachersAddedInMonth,
         count(
             case
-                when e.createdAt >= :prev and e.createdAt <= :month then 1
+                when u.createdAt >= :prev and u.createdAt <= :month then 1
             end
         ) as teachersAddedInPrevMonth
     from Teacher e
-    where e.organizationId = :organizationId
-      and e.deleted = false
+    join e.user u
+    where u.organizationId = :organizationId
+      and u.deleted = false
 """)
     AnalyticTeacherProjection getAnalyticTeacher(String organizationId,
                                                  LocalDateTime prev,
                                                  LocalDateTime month,
                                                  LocalDateTime nextMonth);
+
+
+    AnalyticTeacherProjection getAnalyticTeacher(String organizationId, LocalDateTime monthAgo);
+
+    @Query("select exists (select t.id from Teacher t where t.id =:id and t.user.deleted = false)")
+    Optional<Boolean> checkId(String id);
+
+    @Modifying
+    @Transactional
+    @Query("update Teacher t set t.user.deleted = true where t.id=:id")
+    void softDelete(String id);
+
+    @Query("select exists(select t.id from Teacher t join t.user u where t.id=:id and u.deleted=false and u.organizationId=:organizationId)")
+    Optional<Boolean> checkIdAndOrgId(String id, String organizationId);
 }

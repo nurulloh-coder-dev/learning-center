@@ -31,4 +31,6 @@ public class AttendanceStudent extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AttendanceStatus status;
+
+    private String reason;
 }

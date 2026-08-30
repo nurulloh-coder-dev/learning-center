@@ -6,6 +6,7 @@ import org.example.crm.entity.dto.attendance.AttendanceUpdateDto;
 import org.example.crm.entity.dto.attendance.MonthlyAttendanceDto;
 import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentCreateDto;
 import org.example.crm.entity.dto.attendanceStudent.AttendanceStudentUpdateDto;
+import org.example.crm.entity.dto.attendanceStudent.StatusReasonDto;
 import org.example.crm.entity.enums.AttendanceStatus;
 import org.example.crm.entity.model.Attendance;
 import org.example.crm.entity.model.AttendanceStudent;
@@ -67,7 +68,7 @@ public class AttendanceService extends AbstractService<
             AttendanceStudent studentAttendance = new AttendanceStudent();
             studentAttendance.setStudent(student);
             studentAttendance.setStatus(item.status());
-
+            studentAttendance.setReason(item.reason());
             attendance.addStudentAttendance(studentAttendance);
         }
 
@@ -103,12 +104,14 @@ public class AttendanceService extends AbstractService<
             if (existingRecord != null) {
                 // Update existing status
                 existingRecord.setStatus(dto.status());
+                existingRecord.setReason(dto.reason());
             } else {
                 // Add new student record if not previously present
                 Student student = studentValidator.validateIdAndGet(dto.studentId());
                 AttendanceStudent newRecord = new AttendanceStudent();
                 newRecord.setStudent(student);
                 newRecord.setStatus(dto.status());
+                newRecord.setReason(dto.reason());
                 attendance.addStudentAttendance(newRecord);
             }
         }
@@ -136,15 +139,15 @@ public class AttendanceService extends AbstractService<
                 .toList();
 
         List<AttendanceStudentProjection> studentAttendances = repository.findAttendanceStudentsByAttId(attIds);
-        Map<String, Map<String, AttendanceStatus>> attendanceByAttId = studentAttendances.stream()
+        Map<String, Map<String, StatusReasonDto>> attendanceByAttId = studentAttendances.stream()
                 .collect(
                         Collectors.groupingBy(AttendanceStudentProjection::getAttendanceId,
                                 HashMap::new,
                                 Collectors.toMap(
                                         AttendanceStudentProjection::getStudentId,
-                                        AttendanceStudentProjection::getStatus,
-                                        (existingStatus, newStatus) -> newStatus)
-                        )
+                                        a -> new StatusReasonDto(a.getStatus(), a.getReason()),
+                                        (existing, replacement) -> replacement
+                                ))
                 );
         return allByGroupIdMonth.stream()
                 .map(att -> new MonthlyAttendanceDto(

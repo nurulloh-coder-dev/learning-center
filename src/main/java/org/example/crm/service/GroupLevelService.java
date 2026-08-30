@@ -1,6 +1,7 @@
 package org.example.crm.service;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.groupLevel.GroupLevelCreateDto;
 import org.example.crm.entity.dto.groupLevel.GroupLevelDto;
 import org.example.crm.entity.dto.groupLevel.GroupLevelNameDto;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Slf4j
 public class GroupLevelService extends AbstractService<
         GroupLevelRepository,
         GroupLevelMapper,
@@ -36,7 +38,7 @@ public class GroupLevelService extends AbstractService<
 
     public List<GroupLevelDto> getGroupLevels(String search) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        List<Level> level = repository.findAllLevelsByOrganizationIdAndSearch(organizationId,search);
+        List<Level> level = repository.findAllLevelsByOrganizationIdAndSearch(organizationId, search);
         return mapper.toListDto(level);
     }
 
@@ -50,7 +52,7 @@ public class GroupLevelService extends AbstractService<
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         validator.validateAndGet(id);
         Level level = repository.findLevelByIdAndOrganizationId(id, organizationId)
-                .orElseThrow(()-> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound));
+                .orElseThrow(() -> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound));
         return mapper.toDto(level);
     }
 
@@ -73,6 +75,7 @@ public class GroupLevelService extends AbstractService<
         Level level = validator.validateAndGet(id);
         repository.updateLevelDeleted(level.getId());
     }
+
     @Transactional
     public List<GroupLevelDto> update(List<GroupLevelUpdateDto> levels) {
         List<Level> updatedLevels = levels.stream().map(levelUpdateDto -> {
@@ -87,9 +90,11 @@ public class GroupLevelService extends AbstractService<
 
     public List<GroupLevelNameDto> getGroupLevelsName() {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
+        log.info("orgId->{}", organizationId);
         List<LevelNamesProjection> levelNames = repository.getLevelNames(organizationId);
+        log.info("size of result is {}",levelNames.size());
         return levelNames.stream()
-                .map(l->new GroupLevelNameDto(l.getId(),l.getName()))
+                .map(l -> new GroupLevelNameDto(l.getId(), l.getName()))
                 .toList();
     }
 }

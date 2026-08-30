@@ -6,6 +6,5 @@ import org.springframework.beans.factory.annotation.Value;
 public interface GroupNameProjection {
     String getId();
     String getName();
-    @Value("#{target.timeTable.dayType}")
     DayType getDayType();
 }
