@@ -63,6 +63,9 @@ public class JwtUtils {
         if (user.getOrganizationId() != null) {
             claims.put("organizationId", user.getOrganizationId());
         }
+        if (user.getPermissions() !=null){
+            claims.put("permissions", user.getPermissions());
+        }
         return claims;
     }
 
