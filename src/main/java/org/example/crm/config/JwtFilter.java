@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.crm.entity.enums.AdministratorPermission;
 import org.example.crm.entity.enums.Role;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @AllArgsConstructor
@@ -58,11 +60,20 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private CustomUserDetails prepareUserDetails(Claims claims) {
+        List<?> rawPermissions = claims.get("permissions", List.class);
+        List<AdministratorPermission> permissions = (rawPermissions != null)
+                ? rawPermissions.stream()
+                .map(Object::toString)
+                .map(AdministratorPermission::valueOf)
+                .toList()
+                : List.of();
+
         return CustomUserDetails.builder()
                 .phone(claims.getSubject())
                 .userId(claims.get("userId", String.class))
                 .role(Role.valueOf(claims.get("role", String.class)))
-                .organizationId(claims.get("organizationId",String.class))
+                .organizationId(claims.get("organizationId", String.class))
+                .permissions(permissions)
                 .build();
     }
 }

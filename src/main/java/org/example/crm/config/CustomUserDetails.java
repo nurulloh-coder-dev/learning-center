@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.example.crm.entity.enums.AdministratorPermission;
 import org.example.crm.entity.enums.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,12 +24,23 @@ public class CustomUserDetails implements UserDetails {
     private Role role;
     private String userId;
     private String organizationId;
+    private List<AdministratorPermission> permissions;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> roles = new ArrayList<>();
-        roles.add(new SimpleGrantedAuthority("ROLE_"+role.name()));
-        return roles;
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        if (role != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        }
+
+        if (permissions != null) {
+            for (AdministratorPermission perm : permissions) {
+                authorities.add(new SimpleGrantedAuthority(perm.name()));
+            }
+        }
+
+        return authorities;
     }
 
     @Override
@@ -37,7 +49,22 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
     public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
         return true;
     }
 }

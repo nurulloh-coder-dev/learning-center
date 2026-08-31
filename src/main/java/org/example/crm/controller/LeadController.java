@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/v1/leads")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('LEAD_MANAGEMENT'))")
 public class LeadController {
 
     private final LeadService service;
@@ -69,7 +71,7 @@ public class LeadController {
     @PatchMapping("/{id}/callLater")
     public ResponseEntity<LeadDto> updateStatus(
             @PathVariable String id,
-            @Future LocalDateTime callAt) {
+            @RequestParam @Future @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME) LocalDateTime callAt) {
         return ResponseEntity.ok(service.callLater(id, callAt));
     }
 
