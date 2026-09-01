@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.example.crm.entity.dto.group.FullGroupDto;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.enums.DayType;
-import org.example.crm.entity.model.Level;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.enums.GroupStatus;
@@ -190,5 +189,13 @@ public class GroupService extends AbstractService<
 
     public DayType isOddOrEvenDayOfWeek(DayOfWeek dayOfWeek) {
         return dayOfWeek.getValue() % 2 != 0 ? DayType.ODD : DayType.EVEN;
+    }
+
+    public List<GroupDto> getMyGroups() {
+        String userId = userValidator.authenticateAndGetId();
+        List<Group> myGroups = repository.getMyGroups(userId);
+        return myGroups.stream()
+                .map(g->mapper.toDto(g,null))
+                .toList();
     }
 }

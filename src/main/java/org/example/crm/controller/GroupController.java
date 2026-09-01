@@ -7,7 +7,6 @@ import org.example.crm.entity.dto.group.GroupCreateDto;
 import org.example.crm.entity.dto.group.GroupDto;
 import org.example.crm.entity.dto.group.GroupUpdateDto;
 import org.example.crm.entity.enums.GroupStatus;
-import org.example.crm.entity.model.Level;
 import org.example.crm.projection.GroupNameProjection;
 import org.example.crm.service.GroupService;
 import org.springframework.data.domain.Page;
@@ -72,5 +71,11 @@ public class GroupController {
     public ResponseEntity<FullGroupDto> getGroupWithStudents(@RequestParam(required = false) String groupId) {
         FullGroupDto groupInfo = service.getGroupInfo(groupId);
         return ResponseEntity.ok(groupInfo);
+    }
+
+    @GetMapping("/group/my")
+    public ResponseEntity<List<GroupDto>> getMyGroups(){
+        List<GroupDto> myGroups = service.getMyGroups();
+        return ResponseEntity.ok(myGroups);
     }
 }

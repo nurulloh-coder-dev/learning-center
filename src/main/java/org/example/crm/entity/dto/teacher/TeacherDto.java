@@ -4,6 +4,8 @@ import org.example.crm.entity.dto.user.UserDto;
 
 public record TeacherDto(
         String id,
-        UserDto userDto
+        UserDto userDto,
+        float totalTeachingExp,
+        float currPlaceTeachingExp
 ) {
 }

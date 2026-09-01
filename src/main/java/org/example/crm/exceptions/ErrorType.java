@@ -8,6 +8,7 @@ public enum ErrorType {
     FILE_TYPE_ERROR("file.type.error"),
     ERROR_SAVING_FILE("error.saving.file"),
     BAD_JSON("bad.json"),
+    BAD_REQUEST("bad.request"),
     PAGE_NOT_FOUND("page.not.found"),
     USER_NOT_FOUND("user.not.found"),
     LEAD_NOT_FOUND("lead.not.found"),

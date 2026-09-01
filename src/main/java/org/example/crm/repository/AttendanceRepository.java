@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.example.crm.entity.model.Attendance;
 import org.example.crm.projection.AttendanceProjection;
 import org.example.crm.projection.AttendanceStudentProjection;
+import org.example.crm.projection.MyAttendanceProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -52,11 +53,10 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
                    l.title as lessonTitle
                    from Attendance a
                    join a.lesson l
-                   join l.group g
-                   where g.id= :groupId and l.title like concat(cast((g.currentMonth-:minusMonths) as string) ,'.%')
+                   where l.group.id= :groupId and l.title like concat(:IntendedMonth,'.%')
                    order by a.createdAt asc
             """)
-    List<AttendanceProjection> findAllByGroupIdAndMonth(@Param("groupId") String groupId, @Param("minusMonths") Integer previousMonths);
+    List<AttendanceProjection> findAllByGroupIdAndMonth(@Param("groupId") String groupId, String intendedMonth,@Param("minusMonths") Integer previousMonths);
 
     @Query("""
              select s.id as studentId,
@@ -70,4 +70,18 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
              where a.id in (:attIds)
             """)
     List<AttendanceStudentProjection> findAttendanceStudentsByAttId(@Param("attIds") List<String> id);
+
+    @Query("""
+           select ast.status as status,
+                  ast.reason as reason,
+                  l.title as title,
+                  a.createdAt as date
+           from AttendanceStudent ast
+           join ast.attendance a
+           join a.lesson l
+                   where ast.student.user.id=:userId
+                         and l.group.id =:groupId
+                         and l.title like concat(:intendedMonth,'.%')""")
+    List<MyAttendanceProjection> getmyAttendance(String groupId, String userId, String intendedMonth);
+
 }

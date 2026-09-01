@@ -119,4 +119,20 @@ public interface GroupRepository extends JpaRepository<Group, String> {
 
     @Query("select g.branch.id from Group g where g.id=:id and g.deleted=false")
     Optional<String> checkAndGetBranchId(@Param("id") String groupId);
+
+    @Query("""
+                SELECT e.group
+                FROM Enrollment e
+                JOIN e.student s
+                JOIN s.user u
+                WHERE u.id = :userId
+                  AND u.deleted = false
+                  AND e.deleted = false
+                  AND e.group.deleted = false
+                  AND e.group.status = 'ACTIVE'
+            """)
+    List<Group> getMyGroups(@Param("userId") String userId);
+
+    @Query("select g.currentMonth from Group g where g.id=:id and g.deleted=false")
+    Optional<Integer> checkAndGetCurrentMonth(String groupId);
 }

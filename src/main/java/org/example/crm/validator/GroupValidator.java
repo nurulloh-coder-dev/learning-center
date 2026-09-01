@@ -40,4 +40,16 @@ public class GroupValidator {
         }
         return branchId.get();
     }
+
+    public Integer validateIdAndGetMonth(String groupId, Integer previousMonths) {
+        Optional<Integer> month = repository.checkAndGetCurrentMonth(groupId);
+        if (month.isEmpty()){
+            throw new RestException(ErrorType.GROUP_NOT_FOUND,ErrorCodes.NotFound);
+        }
+        Integer currentMonth = month.get();
+        if (currentMonth-previousMonths<=0){
+            throw new RestException(ErrorType.BAD_REQUEST,ErrorCodes.BadRequest);
+        }
+        return currentMonth-previousMonths;
+    }
 }
