@@ -27,11 +27,9 @@ public class InvoiceService extends AbstractService<
         InvoiceValidator> implements CrudService<InvoiceCreateDto, InvoiceUpdateDto, InvoiceDto, String> {
 
     final StudentRepository studentRepository;
-    final UserValidator userValidator;
-    protected InvoiceService(InvoiceRepository repository, InvoiceMapper mapper, InvoiceValidator validator, StudentRepository studentRepository, UserValidator userValidator) {
+    protected InvoiceService(InvoiceRepository repository, InvoiceMapper mapper, InvoiceValidator validator, StudentRepository studentRepository) {
         super(repository, mapper, validator);
         this.studentRepository = studentRepository;
-        this.userValidator = userValidator;
     }
 
     private String wrapSearch(String search) {
@@ -40,8 +38,6 @@ public class InvoiceService extends AbstractService<
 
     @Override
     public Page<InvoiceDto> getAll(Pageable pageable, String search) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.INVOICE_MANAGEMENT);
         Page<InvoiceProjection> projectionPage = repository.
                 getAllInvoicesByFilter(wrapSearch(search), null, null, null, pageable);
         return projectionPage.map(mapper::toDtoFromProjection);
@@ -49,16 +45,12 @@ public class InvoiceService extends AbstractService<
 
     @Override
     public InvoiceDto get(String id) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.INVOICE_MANAGEMENT);
         Invoice invoice = validator.validateIdAndGet(id);
         return mapper.toDto(invoice);
     }
 
     @Override
     public InvoiceDto create(InvoiceCreateDto createDto) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.INVOICE_MANAGEMENT);
         Invoice invoice = mapper.toEntity(createDto);
 
         Student student = invoice.getStudent();
@@ -69,8 +61,6 @@ public class InvoiceService extends AbstractService<
 
     @Override
     public InvoiceDto update(InvoiceUpdateDto updateDto, String id) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.INVOICE_MANAGEMENT);
         Invoice invoice = validator.validateIdAndGet(id);
         mapper.mapUpdate(invoice, updateDto);
         return mapper.toDto(repository.save(invoice));
@@ -78,8 +68,6 @@ public class InvoiceService extends AbstractService<
 
     @Override
     public void delete(String id) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.INVOICE_MANAGEMENT);
         Invoice invoice = validator.validateIdAndGet(id);
         invoice.setDeleted(true);
         repository.save(invoice);
@@ -87,8 +75,6 @@ public class InvoiceService extends AbstractService<
 
     public Page<InvoiceDto> getAllInvoices(String search, LocalDateTime from, LocalDateTime to,
                                            InvoiceStatus status, Pageable pageable) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.INVOICE_MANAGEMENT);
 
 
         from = from == null ? LocalDateTime.now().minusYears(4) : from;
@@ -98,8 +84,6 @@ public class InvoiceService extends AbstractService<
     }
 
     public InvoiceDto returnInvoice(String studentId) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.INVOICE_MANAGEMENT);
 
         Invoice invoice = mapper.toEntityReturn(studentId);
         return mapper.toDto(repository.save(invoice));

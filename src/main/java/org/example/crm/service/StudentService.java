@@ -37,8 +37,6 @@ public class StudentService extends AbstractService<
 
     @Override
     public Page<StudentDto> getAll(Pageable pageable, String search) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.STUDENT_MANAGEMENT);
 
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         log.info("org id of current user {}", organizationId);
@@ -49,8 +47,6 @@ public class StudentService extends AbstractService<
 
     @Override
     public StudentDto get(String id) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.STUDENT_MANAGEMENT);
 
 
         Student student = validator.validateIdAndGet(id);
@@ -59,8 +55,6 @@ public class StudentService extends AbstractService<
 
     @Override
     public StudentDto create(StudentCreateDto createDto) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.STUDENT_MANAGEMENT);
 
 
         validator.validate(createDto);
@@ -70,8 +64,6 @@ public class StudentService extends AbstractService<
 
     @Override
     public StudentDto update(StudentUpdateDto updateDto, String id) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.STUDENT_MANAGEMENT);
 
 
         Student student = validator.validateIdAndGet(id);
@@ -81,8 +73,6 @@ public class StudentService extends AbstractService<
 
     @Override
     public void delete(String id) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.STUDENT_MANAGEMENT);
 
 
         validator.validateId(id);
@@ -90,8 +80,6 @@ public class StudentService extends AbstractService<
     }
 
     public Long getAllCount() {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.STUDENT_MANAGEMENT);
 
 
         String organizationId = userValidator.authenticateAndGetOrganizationId();
@@ -99,8 +87,6 @@ public class StudentService extends AbstractService<
     }
 
     public List<StudentDto> getStudentsByGroupId(String groupId) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.STUDENT_MANAGEMENT);
 
 
         List<StudentShowProjection> studentByGroupId = repository.getStudentShowByGroupId(groupId);
@@ -111,8 +97,6 @@ public class StudentService extends AbstractService<
     }
 
     public List<StudentDto> getByPhone(String phone) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.STUDENT_MANAGEMENT);
 
 
         List<Student> studentsByPhone = repository.getStudentByPhone(phone);
