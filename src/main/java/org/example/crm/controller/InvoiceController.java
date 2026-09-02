@@ -11,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("api/v1/invoice")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('INVOICE_MANAGEMENT'))")
 public class InvoiceController {
     final InvoiceService service;
 

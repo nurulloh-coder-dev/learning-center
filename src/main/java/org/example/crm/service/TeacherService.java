@@ -6,9 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.teacher.TeacherCreateDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.teacher.TeacherUpdateDto;
-import org.example.crm.entity.enums.AdministratorPermission;
 import org.example.crm.entity.model.Teacher;
-import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
@@ -39,8 +37,6 @@ public class TeacherService extends AbstractService<
 
     @Override
     public Page<TeacherDto> getAll(Pageable pageable, String search) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         log.info("orgId of current user {}", organizationId);
@@ -51,8 +47,6 @@ public class TeacherService extends AbstractService<
 
     @Override
     public TeacherDto get(String id) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
 
         String organizationId = userValidator.authenticateAndGetOrganizationId();
@@ -63,8 +57,6 @@ public class TeacherService extends AbstractService<
 
     @Override
     public TeacherDto create(TeacherCreateDto createDto) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
 
         validator.validate(createDto);
@@ -74,8 +66,6 @@ public class TeacherService extends AbstractService<
 
     @Override
     public TeacherDto update(TeacherUpdateDto updateDto, String id) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
 
         Teacher teacher = validator.validateIdAndGet(id);
@@ -85,8 +75,6 @@ public class TeacherService extends AbstractService<
 
     @Override
     public void delete(String id) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         validator.validateId(id,organizationId);
@@ -94,8 +82,6 @@ public class TeacherService extends AbstractService<
     }
 
     public Long getAllCount() {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
 
         String organizationId = userValidator.authenticateAndGetOrganizationId();
@@ -104,19 +90,12 @@ public class TeacherService extends AbstractService<
 
     public TeacherDto get(String id, String organizationId) {
 
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
-
 
         Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
         return mapper.toDto(teacher);
     }
 
     public TeacherDto create(@Valid TeacherCreateDto createDto, String organizationId) {
-
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
-
 
 
         String organization = userValidator.authenticateAndGetOrganizationId();
@@ -130,8 +109,6 @@ public class TeacherService extends AbstractService<
     @Transactional
     public TeacherDto update(@Valid TeacherUpdateDto updateDto, String id, String organizationId) {
 
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
 
         Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
@@ -141,8 +118,6 @@ public class TeacherService extends AbstractService<
 
     @Transactional
     public void delete(String id, String organizationId) {
-        User user = userValidator.authenticateAndGetUser();
-        userValidator.validateAdministratorPermission(user, AdministratorPermission.TEACHER_MANAGEMENT);
 
 
         Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
