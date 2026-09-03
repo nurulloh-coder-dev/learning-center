@@ -1,5 +1,6 @@
 package org.example.crm.entity.dto.group;
 
+import org.example.crm.entity.dto.groupLevel.GroupLevelDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.timeTable.TimeTableDto;
 import org.example.crm.entity.enums.GroupStatus;
@@ -12,7 +13,7 @@ public record GroupDto(
         TeacherDto teacher,
         TimeTableDto timeTable,
         GroupStatus status,
-        Level level,
+        GroupLevelDto level,
         Integer currentMonth,
         Integer lessonsCount
 ) {

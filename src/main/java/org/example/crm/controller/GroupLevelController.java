@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.crm.entity.dto.groupLevel.GroupLevelCreateDto;
 import org.example.crm.entity.dto.groupLevel.GroupLevelDto;
 import org.example.crm.entity.dto.groupLevel.GroupLevelNameDto;
+import org.example.crm.entity.dto.groupLevel.GroupLevelUpdateDto;
 import org.example.crm.entity.request.GroupLevelList;
 import org.example.crm.service.GroupLevelService;
 import org.springframework.http.HttpStatus;
@@ -50,6 +51,12 @@ public class GroupLevelController {
     ) {
         List<GroupLevelDto> updatedGroupLevel = service.update(updateDto.levels());
         return ResponseEntity.ok(updatedGroupLevel);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<GroupLevelDto> update(@PathVariable String id, @RequestBody GroupLevelUpdateDto updateDto){
+        GroupLevelDto update = service.update(updateDto, id);
+        return ResponseEntity.ok(update);
     }
 
     @DeleteMapping("/{id}")

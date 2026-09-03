@@ -3,6 +3,7 @@ package org.example.crm.mapper;
 import lombok.RequiredArgsConstructor;
 import org.example.crm.entity.dto.groupLevel.GroupLevelCreateDto;
 import org.example.crm.entity.dto.groupLevel.GroupLevelDto;
+import org.example.crm.entity.dto.groupLevel.GroupLevelUpdateDto;
 import org.example.crm.entity.model.Level;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +18,8 @@ public class GroupLevelMapper {
                 level.getName(),
                 level.getOrderNumber(),
                 level.getLessonCount(),
-                level.getDurationInMonths()
+                level.getDurationInMonths(),
+                level.getMonthlyFee()
         );
     }
 
@@ -31,6 +33,11 @@ public class GroupLevelMapper {
         level.setOrderNumber(createDto.orderNumber());
         level.setLessonCount(createDto.lessonCount());
         level.setDurationInMonths(createDto.durationInMonths());
+        level.setMonthlyFee(createDto.monthlyFee());
         return level;
+    }
+
+    public void mapUpdate(Level level, GroupLevelUpdateDto updateDto) {
+
     }
 }

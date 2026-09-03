@@ -1,7 +1,10 @@
 package org.example.crm.entity.dto.groupLevel;
 
+import java.math.BigDecimal;
+
 public record GroupLevelUpdateDto(
-        String id,
-        Integer orderNumber
+        Integer lessonCount,
+        Integer durationInMonths,
+        BigDecimal monthlyFee
 ) {
 }

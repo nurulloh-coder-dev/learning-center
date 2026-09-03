@@ -73,7 +73,7 @@ public class GroupController {
         return ResponseEntity.ok(groupInfo);
     }
 
-    @GetMapping("/group/my")
+    @GetMapping("/my")
     public ResponseEntity<List<GroupDto>> getMyGroups(){
         List<GroupDto> myGroups = service.getMyGroups();
         return ResponseEntity.ok(myGroups);

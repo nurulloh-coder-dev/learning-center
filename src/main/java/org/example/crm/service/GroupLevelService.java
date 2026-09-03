@@ -2,10 +2,7 @@ package org.example.crm.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.example.crm.entity.dto.groupLevel.GroupLevelCreateDto;
-import org.example.crm.entity.dto.groupLevel.GroupLevelDto;
-import org.example.crm.entity.dto.groupLevel.GroupLevelNameDto;
-import org.example.crm.entity.dto.groupLevel.GroupLevelUpdateDto;
+import org.example.crm.entity.dto.groupLevel.*;
 import org.example.crm.entity.model.Level;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
@@ -66,7 +63,10 @@ public class GroupLevelService extends AbstractService<
 
     @Override
     public GroupLevelDto update(GroupLevelUpdateDto updateDto, String id) {
-        return null;
+        Level level = validator.validateAndGet(id);
+        mapper.mapUpdate(level,updateDto);
+        repository.save(level);
+        return mapper.toDto(level);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class GroupLevelService extends AbstractService<
     }
 
     @Transactional
-    public List<GroupLevelDto> update(List<GroupLevelUpdateDto> levels) {
+    public List<GroupLevelDto> update(List<GroupLevelOrderUpdateDto> levels) {
         List<Level> updatedLevels = levels.stream().map(levelUpdateDto -> {
             Level level = repository.findById(levelUpdateDto.id())
                     .orElseThrow(() -> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound));

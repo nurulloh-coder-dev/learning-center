@@ -24,6 +24,7 @@ public class GroupMapper {
     final TeacherMapper teacherMapper;
     final TimeTableMapper timeTableMapper;
     final GroupLevelRepository groupLevelRepository;
+    private final GroupLevelMapper groupLevelMapper;
 
     public Group toEntity(GroupCreateDto createDto, Branch branch) {
         return new Group(
@@ -49,7 +50,7 @@ public class GroupMapper {
                 teacherMapper.toDto(save.getTeacher()),
                 timeTableMapper.toDto(save.getTimeTable()),
                 save.getStatus(),
-                save.getLevel(),
+                groupLevelMapper.toDto(save.getLevel()),
                 save.getCurrentMonth(),
                 lessonsCount
         );
@@ -63,8 +64,8 @@ public class GroupMapper {
                 teacherMapper.toDto(projection.getTeacher()),
                 timeTableMapper.toDto(projection.getTimeTable()),
                 projection.getStatus(),
-                groupLevelRepository.findById(projection.getLevelId())
-                        .orElseThrow(()-> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound)),
+                groupLevelMapper.toDto(groupLevelRepository.findById(projection.getLevelId())
+                        .orElseThrow(()-> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound))),
                 projection.getCurrentMonth(),
                 projection.getLessonsCount()
         );
