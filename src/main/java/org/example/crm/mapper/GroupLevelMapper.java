@@ -38,6 +38,20 @@ public class GroupLevelMapper {
     }
 
     public void mapUpdate(Level level, GroupLevelUpdateDto updateDto) {
+        if (updateDto == null || level == null) {
+            return;
+        }
 
+        if (updateDto.lessonCount() != null) {
+            level.setLessonCount(updateDto.lessonCount());
+        }
+
+        if (updateDto.durationInMonths() != null) {
+            level.setDurationInMonths(updateDto.durationInMonths());
+        }
+
+        if (updateDto.monthlyFee() != null) {
+            level.setMonthlyFee(updateDto.monthlyFee());
+        }
     }
 }
