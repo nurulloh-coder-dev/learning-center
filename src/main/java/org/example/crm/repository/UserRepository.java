@@ -20,12 +20,12 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 
     @Query("""
-                    select u
-                    from User u
-                    left join fetch u.branch
-                    where u.phone = :phone
-                    and u.deleted = false
-""")
+                                select u
+                                from User u
+                                left join fetch u.branch
+                                where u.phone = :phone
+                                and u.deleted = false
+            """)
     Optional<User> findByPhoneAndDeletedFalse(String phone);
 
 
@@ -55,4 +55,9 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Transactional
     @Query("UPDATE User u set u.deleted = true where u.id=:id and u.organizationId = :orgId")
     int softDelete(@Param("id") String id, @Param("orgId") String organizationId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE User u SET u.imageUrl =:imageUrl where u.id=:userId and u.deleted = false")
+    void updateUserImage(@Param("userId") String userId, @Param("imageUrl") String presignedUrl);
 }

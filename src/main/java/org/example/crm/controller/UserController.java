@@ -9,9 +9,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@PreAuthorize("hasAnyRole('SUPER_ADMIN,ADMINISTRATOR')")
 @RequestMapping("api/v1/user")
 public class UserController {
 
@@ -36,12 +38,14 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_MANAGEMENT')")
     @PostMapping
     public ResponseEntity<UserDto> create(@Valid @RequestBody UserCreateDto createDto) {
         UserDto createdUser = userService.create(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_MANAGEMENT')")
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> update(
             @PathVariable String id,
@@ -51,6 +55,7 @@ public class UserController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    @PreAuthorize("hasAuthority('EMPLOYEE_MANAGEMENT')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         userService.delete(id);

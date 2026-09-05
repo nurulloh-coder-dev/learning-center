@@ -11,6 +11,7 @@ import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.ImageMapper;
 import org.example.crm.projection.ImageProjection;
 import org.example.crm.repository.ImageRepository;
+import org.example.crm.repository.UserRepository;
 import org.example.crm.validator.ImageValidator;
 import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
@@ -28,11 +29,13 @@ public class ImageService extends AbstractService<
 
     private final S3Service s3Service;
     private final UserValidator userValidator;
+    private final UserRepository userRepository;
 
-    protected ImageService(ImageRepository repository, ImageMapper mapper, ImageValidator validator, S3Service s3Service, UserValidator userValidator) {
+    protected ImageService(ImageRepository repository, ImageMapper mapper, ImageValidator validator, S3Service s3Service, UserValidator userValidator, UserRepository userRepository) {
         super(repository, mapper, validator);
         this.s3Service = s3Service;
         this.userValidator = userValidator;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -59,7 +62,9 @@ public class ImageService extends AbstractService<
 
     @Override
     public void delete(String id) {
-
+        validator.validateId(id);
+        String userId = userValidator.authenticateAndGetId();
+        repository.softDelete(id,userId);
     }
 
     public ImageDto uploadImage(@Valid MultipartFile file) throws IOException {
@@ -78,6 +83,8 @@ public class ImageService extends AbstractService<
         image.setS3Key(key);
         String presignedUrl = s3Service.getPublicUrl(key);
         image.setImageUrl(presignedUrl);
+        String userId = userValidator.authenticateAndGetId();
+        userRepository.updateUserImage(userId,presignedUrl);
         Image save = repository.save(image);
         return mapper.toDto(save);
     }
