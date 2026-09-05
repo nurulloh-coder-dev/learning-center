@@ -24,13 +24,14 @@ public class AnalyticService {
     final TeacherRepository teacherRepository;
     private final UserValidator userValidator;
 
-    public AnalyticBranch getBranch(User user) {
-
-        AnalyticBranchProjection projection = branchRepository.getAnalyticBranch(user.getOrganizationId());
+    public AnalyticBranch getBranch() {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        AnalyticBranchProjection projection = branchRepository.getAnalyticBranch(organizationId);
         return new AnalyticBranch(projection.getBranchCount());
     }
 
-    public AnalyticEnrollment getEnrollment(User user, Integer year, Month month) {
+    public AnalyticEnrollment getEnrollment(Integer year, Month month) {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
         int filterYear = year == null ? LocalDateTime.now().getYear() : year;
         Month filterMonth = month ==null ? LocalDateTime.now().getMonth() : month;
         YearMonth yearMonth = YearMonth.of(filterYear, filterMonth);
@@ -47,12 +48,12 @@ public class AnalyticService {
         LocalDateTime startOfNextMonth = yearMonth.plusMonths(1)
                 .atDay(1)
                 .atStartOfDay();
-        AnalyticEnrollmentProjection projection = enrollmentRepository.getAnalyticEnrollment(user.getOrganizationId(),startOfPreviousMonth,startOfMonth,startOfNextMonth);
+        AnalyticEnrollmentProjection projection = enrollmentRepository.getAnalyticEnrollment(organizationId,startOfPreviousMonth,startOfMonth,startOfNextMonth);
 
         Long current = projection.getEnrollmentCountInMonth();
         Long previous = projection.getEnrollmentCountInPreviousMonth();
 
-        Double difference = 0.0;
+        double difference = 0.0;
 
         if (previous != 0) {
             difference = ((double) (current - previous) / previous) * 100;
@@ -61,7 +62,8 @@ public class AnalyticService {
         return new AnalyticEnrollment(projection.getEnrollmentCount(), current, previous, difference);
     }
 
-    public AnalyticInvoice getInvoice(User user, Integer year, Month month) {
+    public AnalyticInvoice getInvoice(Integer year, Month month) {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
         int filterYear = year == null ? LocalDateTime.now().getYear() : year;
         Month filterMonth = month ==null ? LocalDateTime.now().getMonth() : month;
         YearMonth yearMonth = YearMonth.of(filterYear, filterMonth);
@@ -79,7 +81,7 @@ public class AnalyticService {
         LocalDateTime startOfNextMonth = yearMonth.plusMonths(1)
                 .atDay(1)
                 .atStartOfDay();
-        AnalyticInvoiceProjection projection = invoiceRepository.getAnalyticInvoice(user.getOrganizationId(),startOfPreviousMonth,startOfMonth,startOfNextMonth);
+        AnalyticInvoiceProjection projection = invoiceRepository.getAnalyticInvoice(organizationId,startOfPreviousMonth,startOfMonth,startOfNextMonth);
 
 
         Double current = projection.getInvoiceAmountInMonth();

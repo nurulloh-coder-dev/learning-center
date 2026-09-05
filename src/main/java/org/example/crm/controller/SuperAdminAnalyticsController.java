@@ -27,48 +27,42 @@ public class SuperAdminAnalyticsController {
 
     @GetMapping("/branch")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<AnalyticBranch> branch(@CurrentUser User user){
-        return ResponseEntity.ok(service.getBranch(user));
+    public ResponseEntity<AnalyticBranch> branch() {
+        return ResponseEntity.ok(service.getBranch());
     }
 
     @GetMapping("/enrollment")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<AnalyticEnrollment> enrollment(@CurrentUser User user,
-                                                 @RequestParam(required = false) Integer year,
-                                                 @RequestParam(required = false) Month month){
-        return ResponseEntity.ok(service.getEnrollment(user,year, month));
+    public ResponseEntity<AnalyticEnrollment> enrollment(@RequestParam(required = false) Integer year,
+                                                         @RequestParam(required = false) Month month) {
+        return ResponseEntity.ok(service.getEnrollment(year, month));
     }
 
     @GetMapping("/invoice")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<AnalyticInvoice> invoice(@CurrentUser User user,
-                                                   @RequestParam(required = false) Integer year,
-                                                   @RequestParam(required = false) Month month){
-        return ResponseEntity.ok(service.getInvoice(user,year, month));
+    public ResponseEntity<AnalyticInvoice> invoice(@RequestParam(required = false) Integer year,
+                                                   @RequestParam(required = false) Month month) {
+        return ResponseEntity.ok(service.getInvoice(year, month));
     }
 
     @GetMapping("/lead")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<AnalyticLead> lead(@RequestParam(required = false) Integer year,
-                                             @RequestParam(required = false) Month month){
+                                             @RequestParam(required = false) Month month) {
         return ResponseEntity.ok(service.getLead(year, month));
     }
 
     @GetMapping("/student")
     public ResponseEntity<AnalyticStudent> student(@RequestParam(required = false) Integer year,
-                                                   @RequestParam(required = false) Month month){
+                                                   @RequestParam(required = false) Month month) {
         return ResponseEntity.ok(service.getStudent(year, month));
     }
 
     @GetMapping("/teacher")
     public ResponseEntity<AnalyticTeacher> teacher(@RequestParam(required = false) Integer year,
-                                                   @RequestParam(required = false) Month month){
+                                                   @RequestParam(required = false) Month month) {
         return ResponseEntity.ok(service.getTeacher(year, month));
     }
-
-
-
-
 
 
 }
