@@ -63,7 +63,9 @@ public class ImageService extends AbstractService<
 
     @Override
     public void delete(String id) {
-
+        validator.validateId(id);
+        String userId = userValidator.authenticateAndGetId();
+        repository.softDelete(id,userId);
     }
 
     public ImageDto uploadImage(@Valid MultipartFile file) throws IOException {
@@ -74,7 +76,6 @@ public class ImageService extends AbstractService<
         if (!validExtension || !validContentType) {
             throw new RestException(ErrorType.INVALID_FILE_TYPE, ErrorCodes.BadRequest);
         }
-        User user = userValidator.authenticateAndGetUser();
         Image image = new Image();
         image.setOriginalFileName(filename);
         image.setFileSize(file.getSize());
@@ -83,10 +84,9 @@ public class ImageService extends AbstractService<
         image.setS3Key(key);
         String presignedUrl = s3Service.getPublicUrl(key);
         image.setImageUrl(presignedUrl);
+        String userId = userValidator.authenticateAndGetId();
+        userRepository.updateUserImage(userId,presignedUrl);
         Image save = repository.save(image);
-        user.setImageUrl(presignedUrl);
-
-        userRepository.save(user);
         return mapper.toDto(save);
     }
 

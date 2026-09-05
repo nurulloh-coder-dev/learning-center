@@ -22,4 +22,9 @@ public interface ImageRepository extends JpaRepository<Image, String> {
     @Modifying
     @Query("UPDATE User u set u.imageUrl =(SELECT i.imageUrl FROM Image i WHERE i.id =:imgId) WHERE u.id =:userId")
     void updateMainImg(@Param("imgId") String id, @Param("userId") String userId);
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE Image i set i.deleted = true where i.id =:id and i.createdBy =:userId")
+    void softDelete(String id, String userId);
 }

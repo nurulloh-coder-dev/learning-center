@@ -1,7 +1,6 @@
 package org.example.crm.controller;
 
 import jakarta.validation.Valid;
-import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.teacher.TeacherCreateDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.teacher.TeacherUpdateDto;
@@ -13,11 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/teacher")
+@PreAuthorize("hasAnyRole('SUPER_ADMIN,ADMINISTRATOR,TEACHER')")
 public class TeacherController {
 
     private final TeacherService teacherService;
@@ -27,7 +26,6 @@ public class TeacherController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('TEACHER_MANAGEMENT'))")
     public ResponseEntity<Page<TeacherDto>> getAll(
             Pageable pageable,
             @RequestParam(required = false) String search
@@ -37,28 +35,26 @@ public class TeacherController {
     }
 
     @GetMapping("/count")
-    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('TEACHER_MANAGEMENT'))")
     public ResponseEntity<Map<String, Long>> count() {
         Long count = teacherService.getAllCount();
         return ResponseEntity.ok(Map.of("count",count));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('TEACHER_MANAGEMENT'))")
     public ResponseEntity<TeacherDto> getById(@PathVariable String id) {
         TeacherDto teacher = teacherService.get(id);
         return ResponseEntity.ok(teacher);
     }
 
+    @PreAuthorize("hasAuthority('TEACHER_MANAGEMENT')")
     @PostMapping
-    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('TEACHER_MANAGEMENT'))")
     public ResponseEntity<TeacherDto> create(@Valid @RequestBody TeacherCreateDto createDto) {
         TeacherDto createdTeacher = teacherService.create(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTeacher);
     }
 
+    @PreAuthorize("hasAuthority('TEACHER_MANAGEMENT')")
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('TEACHER_MANAGEMENT'))")
     public ResponseEntity<TeacherDto> update(
             @PathVariable String id,
             @Valid @RequestBody TeacherUpdateDto updateDto
@@ -67,16 +63,16 @@ public class TeacherController {
         return ResponseEntity.ok(updatedTeacher);
     }
 
+    @PreAuthorize("hasAuthority('TEACHER_MANAGEMENT')")
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('TEACHER_MANAGEMENT'))")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         teacherService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/my-group/{groupId}")
-    public ResponseEntity<List<StudentDto>> getMyGroup(@PathVariable String groupId){
-        List<StudentDto> myGroup = teacherService.getMyGroup(groupId);
-        return ResponseEntity.ok(myGroup);
-    }
+//    @GetMapping("/my-group/{groupId}")
+//    public ResponseEntity<List<StudentDto>> getMyGroup(@PathVariable String groupId){
+//        List<StudentDto> myGroup = teacherService.getMyGroup(groupId);
+//        return ResponseEntity.ok(myGroup);
+//    }
 }
