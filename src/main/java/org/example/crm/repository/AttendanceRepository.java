@@ -69,7 +69,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
              join ast.attendance a
              where a.id in (:attIds)
             """)
-    List<AttendanceStudentProjection> findAttendanceStudentsByAttId(@Param("attIds") List<String> id);
+    List<AttendanceStudentProjection> findAttendanceStudentsByAttId(@Param("attIds") List<String> attIds);
 
     @Query("""
            select ast.status as status,
