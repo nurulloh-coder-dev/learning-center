@@ -99,10 +99,10 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                     tt.dayType AS dayType
                 FROM Group g
                 LEFT JOIN g.timeTable tt
-                WHERE g.teacher.id = :teacherId
+                WHERE g.teacher.user.id = :userId
                   AND g.deleted = false
             """)
-    List<GroupNameProjection> findAllGroupNames(@Param("teacherId") String teacherId);
+    List<GroupNameProjection> findAllGroupNames(@Param("userId") String teacherId);
 
     @Query("SELECT g FROM Group g WHERE g.teacher.user.id = :userId AND g.status = 'ONGOING' and g.deleted = false")
     List<Group> findAllByTeacherUserId(@Param("userId") String userId);
