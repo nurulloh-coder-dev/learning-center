@@ -78,4 +78,10 @@ public class UserValidator {
                     .findFirst().orElseThrow(() -> new RestException(ErrorType.NO_PERMISSION,  ErrorCodes.BadRequest));
         }
     }
+
+    public void validateIfCurrentUser(User user, String id) {
+        if (!user.getId().equals(id)) {
+            throw new RestException(ErrorType.FORBIDDEN, ErrorCodes.Forbidden);
+        }
+    }
 }

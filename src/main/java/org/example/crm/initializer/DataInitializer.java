@@ -193,21 +193,34 @@ public class DataInitializer {
         Enrollment enrollment1 = new Enrollment();
         enrollment1.setStudent(student1);
         enrollment1.setGroup(group1);
+        enrollment1.setStatus(EnrollmentPaymentStatus.PARTIAL);
+        enrollment1.setMonthlyFee(group1.getLevel().getMonthlyFee());
+        enrollment1.setPaidAmount(group1.getLevel().getMonthlyFee().subtract(BigDecimal.valueOf(100)));
         entityManager.persist(enrollment1);
 
         Enrollment enrollment2 = new Enrollment();
         enrollment2.setStudent(student2);
         enrollment2.setGroup(group1);
+        enrollment2.setStatus(EnrollmentPaymentStatus.UNPAID);
+        enrollment2.setMonthlyFee(group1.getLevel().getMonthlyFee());
+        enrollment2.setPaidAmount(BigDecimal.ZERO);
         entityManager.persist(enrollment2);
 
         Enrollment enrollment3 = new Enrollment();
         enrollment3.setStudent(student3);
         enrollment3.setGroup(group2);
+        enrollment3.setStatus(EnrollmentPaymentStatus.PAID);
+        enrollment3.setMonthlyFee(group2.getLevel().getMonthlyFee());
+        enrollment3.setPaidAmount(group2.getLevel().getMonthlyFee());
         entityManager.persist(enrollment3);
 
         Enrollment enrollment4 = new Enrollment();
         enrollment4.setStudent(student4);
         enrollment4.setGroup(group2);
+
+        enrollment4.setStatus(EnrollmentPaymentStatus.PAID);
+        enrollment4.setMonthlyFee(group2.getLevel().getMonthlyFee());
+        enrollment4.setPaidAmount(group2.getLevel().getMonthlyFee());
         entityManager.persist(enrollment4);
 
         // ============ INVOICES ============
@@ -216,15 +229,13 @@ public class DataInitializer {
         invoice1.setAmount(new BigDecimal("150.00"));
         invoice1.setPaymentStatus(InvoiceStatus.PAID);
         invoice1.setIssuedAt(LocalDateTime.now().minusMonths(2));
-        invoice1.setStudent(student1);
         invoiceRepository.save(invoice1);
 
         Invoice invoice2 = new Invoice();
         invoice2.setInvoiceNumber("INV-002");
         invoice2.setAmount(new BigDecimal("150.00"));
-        invoice2.setPaymentStatus(InvoiceStatus.PENDING);
         invoice2.setIssuedAt(LocalDateTime.now().minusDays(5));
-        invoice2.setStudent(student2);
+        invoice2.setEnrollment(enrollment1);
         invoiceRepository.save(invoice2);
 
         Invoice invoice3 = new Invoice();
@@ -232,15 +243,14 @@ public class DataInitializer {
         invoice3.setAmount(new BigDecimal("200.00"));
         invoice3.setPaymentStatus(InvoiceStatus.OVERDUE);
         invoice3.setIssuedAt(LocalDateTime.now().minusMonths(1));
-        invoice3.setStudent(student3);
+        invoice3.setEnrollment(enrollment3);
         invoiceRepository.save(invoice3);
 
         Invoice invoice4 = new Invoice();
         invoice4.setInvoiceNumber("INV-004");
         invoice4.setAmount(new BigDecimal("200.00"));
-        invoice4.setPaymentStatus(InvoiceStatus.PENDING);
         invoice4.setIssuedAt(LocalDateTime.now().minusDays(3));
-        invoice4.setStudent(student4);
+        invoice4.setEnrollment(enrollment4);
         invoiceRepository.save(invoice4);
 
         // ============ ATTENDANCES ============

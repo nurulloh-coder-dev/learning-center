@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.crm.entity.dto.image.ImageCreateDto;
 import org.example.crm.entity.dto.image.ImageDto;
 import org.example.crm.entity.dto.image.ImageUpdateDto;
+import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.model.Image;
@@ -11,6 +12,7 @@ import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.ImageMapper;
 import org.example.crm.projection.ImageProjection;
 import org.example.crm.repository.ImageRepository;
+import org.example.crm.repository.UserRepository;
 import org.example.crm.validator.ImageValidator;
 import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
@@ -28,11 +30,13 @@ public class ImageService extends AbstractService<
 
     private final S3Service s3Service;
     private final UserValidator userValidator;
+    final UserRepository userRepository;
 
-    protected ImageService(ImageRepository repository, ImageMapper mapper, ImageValidator validator, S3Service s3Service, UserValidator userValidator) {
+    protected ImageService(ImageRepository repository, ImageMapper mapper, ImageValidator validator, S3Service s3Service, UserValidator userValidator, UserRepository userRepository) {
         super(repository, mapper, validator);
         this.s3Service = s3Service;
         this.userValidator = userValidator;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -70,6 +74,7 @@ public class ImageService extends AbstractService<
         if (!validExtension || !validContentType) {
             throw new RestException(ErrorType.INVALID_FILE_TYPE, ErrorCodes.BadRequest);
         }
+        User user = userValidator.authenticateAndGetUser();
         Image image = new Image();
         image.setOriginalFileName(filename);
         image.setFileSize(file.getSize());
@@ -79,6 +84,9 @@ public class ImageService extends AbstractService<
         String presignedUrl = s3Service.getPublicUrl(key);
         image.setImageUrl(presignedUrl);
         Image save = repository.save(image);
+        user.setImageUrl(presignedUrl);
+
+        userRepository.save(user);
         return mapper.toDto(save);
     }
 

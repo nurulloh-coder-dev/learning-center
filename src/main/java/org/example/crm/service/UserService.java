@@ -61,8 +61,9 @@ public class UserService extends AbstractService<
 
     @Override
     public UserDto update(UserUpdateDto updateDto, String id) {
-        User user = validator.validateIdAndGet(id);
+        User user = validator.authenticateAndGetUser();
         String organizationId = validator.authenticateAndGetOrganizationId();
+        validator.validateIfCurrentUser(user, id);
         organizationValidator.validateOrganizationMatch(user.getOrganizationId(), organizationId);
         mapper.mapUpdate(user, updateDto);
         return mapper.toDto(repository.save(user));

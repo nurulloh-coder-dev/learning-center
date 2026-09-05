@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Invoice extends BaseEntity {
 
-
     @Column(unique = true, nullable = false)
     private String invoiceNumber;
 
@@ -32,11 +31,11 @@ public class Invoice extends BaseEntity {
 
     private LocalDateTime issuedAt = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "student_id")
-    private Student student;
-
-
     @Enumerated(EnumType.STRING)
     private InvoiceType type;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private Enrollment enrollment;
+
+
 }
