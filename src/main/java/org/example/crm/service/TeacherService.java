@@ -3,6 +3,7 @@ package org.example.crm.service;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.teacher.TeacherCreateDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.teacher.TeacherUpdateDto;
@@ -19,6 +20,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class TeacherService extends AbstractService<
@@ -28,11 +31,13 @@ public class TeacherService extends AbstractService<
 
     final UserValidator userValidator;
     final UserRepository userRepository;
+    final StudentService studentService;
 
-    protected TeacherService(TeacherRepository repository, TeacherMapper mapper, TeacherValidator validator, UserValidator userValidator, UserRepository userRepository) {
+    protected TeacherService(TeacherRepository repository, TeacherMapper mapper, TeacherValidator validator, UserValidator userValidator, UserRepository userRepository, StudentService studentService) {
         super(repository, mapper, validator);
         this.userValidator = userValidator;
         this.userRepository = userRepository;
+        this.studentService = studentService;
     }
 
     @Override
@@ -123,5 +128,11 @@ public class TeacherService extends AbstractService<
         Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
 
         repository.softDelete(teacher.getId());
+    }
+
+    public List<StudentDto> getMyGroup(String groupId) {
+        String userId = userValidator.authenticateAndGetId();
+        validator.validateGroupAndTeacher(userId,groupId);
+        return studentService.getStudentsByGroupId(groupId);
     }
 }

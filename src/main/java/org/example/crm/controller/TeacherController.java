@@ -1,6 +1,7 @@
 package org.example.crm.controller;
 
 import jakarta.validation.Valid;
+import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.teacher.TeacherCreateDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.teacher.TeacherUpdateDto;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -65,5 +67,11 @@ public class TeacherController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         teacherService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/my-group/{groupId}")
+    public ResponseEntity<List<StudentDto>> getMyGroup(@PathVariable String groupId){
+        List<StudentDto> myGroup = teacherService.getMyGroup(groupId);
+        return ResponseEntity.ok(myGroup);
     }
 }

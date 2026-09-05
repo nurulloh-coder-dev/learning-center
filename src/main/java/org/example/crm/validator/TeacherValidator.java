@@ -43,4 +43,11 @@ public class TeacherValidator {
     public void validate(TeacherCreateDto createDto) {
 
     }
+
+    public void validateGroupAndTeacher(String userId, String groupId) {
+        boolean validated = repository.validateGroupAndTeacher(userId, groupId);
+        if (!validated){
+            throw new RestException(ErrorType.FORBIDDEN,ErrorCodes.Forbidden);
+        }
+    }
 }

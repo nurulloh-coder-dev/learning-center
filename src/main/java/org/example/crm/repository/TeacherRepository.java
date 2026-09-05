@@ -20,10 +20,10 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
     Page<Teacher> findAll(Pageable pageable, String search);
 
     @Query("""
-        SELECT COUNT(t.id)
-        from Teacher t
-        join t.user u
-        where u.organizationId =:organizationId and u.deleted = false""")
+            SELECT COUNT(t.id)
+            from Teacher t
+            join t.user u
+            where u.organizationId =:organizationId and u.deleted = false""")
     Long countTeachersByDeletedAndOrg(@Param("organizationId") String organizationId);
 
     @Query("""
@@ -37,23 +37,23 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
     Page<Teacher> findAllBySearch(@Param("orgId") String organizationId, @Param("search") String search, Pageable pageable);
 
     @Query("""
-    select
-        count(e.id) as teacherCount,
-        count(
-            case
-                when u.createdAt > :month and u.createdAt < :nextMonth then 1
-            end
-        ) as teachersAddedInMonth,
-        count(
-            case
-                when u.createdAt > :prev and u.createdAt < :month then 1
-            end
-        ) as teachersAddedInPrevMonth
-    from Teacher e
-    join e.user u
-    where u.organizationId = :organizationId
-      and u.deleted = false
-""")
+                select
+                    count(e.id) as teacherCount,
+                    count(
+                        case
+                            when u.createdAt > :month and u.createdAt < :nextMonth then 1
+                        end
+                    ) as teachersAddedInMonth,
+                    count(
+                        case
+                            when u.createdAt > :prev and u.createdAt < :month then 1
+                        end
+                    ) as teachersAddedInPrevMonth
+                from Teacher e
+                join e.user u
+                where u.organizationId = :organizationId
+                  and u.deleted = false
+            """)
     AnalyticTeacherProjection getAnalyticTeacher(@Param("organizationId") String organizationId,
                                                  @Param("prev") LocalDateTime prev,
                                                  @Param("month") LocalDateTime month,
@@ -69,4 +69,13 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
 
     @Query("select exists(select t.id from Teacher t join t.user u where t.id=:id and u.deleted=false and u.organizationId=:organizationId)")
     Optional<Boolean> checkIdAndOrgId(String id, String organizationId);
+
+    @Query("""
+                SELECT CASE WHEN COUNT(g) > 0 THEN true ELSE false END
+                FROM Group g
+                WHERE g.id = :groupId
+                  AND g.teacher.user.id = :userId
+                  AND g.deleted = false
+            """)
+    boolean validateGroupAndTeacher(@Param("userId") String userId, @Param("groupId") String groupId);
 }
