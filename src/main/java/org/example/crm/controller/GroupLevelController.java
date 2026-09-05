@@ -45,7 +45,7 @@ public class GroupLevelController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdGroupLevel);
     }
 
-    @PutMapping()
+    @PutMapping
     public ResponseEntity<List<GroupLevelDto>> update(
             @Valid @RequestBody GroupLevelList updateDto
     ) {

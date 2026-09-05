@@ -156,11 +156,10 @@ public class GroupService extends AbstractService<
             if (group == null) {
                 return null;
             }
-            lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         } else {
             group = validator.validateIdAndGet(groupId);
-            lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         }
+        lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         groupDto = mapper.toDto(group, lessonsCount);
         studentsByGroupId = studentService.getStudentsByGroupId(groupDto.id());
         return new FullGroupDto(studentsByGroupId, groupDto);

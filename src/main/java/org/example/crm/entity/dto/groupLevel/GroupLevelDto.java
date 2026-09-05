@@ -8,6 +8,6 @@ public record GroupLevelDto(
         Integer lessonCount,
         Integer orderNumber,
         Integer durationInMonths,
-        BigDecimal MonthlyFee
+        BigDecimal monthlyFee
 ) {
 }
