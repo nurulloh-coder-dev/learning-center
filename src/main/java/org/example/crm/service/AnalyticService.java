@@ -1,10 +1,12 @@
 package org.example.crm.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.crm.config.CustomUserDetails;
 import org.example.crm.entity.analyticsRecord.*;
 import org.example.crm.entity.model.User;
 import org.example.crm.projection.*;
 import org.example.crm.repository.*;
+import org.example.crm.validator.UserValidator;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -20,6 +22,7 @@ public class AnalyticService {
     final LeadRepository leadRepository;
     final StudentRepository studentRepository;
     final TeacherRepository teacherRepository;
+    private final UserValidator userValidator;
 
     public AnalyticBranch getBranch(User user) {
 
@@ -91,7 +94,8 @@ public class AnalyticService {
         return new AnalyticInvoice(projection.getInvoiceAmount(),current,previous,difference);
     }
 
-    public AnalyticLead getLead(User user, Integer year, Month month) {
+    public AnalyticLead getLead(Integer year, Month month) {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
         int filterYear = year == null ? LocalDateTime.now().getYear() : year;
         Month filterMonth = month ==null ? LocalDateTime.now().getMonth() : month;
         YearMonth yearMonth = YearMonth.of(filterYear, filterMonth);
@@ -109,7 +113,7 @@ public class AnalyticService {
         LocalDateTime startOfNextMonth = yearMonth.plusMonths(1)
                 .atDay(1)
                 .atStartOfDay();
-        AnalyticLeadProjection projection = leadRepository.getAnalyticLead(user.getOrganizationId(),startOfPreviousMonth, startOfMonth,startOfNextMonth);
+        AnalyticLeadProjection projection = leadRepository.getAnalyticLead(organizationId,startOfPreviousMonth, startOfMonth,startOfNextMonth);
 
 
 
@@ -125,7 +129,8 @@ public class AnalyticService {
         return new AnalyticLead(projection.getLeadCount(),current, previous,difference);
     }
 
-    public AnalyticStudent getStudent(User user, Integer year, Month month) {
+    public AnalyticStudent getStudent(Integer year, Month month) {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
         int filterYear = year == null ? LocalDateTime.now().getYear() : year;
         Month filterMonth = month ==null ? LocalDateTime.now().getMonth() : month;
         YearMonth yearMonth = YearMonth.of(filterYear, filterMonth);
@@ -143,7 +148,7 @@ public class AnalyticService {
         LocalDateTime startOfNextMonth = yearMonth.plusMonths(1)
                 .atDay(1)
                 .atStartOfDay();
-        AnalyticStudentProjection projection = studentRepository.getAnalyticStudent(user.getOrganizationId(),startOfPreviousMonth,startOfMonth,startOfNextMonth);
+        AnalyticStudentProjection projection = studentRepository.getAnalyticStudent(organizationId,startOfPreviousMonth,startOfMonth,startOfNextMonth);
 
 
 
@@ -160,7 +165,8 @@ public class AnalyticService {
         return  new AnalyticStudent(projection.getStudentCount(),current,previous,difference);
     }
 
-    public AnalyticTeacher getTeacher(User user, Integer year, Month month) {
+    public AnalyticTeacher getTeacher(Integer year, Month month) {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
         int filterYear = year == null ? LocalDateTime.now().getYear() : year;
         Month filterMonth = month ==null ? LocalDateTime.now().getMonth() : month;
         YearMonth yearMonth = YearMonth.of(filterYear, filterMonth);
@@ -178,7 +184,7 @@ public class AnalyticService {
         LocalDateTime startOfNextMonth = yearMonth.plusMonths(1)
                 .atDay(1)
                 .atStartOfDay();
-        AnalyticTeacherProjection projection = teacherRepository.getAnalyticTeacher(user.getOrganizationId(), startOfPreviousMonth,startOfMonth,startOfNextMonth);
+        AnalyticTeacherProjection projection = teacherRepository.getAnalyticTeacher(organizationId, startOfPreviousMonth,startOfMonth,startOfNextMonth);
 
 
         Long current = projection.getTeachersAddedInMonth();

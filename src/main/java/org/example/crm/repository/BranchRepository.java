@@ -17,14 +17,20 @@ import java.util.Optional;
 public interface BranchRepository extends JpaRepository<Branch, String> {
 
     @Query("""
-                        select b from Branch b
-                        where b.deleted = false and
-                        b.organizationId = :orgId and
-                        (:search is null
-                        or b.name ilike concat('%', :search, '%')
-                        or b.address ilike concat('%', :search, '%'))
-            """)
-    Page<Branch> findAll(@Param("search") String search, @Param("orgId") String orgId, Pageable pageable);
+    SELECT b FROM Branch b
+    WHERE b.deleted = false
+      AND b.organizationId = :orgId
+      AND (
+          CAST(:search AS string) IS NULL
+          OR LOWER(b.name) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+          OR LOWER(b.address) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+      )
+""")
+    Page<Branch> findAll(
+            @Param("search") String search,
+            @Param("orgId") String orgId,
+            Pageable pageable
+    );
 
     boolean existsBranchByName(String name);
 

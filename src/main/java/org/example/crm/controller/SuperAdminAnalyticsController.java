@@ -2,6 +2,7 @@ package org.example.crm.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.crm.annotation.CurrentUser;
+import org.example.crm.config.CustomUserDetails;
 import org.example.crm.entity.analyticsRecord.*;
 import org.example.crm.entity.model.Invoice;
 import org.example.crm.entity.model.Lead;
@@ -48,24 +49,21 @@ public class SuperAdminAnalyticsController {
 
     @GetMapping("/lead")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<AnalyticLead> lead(@CurrentUser User user,
-                                             @RequestParam(required = false) Integer year,
+    public ResponseEntity<AnalyticLead> lead(@RequestParam(required = false) Integer year,
                                              @RequestParam(required = false) Month month){
-        return ResponseEntity.ok(service.getLead(user,year, month));
+        return ResponseEntity.ok(service.getLead(year, month));
     }
 
     @GetMapping("/student")
-    public ResponseEntity<AnalyticStudent> student(@CurrentUser User user,
-                                                   @RequestParam(required = false) Integer year,
+    public ResponseEntity<AnalyticStudent> student(@RequestParam(required = false) Integer year,
                                                    @RequestParam(required = false) Month month){
-        return ResponseEntity.ok(service.getStudent(user,year, month));
+        return ResponseEntity.ok(service.getStudent(year, month));
     }
 
     @GetMapping("/teacher")
-    public ResponseEntity<AnalyticTeacher> teacher(@CurrentUser User user,
-                                                   @RequestParam(required = false) Integer year,
+    public ResponseEntity<AnalyticTeacher> teacher(@RequestParam(required = false) Integer year,
                                                    @RequestParam(required = false) Month month){
-        return ResponseEntity.ok(service.getTeacher(user,year, month));
+        return ResponseEntity.ok(service.getTeacher(year, month));
     }
 
 
