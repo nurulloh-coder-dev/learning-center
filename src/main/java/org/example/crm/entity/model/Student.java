@@ -25,6 +25,4 @@ public class Student extends IdEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private User user;
 
-    private BigDecimal balance;
-
 }

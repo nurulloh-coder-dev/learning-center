@@ -6,6 +6,9 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.enums.EnrollmentPaymentStatus;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "enrollments")
@@ -24,4 +27,12 @@ public class Enrollment extends BaseEntity {
     private Group group;
 
     private String leavingReason;
+
+    @Column(nullable = false)
+    private BigDecimal monthlyFee;
+
+    @Column(nullable = false)
+    private BigDecimal paidAmount;
+
+    private EnrollmentPaymentStatus status;
 }

@@ -38,7 +38,7 @@ public class ImageController {
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> upload(@Valid @RequestParam MultipartFile file) throws IOException {
-        return ResponseEntity.ok(Map.of("imageUrl:",imageService.uploadImage(file)));
+        return ResponseEntity.ok(Map.of("imageUrl",imageService.uploadImage(file)));
     }
 
     @PutMapping("/main/{id}")

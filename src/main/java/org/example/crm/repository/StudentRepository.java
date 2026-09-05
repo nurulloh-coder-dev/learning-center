@@ -25,16 +25,6 @@ public interface StudentRepository extends JpaRepository<Student, String> {
             """)
     Page<StudentProjection> searchStudents(@Param("search") String search, Pageable pageable);
 
-    @Query("""
-                    select distinct s
-                    from Student s
-                    join Enrollment e on s.id = e.student.id
-                    join s.user u
-                    join Group g on e.group.id = g.id and g.status = 'ONGOING'
-                     where u.deleted = false and
-                     s.balance < 0
-            """)
-    List<Student> findAllStudentsForInvoice();
 
     @Query("SELECT s FROM Student s WHERE s.id IN " +
             "(SELECT e.student.id FROM Enrollment e WHERE e.group.id = :groupId)")
@@ -86,4 +76,13 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     @Transactional
     @Query("update Student s set s.user.deleted = true where s.id=:id")
     void softDelete(String id);
+
+
+    @Query("""
+        select s
+        from Student s
+        join fetch User u on u.id = :id and s.user.id = u.id
+        
+""")
+    Optional<Student> findByUserId(String id);
 }

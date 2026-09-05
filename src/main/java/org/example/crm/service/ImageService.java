@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.crm.entity.dto.image.ImageCreateDto;
 import org.example.crm.entity.dto.image.ImageDto;
 import org.example.crm.entity.dto.image.ImageUpdateDto;
+import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.model.Image;
@@ -29,7 +30,7 @@ public class ImageService extends AbstractService<
 
     private final S3Service s3Service;
     private final UserValidator userValidator;
-    private final UserRepository userRepository;
+    final UserRepository userRepository;
 
     protected ImageService(ImageRepository repository, ImageMapper mapper, ImageValidator validator, S3Service s3Service, UserValidator userValidator, UserRepository userRepository) {
         super(repository, mapper, validator);

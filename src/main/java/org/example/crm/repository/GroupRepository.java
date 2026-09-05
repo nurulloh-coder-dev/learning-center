@@ -1,6 +1,7 @@
 package org.example.crm.repository;
 
 import org.example.crm.entity.enums.GroupStatus;
+import org.example.crm.entity.model.Enrollment;
 import org.example.crm.projection.GroupNameProjection;
 import org.example.crm.projection.GroupProjection;
 import org.example.crm.entity.model.Group;
@@ -135,4 +136,15 @@ public interface GroupRepository extends JpaRepository<Group, String> {
 
     @Query("select g.currentMonth from Group g where g.id=:id and g.deleted=false")
     Optional<Integer> checkAndGetCurrentMonth(String groupId);
+
+
+    @Query("""
+                SELECT s
+                FROM Enrollment e
+                JOIN fetch e.student s
+                WHERE e.group.id = :groupId
+                  AND e.deleted = false
+                  AND s.user.deleted = false
+""")
+    List<Enrollment> findAllEnrollmentsByGroupId(String groupDd);
 }

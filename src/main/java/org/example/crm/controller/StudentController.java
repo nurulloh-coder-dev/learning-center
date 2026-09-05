@@ -17,7 +17,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/student")
-@PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('STUDENT_MANAGEMENT'))")
 public class StudentController {
 
     private final StudentService studentService;
@@ -27,6 +26,7 @@ public class StudentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('STUDENT_MANAGEMENT'))")
     public ResponseEntity<Page<StudentDto>> getAll(
             Pageable pageable,
             @RequestParam(required = false) String search
@@ -36,11 +36,13 @@ public class StudentController {
     }
 
     @GetMapping("/count")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('STUDENT_MANAGEMENT'))")
     public ResponseEntity<Map<String, Long>> count() {
         return ResponseEntity.ok(Map.of("count", studentService.getAllCount()));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('STUDENT_MANAGEMENT'))")
     public ResponseEntity<StudentDto> getById(@PathVariable String id) {
         StudentDto student = studentService.get(id);
         return ResponseEntity.ok(student);
@@ -59,12 +61,14 @@ public class StudentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('STUDENT_MANAGEMENT'))")
     public ResponseEntity<StudentDto> create(@Valid @RequestBody StudentCreateDto createDto) {
         StudentDto createdStudent = studentService.create(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStudent);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('STUDENT_MANAGEMENT'))")
     public ResponseEntity<StudentDto> update(
             @PathVariable String id,
             @Valid @RequestBody StudentUpdateDto updateDto
@@ -74,8 +78,15 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('STUDENT_MANAGEMENT'))")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         studentService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<StudentDto> getMe() {
+        StudentDto student = studentService.getMe();
+        return ResponseEntity.ok(student);
     }
 }
