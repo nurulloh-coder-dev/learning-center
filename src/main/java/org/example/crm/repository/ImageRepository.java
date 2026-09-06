@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface ImageRepository extends JpaRepository<Image, String> {
-    @Query("SELECT i from Image i where i.createdBy =:userId and i.deleted = false")
+    @Query("SELECT i.id as id, i.imageUrl as imageUrl, i.originalFileName as originalFileName from Image i where i.createdBy =:userId and i.deleted = false")
     Page<ImageProjection> findAllByUserId(@Param("userId") String userId, Pageable pageable);
 
     @Query("SELECT EXISTS (SELECT i.id FROM Image i WHERE i.id=:id)")

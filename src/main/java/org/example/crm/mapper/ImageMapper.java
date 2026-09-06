@@ -19,7 +19,7 @@ public class ImageMapper {
         return new ImageDto(
                 imageProjection.getId(),
                 imageProjection.getImageUrl(),
-                imageProjection.getOriginalName()
+                imageProjection.getOriginalFileName()
         );
     }
 }

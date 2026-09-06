@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 public class ImageService extends AbstractService<
@@ -70,7 +71,7 @@ public class ImageService extends AbstractService<
 
     public ImageDto uploadImage(@Valid MultipartFile file) throws IOException {
         String filename = file.getOriginalFilename();
-        boolean validExtension = filename != null && filename.toLowerCase().endsWith(".pdf");
+        boolean validExtension = filename != null && filename.toLowerCase().endsWith(".jpg")|| Objects.requireNonNull(filename).toLowerCase().endsWith(".png");
         boolean validContentType = "application/pdf".equals(file.getContentType());
 
         if (!validExtension || !validContentType) {

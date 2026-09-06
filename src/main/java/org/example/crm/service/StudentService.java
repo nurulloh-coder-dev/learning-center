@@ -96,8 +96,6 @@ public class StudentService extends AbstractService<
     }
 
     public List<StudentDto> getByPhone(String phone) {
-
-
         List<Student> studentsByPhone = repository.getStudentByPhone(phone);
         return studentsByPhone
                 .stream()
@@ -106,7 +104,6 @@ public class StudentService extends AbstractService<
     }
 
     public StudentDto getMe() {
-
         User userId = userValidator.authenticateAndGetUser();
         Student student = validator.validateStudentByUserId(userId.getId());
         return mapper.toDto(student);

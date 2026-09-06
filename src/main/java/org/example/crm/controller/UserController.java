@@ -13,7 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@PreAuthorize("hasAnyRole('SUPER_ADMIN,ADMINISTRATOR')")
+@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR')")
 @RequestMapping("api/v1/user")
 public class UserController {
 

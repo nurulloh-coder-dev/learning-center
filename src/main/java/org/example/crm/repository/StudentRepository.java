@@ -81,7 +81,7 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     @Query("""
         select s
         from Student s
-        join fetch User u on u.id = :id and s.user.id = u.id
+        where s.user.id=:userId
         
 """)
     Optional<Student> findByUserId(String id);
