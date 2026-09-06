@@ -49,7 +49,6 @@ public class InvoiceService extends AbstractService<
     @Override
     public InvoiceDto create(InvoiceCreateDto createDto) {
         Invoice invoice = mapper.toEntity(createDto);
-
         Student student = invoice.getStudent();
         student.setBalance(student.getBalance().add(createDto.amount()));
         studentRepository.save(student);

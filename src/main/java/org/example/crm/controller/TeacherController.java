@@ -16,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/teacher")
-@PreAuthorize("hasAnyRole('SUPER_ADMIN,ADMINISTRATOR,TEACHER')")
+@PreAuthorize("hasAnyRole('SUPER_ADMIN','ADMINISTRATOR','TEACHER')")
 public class TeacherController {
 
     private final TeacherService teacherService;

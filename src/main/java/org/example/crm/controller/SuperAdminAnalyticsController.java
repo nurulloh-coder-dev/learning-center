@@ -1,13 +1,7 @@
 package org.example.crm.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.crm.annotation.CurrentUser;
-import org.example.crm.config.CustomUserDetails;
 import org.example.crm.entity.analyticsRecord.*;
-import org.example.crm.entity.model.Invoice;
-import org.example.crm.entity.model.Lead;
-import org.example.crm.entity.model.Student;
-import org.example.crm.entity.model.User;
 import org.example.crm.service.AnalyticService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
