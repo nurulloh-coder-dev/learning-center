@@ -45,17 +45,11 @@ public class InvoiceController {
     }
 
     @PostMapping("/return")
-    public ResponseEntity<InvoiceDto> returnInvoice(@RequestParam String studentId) {
-        return ResponseEntity.ok(service.returnInvoice(studentId));
+    public ResponseEntity<InvoiceDto> returnInvoice(@RequestParam String studentId,
+                                                    @RequestParam String groupId) {
+        return ResponseEntity.ok(service.returnInvoice(studentId, groupId));
     }
 
-
-
-
-    @PutMapping("/{id}")
-    public ResponseEntity<InvoiceDto> updateInvoice(@PathVariable String id, @RequestBody InvoiceUpdateDto updateDto) {
-        return ResponseEntity.ok(service.update(updateDto, id));
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInvoice(@PathVariable String id) {

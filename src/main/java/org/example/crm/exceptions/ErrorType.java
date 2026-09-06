@@ -57,7 +57,10 @@ public enum ErrorType {
     INCORRECT_GROUP_LEVEL_COUNT("incorrect.group.level.count"),
     LEAD_ALREADY_ENROLLED("lead.already.enrolled"),
     LEAD_STATUS_CHANGE_FORBIDDEN("lead.status.change.forbidden"),
-    PERMISSION_ONLY_FOR_ADMINISTRATOR("permission.only.for.administrator"),;
+    PERMISSION_ONLY_FOR_ADMINISTRATOR("permission.only.for.administrator"),
+    ZERO_ON_BALANCE("zero.on.balance"),
+    ENROLLMENT_ALREADY_EXISTS("enrollment.already.exists"),
+    STUDENT_ALREADY_ENROLLED_TO_THIS_GROUP("student.already.enrolled.to.this.group"),;
 
 
     private final String key;

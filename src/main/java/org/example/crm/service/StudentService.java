@@ -5,6 +5,7 @@ import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
 import org.example.crm.entity.dto.student.StudentCreateDto;
 import org.example.crm.entity.model.Student;
+import org.example.crm.entity.model.User;
 import org.example.crm.mapper.StudentMapper;
 import org.example.crm.projection.StudentProjection;
 import org.example.crm.projection.StudentShowProjection;
@@ -102,5 +103,12 @@ public class StudentService extends AbstractService<
                 .stream()
                 .map(mapper::toDto)
                 .toList();
+    }
+
+    public StudentDto getMe() {
+
+        User userId = userValidator.authenticateAndGetUser();
+        Student student = validator.validateStudentByUserId(userId.getId());
+        return mapper.toDto(student);
     }
 }

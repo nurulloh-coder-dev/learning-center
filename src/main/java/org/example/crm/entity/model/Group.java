@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
 import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.repository.GroupLevelRepository;
+import org.example.crm.repository.GroupRepository;
 
 import java.time.LocalDate;
 
@@ -58,7 +59,9 @@ public class Group extends BaseEntity {
             } else {
                 this.setLevel(nextLevel);
                 this.setCurrentMonth(1);
+
             }
+
         } else {
             this.currentMonth++;
         }

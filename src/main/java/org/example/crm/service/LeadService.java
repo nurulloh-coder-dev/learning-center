@@ -108,6 +108,7 @@ public class LeadService extends AbstractService<
     public LeadDto enroll(String id, String groupId) {
         Lead lead = validator.validateIdAndGet(id);
         String branchId = groupValidator.validateIdAndGetBranchId(groupId);
+
         UserCreateDto userCreateDto = new UserCreateDto(lead.getFullName(), lead.getPhone(), null, Role.STUDENT, branchId, null);
         StudentDto studentDto = studentService.create(new StudentCreateDto(userCreateDto, null));
         enrollmentService.create(new EnrollmentCreateDto(studentDto.id(), groupId));

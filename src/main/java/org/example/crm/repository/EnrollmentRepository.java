@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface EnrollmentRepository extends JpaRepository<Enrollment, String> {
@@ -51,4 +52,20 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, String> 
             LocalDateTime startPreviousMonth,
             LocalDateTime startMonth,
             LocalDateTime startNextMonth);
+
+    @Query("""
+        select en
+        from Enrollment en
+        where en.student.id = :studentId and en.group.id = :groupId
+        and en.deleted = false and en.student.user.deleted = false and en.group.deleted = false
+""")
+    Optional<Enrollment> findByStudentIdAndGroupId(String studentId, String groupId);
+
+    @Query("""
+        select en
+        from Enrollment en
+        where en.student.id = :studentId
+        and en.deleted = false and en.student.user.deleted = false
+""")
+    List<Enrollment> findByStudentId(String studentId);
 }

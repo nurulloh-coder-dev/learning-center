@@ -20,24 +20,23 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
         select
             i.id as id,
             i.invoiceNumber as invoiceNumber,
-            tu.branch.id as branchId,
+    
+            e.id as enrollmentId,
             s.id as studentId,
-            su.imageUrl as studentImageUrl,
-            su.id as studentUserId,
-            su.fullName as studentFullName,
-            su.phone as studentPhone,
-            su.birthDate as studentBirthDate,
-            su.role as studentRole,
-            s.parentPhone as parentPhone,
-            tu.role as teacherRole,
+            g.id as groupId,
+            e.leavingReason as reason,
+            e.monthlyFee as monthlyFee,
+            e.paidAmount as paidAmount,
+            e.status as enrollmentStatus,
+    
             i.amount as amount,
             i.issuedAt as issuedAt,
             i.paymentStatus as status,
             i.type as type
         from Invoice i
-        join i.student s
+        join i.enrollment e
+        join e.student s
         join s.user su
-        left join Enrollment e on s.id = e.student.id
         left join Group g on e.group.id = g.id
         left join g.teacher t
         left join t.user tu
@@ -59,14 +58,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
             @Param("status") InvoiceStatus status,
             Pageable pageable
     );
-
-    @Query("""
-        update Invoice i
-        set i.paymentStatus = :newStatus
-        where i.paymentStatus = :oldStatus
-          and i.issuedAt <= :now
-""")
-    long findInvoicesByPaymentStatusAnd2DaysOld(InvoiceStatus oldStatus,InvoiceStatus newStatus, LocalDate now);
 
 
     @Query("""

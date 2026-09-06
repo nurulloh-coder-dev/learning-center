@@ -4,22 +4,19 @@ import jakarta.transaction.Transactional;
 import org.example.crm.entity.dto.lesson.LessonCreateDto;
 import org.example.crm.entity.dto.lesson.LessonDto;
 import org.example.crm.entity.dto.lesson.LessonUpdateDto;
-import org.example.crm.exceptions.ErrorCodes;
-import org.example.crm.exceptions.ErrorType;
-import org.example.crm.entity.model.Group;
-import org.example.crm.entity.model.Lesson;
-import org.example.crm.exceptions.RestException;
+import org.example.crm.entity.enums.EnrollmentPaymentStatus;
+import org.example.crm.entity.model.*;
 import org.example.crm.mapper.LessonMapper;
-import org.example.crm.repository.GroupLevelRepository;
-import org.example.crm.repository.GroupRepository;
-import org.example.crm.repository.TeacherRepository;
+import org.example.crm.repository.*;
 import org.example.crm.validator.GroupValidator;
 import org.example.crm.validator.LessonValidator;
-import org.example.crm.repository.LessonRepository;
 import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class LessonService extends AbstractService<
@@ -31,15 +28,17 @@ public class LessonService extends AbstractService<
     private final UserValidator userValidator;
     final GroupLevelRepository groupLevelRepository;
     private final GroupValidator groupValidator;
+    private final EnrollmentRepository enrollmentRepository;
 
 
-    protected LessonService(LessonRepository repository, LessonMapper mapper, LessonValidator validator, TeacherRepository teacherRepository, GroupRepository groupRepository, UserValidator userValidator, GroupLevelRepository groupLevelRepository, GroupValidator groupValidator) {
+    protected LessonService(LessonRepository repository, LessonMapper mapper, LessonValidator validator, TeacherRepository teacherRepository, GroupRepository groupRepository, UserValidator userValidator, GroupLevelRepository groupLevelRepository, GroupValidator groupValidator, EnrollmentRepository enrollmentRepository) {
         super(repository, mapper, validator);
         this.teacherRepository = teacherRepository;
         this.groupRepository = groupRepository;
         this.userValidator = userValidator;
         this.groupLevelRepository = groupLevelRepository;
         this.groupValidator = groupValidator;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     @Override
@@ -59,10 +58,25 @@ public class LessonService extends AbstractService<
     public LessonDto create(LessonCreateDto createDto) {
         validator.validate(createDto);
         Group group = groupValidator.validateIdAndGet(createDto.groupId());
-        Integer lessonsInCurrMonth = repository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0) + 1;
-        group.registerCompletedLesson(lessonsInCurrMonth, groupLevelRepository);
+        Level level = group.getLevel();
+        Integer lessonsInCurrMonth = repository.findLessonCountByGroupId(group.getId(), level.getName()).orElse(0) + 1;
+
+
         Lesson entity = toEntity(createDto,String.format("%s.%s",group.getCurrentMonth(),lessonsInCurrMonth),group);
         Lesson save = repository.save(entity);
+
+        group.registerCompletedLesson(lessonsInCurrMonth, groupLevelRepository);
+        int lessonsPerMonth = level.getLessonCount() / level.getDurationInMonths();
+        if (lessonsPerMonth == lessonsInCurrMonth){
+            List<Enrollment> enrollments = groupRepository.findAllEnrollmentsByGroupId(group.getId());
+
+            for (Enrollment enrollment : enrollments) {
+                enrollment.setPaidAmount(BigDecimal.ZERO);
+                enrollment.setMonthlyFee(group.getLevel().getMonthlyFee());
+                enrollment.setStatus(EnrollmentPaymentStatus.UNPAID);
+                enrollmentRepository.save(enrollment);
+            }
+        }
         groupRepository.save(group);
         return mapper.toDto(save);
     }
@@ -100,4 +114,8 @@ public class LessonService extends AbstractService<
     }
 
 
+    public Integer getLessonCountByGroup(String groupId, String name) {
+        groupValidator.validateIdAndGet(groupId);
+        return repository.findLessonCountByGroupId(groupId,name).orElse(0);
+    }
 }

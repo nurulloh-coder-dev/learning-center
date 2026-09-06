@@ -29,4 +29,9 @@ public class StudentValidator {
     public void validate(StudentCreateDto createDto) {
 
     }
+
+    public Student validateStudentByUserId(String id) {
+        return repository.findByUserId(id)
+                .orElseThrow(()-> new RestException(ErrorType.STUDENT_NOT_FOUND, ErrorCodes.NotFound));
+    }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.InvoiceCreateDto;
 import org.example.crm.entity.enums.InvoiceStatus;
 import org.example.crm.entity.model.Student;
+import org.example.crm.repository.EnrollmentRepository;
 import org.example.crm.repository.GroupRepository;
 import org.example.crm.repository.InvoiceRepository;
 import org.example.crm.repository.StudentRepository;
@@ -26,25 +27,20 @@ public class InvoiceCron {
     final StudentRepository studentRepository;
     final InvoiceRepository invoiceRepository;
     private BigDecimal invoiceAmount;
+    final EnrollmentRepository enrollmentRepository;
 
-    @Scheduled(cron = "0 0 7 * * *", zone = "Asia/Tashkent")
-    public void sendAndCreateInvoices() {
-       List<Student> students = studentRepository.findAllStudentsForInvoice();
-       students.forEach(student -> {
-           invoiceService.create(new InvoiceCreateDto(
-                   student.getId(),
-                   invoiceAmount
-           ));
-       });
-        int size = students.size();
-        log.info("{} Invoices have been created and sent to students", size);
-        ///send invoice to students
-    }
+//    @Scheduled(cron = "0 0 7 * * *", zone = "Asia/Tashkent")
+//    public void sendAndCreateInvoices() {
+//       List<Student> students = studentRepository.findAllStudentsForInvoice();
+//       students.forEach(student -> {
+//           invoiceService.create(new InvoiceCreateDto(
+//                   student.getId(),
+//                   invoiceAmount
+//           ));
+//       });
+//        int size = students.size();
+//        log.info("{} Invoices have been created and sent to students", size);
+//        ///send invoice to students
+//    }
 
-    @Scheduled(cron = "0 1 7 * * *", zone = "Asia/Tashkent")
-    public void updateStatusToOverDue() {
-        LocalDate now = LocalDate.now().minusDays(2);
-        long invoices = invoiceRepository.findInvoicesByPaymentStatusAnd2DaysOld(InvoiceStatus.PENDING, InvoiceStatus.OVERDUE, now);
-        log.info("{} Invoice's status have been set to OVERDUE", invoices);
-    }
 }

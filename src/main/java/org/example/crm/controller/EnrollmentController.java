@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/v1/enrollments")
 public class EnrollmentController {
@@ -57,5 +59,10 @@ public class EnrollmentController {
     public ResponseEntity<Void> delete(@PathVariable String id, @RequestParam String reason) {
         enrollmentService.delete(id,reason);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/student/{studentId}")
+    public ResponseEntity<List<EnrollmentDto>> getByStudentId(@PathVariable String studentId) {
+        return ResponseEntity.ok(enrollmentService.getByStudentId(studentId));
     }
 }

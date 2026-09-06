@@ -10,17 +10,15 @@ import java.time.LocalTime;
 public interface  InvoiceProjection {
     String getId();
     String getInvoiceNumber();
+    String getEnrollmentId();
     String getStudentId();
-    String getBranchId();
-    String getStudentImageUrl();
-    String getStudentUserId();
-    String getStudentFullName();
-    String getStudentPhone();
-    LocalDate getStudentBirthDate();
-    Role getStudentRole();
-    String getParentPhone();
+    String getGroupId();
+    String getReason();
+    BigDecimal getMonthlyFee();
+    BigDecimal getPaidAmount();
+    EnrollmentPaymentStatus getEnrollmentStatus();
+
     BigDecimal getAmount();
     LocalDateTime getIssuedAt();
-    InvoiceStatus getStatus();
     InvoiceType getType();
 }
