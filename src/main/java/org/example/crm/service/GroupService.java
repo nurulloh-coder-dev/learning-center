@@ -85,11 +85,6 @@ public class GroupService extends AbstractService<
         Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         return mapper.toDto(group, lessonsCount);
     }
-    public GroupDto get(String id, String organizationId) {
-        Group group = validator.validateIdOrgAndGet(id,organizationId);
-        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
-        return mapper.toDto(group, lessonsCount);
-    }
 
     @Override
     public GroupDto create(GroupCreateDto createDto) {
@@ -105,13 +100,6 @@ public class GroupService extends AbstractService<
     @Override
     public GroupDto update(GroupUpdateDto updateDto, String id) {
         Group group = validator.validateIdAndGet(id);
-        mapper.mapUpdate(group, updateDto);
-        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
-        return mapper.toDto(repository.save(group), lessonsCount);
-    }
-
-    public GroupDto update(GroupUpdateDto updateDto, String id, String organizationId) {
-        Group group = validator.validateIdOrgAndGet(id, organizationId);
         mapper.mapUpdate(group, updateDto);
         Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         return mapper.toDto(repository.save(group), lessonsCount);
