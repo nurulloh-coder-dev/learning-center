@@ -8,6 +8,8 @@ import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
 import org.example.crm.entity.base.IdEntity;
 
+import java.util.List;
+
 @Entity
 @Table(name = "teachers")
 @Getter
@@ -24,4 +26,6 @@ public class Teacher extends IdEntity {
     private float totalTeachingExp;
     private float currPlaceTeachingExp;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    List<Course> courses;
 }
