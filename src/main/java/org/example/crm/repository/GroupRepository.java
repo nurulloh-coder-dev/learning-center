@@ -139,7 +139,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
 
 
     @Query("""
-                SELECT s
+                SELECT e
                 FROM Enrollment e
                 JOIN fetch e.student s
                 WHERE e.group.id = :groupId
