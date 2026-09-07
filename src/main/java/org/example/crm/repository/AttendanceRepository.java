@@ -36,8 +36,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
     @Query("update Attendance t set t.deleted = true where t.id =:id")
     void softDelete(String id);
 
-    @Query("select count(a.id) from Attendance a where a.deleted = false")
-    Optional<Integer> getCount();
+    @Query("select count(a.id) from Attendance a where a.deleted = false and a.organizationId = :organizationId")
+    Optional<Integer> getCount(String organizationId);
 
     @Query("""
             select a.id as id,

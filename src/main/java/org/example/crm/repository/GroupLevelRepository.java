@@ -65,8 +65,8 @@ public interface GroupLevelRepository extends JpaRepository<Level, String> {
 
 
     @Modifying
-    @Query("UPDATE Level l SET l.deleted = true WHERE l.id = :id")
-    void updateLevelDeleted(String id);
+    @Query("UPDATE Level l SET l.deleted = true WHERE l.id = :id and l.organizationId = :organizationId")
+    void updateLevelDeleted(String id, String organizationId);
 
     @Query("""
        select l

@@ -117,7 +117,8 @@ public class AttendanceService extends AbstractService<
     }
 
     public Integer getCount() {
-        Optional<Integer> count = repository.getCount();
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Optional<Integer> count = repository.getCount(organizationId);
         return count.orElse(0);
     }
 

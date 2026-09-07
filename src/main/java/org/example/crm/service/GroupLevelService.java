@@ -72,8 +72,10 @@ public class GroupLevelService extends AbstractService<
     @Override
     @Transactional
     public void delete(String id) {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
         Level level = validator.validateAndGet(id);
-        repository.updateLevelDeleted(level.getId());
+
+        repository.updateLevelDeleted(level.getId(), organizationId);
     }
 
     @Transactional
