@@ -1,6 +1,6 @@
 package org.example.crm.entity.enums;
 
-public enum InvoiceType {
+public enum TransactionType {
     PAID,
     RETURNED
 }

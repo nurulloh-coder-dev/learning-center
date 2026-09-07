@@ -50,4 +50,12 @@ public interface BranchRepository extends JpaRepository<Branch, String> {
         
 """)
     AnalyticBranchProjection getAnalyticBranch(String organizationId);
+
+    @Query("""
+        select count(b.id)
+        from Branch b
+        where b.organizationId = :organizationId
+        and b.deleted = false
+""")
+    Long countByOrganizationId(String organizationId);
 }

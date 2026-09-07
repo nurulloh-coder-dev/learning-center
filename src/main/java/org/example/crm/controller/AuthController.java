@@ -39,14 +39,13 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<Map<String, String>> changePassword(@Valid @RequestBody ChangePasswordRequest request,
-                                               @CurrentUser User user) {
-        String response =  authService.changePassword(request, user);
+    public ResponseEntity<Map<String, String>> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        String response =  authService.changePassword(request);
         return ResponseEntity.ok(Map.of("response", response));
     }
 
     @GetMapping("/me")
-    public  ResponseEntity<UserDto> me(@CurrentUser User user) {
-        return ResponseEntity.ok(authService.getMe(user));
+    public  ResponseEntity<UserDto> me() {
+        return ResponseEntity.ok(authService.getMe());
     }
 }

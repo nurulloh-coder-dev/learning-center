@@ -1,6 +1,8 @@
 package org.example.crm.repository;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
+import org.example.crm.entity.model.Invoice;
 import org.example.crm.entity.model.Student;
 import org.example.crm.projection.AnalyticStudentProjection;
 import org.example.crm.projection.StudentProjection;
@@ -85,4 +87,14 @@ public interface StudentRepository extends JpaRepository<Student, String> {
         
 """)
     Optional<Student> findByUserId(String id);
+
+
+    @Query("""
+        select i
+        from Invoice i
+        join Enrollment e on i.enrollment.id = e.id
+        join Student s on e.student.id = s.id and s.id = :studentId
+        order by i.createdAt desc
+""")
+    Optional<Invoice> findLatestInvoiceByStudentId(@NotNull String studentId);
 }

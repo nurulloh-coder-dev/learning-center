@@ -19,6 +19,7 @@ import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.UserMapper;
 import org.example.crm.repository.UserRepository;
+import org.example.crm.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -37,6 +38,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
     private final UserMapper userMapper;
+    private final UserValidator userValidator;
 
     @Value("${jwt.refresh.token.expire.date:86400}")
     private Long refreshTokenExpiration;
@@ -109,8 +111,8 @@ public class AuthService {
         response.addHeader(HttpHeaders.SET_COOKIE, cookieBuilder.build().toString());
     }
 
-    public String changePassword(@Valid ChangePasswordRequest request, User user) {
-
+    public String changePassword(@Valid ChangePasswordRequest request) {
+        User user = userValidator.authenticateAndGetUser();
         if (!request.confirmPassword().equals(request.newPassword())) {
             throw new RestException(ErrorType.PASSWORDS_DO_NOT_MATCH, ErrorCodes.BadRequest);
         }
@@ -125,7 +127,8 @@ public class AuthService {
         return "Password changed successfully";
     }
 
-    public UserDto getMe(User user) {
+    public UserDto getMe() {
+        User user = userValidator.authenticateAndGetUser();
         return userMapper.toDto(user);
     }
 }

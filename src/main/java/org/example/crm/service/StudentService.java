@@ -1,10 +1,12 @@
 package org.example.crm.service;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
 import org.example.crm.entity.dto.student.StudentCreateDto;
 import org.example.crm.entity.model.Enrollment;
+import org.example.crm.entity.model.Invoice;
 import org.example.crm.entity.model.Student;
 import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
@@ -125,5 +127,11 @@ public class StudentService extends AbstractService<
                 enrollment.getPaidAmount().subtract(enrollment.getMonthlyFee()),
                 enrollment.getStatus()
         );
+    }
+
+    public Invoice getLatestInvoice(@NotNull String studentId) {
+        Invoice invoice = repository.findLatestInvoiceByStudentId(studentId)
+                .orElseThrow(() -> new RestException(ErrorType.INVOICE_NOT_FOUND, ErrorCodes.NotFound));
+        return invoice;
     }
 }
