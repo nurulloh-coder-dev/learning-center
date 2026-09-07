@@ -79,11 +79,8 @@ public class BranchService extends AbstractService<
         }
     }
 
-    public Long getAllCount(User user) {
-
-        /// add organization filter
-        return null;
-
-
+    public Long getAllCount() {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        return repository.countByOrganizationId(organizationId);
     }
 }

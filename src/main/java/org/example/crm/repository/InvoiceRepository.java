@@ -31,8 +31,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
     
             i.amount as amount,
             i.issuedAt as issuedAt,
-            i.paymentStatus as status,
-            i.type as type
+            i.paymentStatus as status
         from Invoice i
         join i.enrollment e
         join e.student s

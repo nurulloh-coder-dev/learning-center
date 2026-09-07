@@ -6,7 +6,6 @@ import org.example.crm.entity.dto.InvoiceDto;
 import org.example.crm.entity.dto.InvoiceUpdateDto;
 import org.example.crm.entity.dto.enrollment.EnrollmentDto;
 import org.example.crm.entity.enums.InvoiceStatus;
-import org.example.crm.entity.enums.InvoiceType;
 import org.example.crm.entity.model.*;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
@@ -52,7 +51,6 @@ public class InvoiceMapper {
                 invoice.getInvoiceNumber(),
                 invoice.getAmount(),
                 invoice.getIssuedAt(),
-                invoice.getType(),
                 invoice.getEnrollment() != null ? enrollmentMapper.toDto(invoice.getEnrollment()) : null
 
         );
@@ -64,7 +62,6 @@ public class InvoiceMapper {
                 projection.getInvoiceNumber(),
                 projection.getAmount(),
                 projection.getIssuedAt(),
-                projection.getType(),
                 new EnrollmentDto(
                         projection.getEnrollmentId(),
                         projection.getStudentId(),
@@ -91,7 +88,6 @@ public class InvoiceMapper {
         Invoice invoice = new Invoice();
         invoice.setInvoiceNumber(invoiceNumberService.generateInvoiceNumber());
         invoice.setPaymentStatus(InvoiceStatus.PAID);
-        invoice.setType(InvoiceType.RETURNED);
         invoice.setIssuedAt(LocalDateTime.now());
         invoice.setEnrollment(enrollment);
         Level level = group.getLevel();

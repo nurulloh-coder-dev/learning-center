@@ -36,8 +36,8 @@ public class BranchController {
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Map<String,Long>> count(@CurrentUser User user) {
-        Long count = branchService.getAllCount(user);
+    public ResponseEntity<Map<String,Long>> count() {
+        Long count = branchService.getAllCount();
         return ResponseEntity.ok(Map.of("count",count));
     }
 

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
 import org.example.crm.entity.enums.InvoiceStatus;
-import org.example.crm.entity.enums.InvoiceType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,9 +29,6 @@ public class Invoice extends BaseEntity {
     private InvoiceStatus paymentStatus;
 
     private LocalDateTime issuedAt = LocalDateTime.now();
-
-    @Enumerated(EnumType.STRING)
-    private InvoiceType type;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Enrollment enrollment;
