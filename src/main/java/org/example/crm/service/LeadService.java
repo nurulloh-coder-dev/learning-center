@@ -79,7 +79,8 @@ public class LeadService extends AbstractService<
     public LeadDto create(LeadCreateDto createDto) {
         validator.validate(createDto);
         Lead entity = mapper.toEntity(createDto);
-        Level level = groupLevelValidator.validateAndGet(createDto.preferredCourseId());
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Level level = groupLevelValidator.validateAndGet(createDto.preferredCourseId(),organizationId);
         entity.setPreferredCourse(level);
         return mapper.toDto(repository.save(entity));
     }
@@ -89,7 +90,8 @@ public class LeadService extends AbstractService<
         validator.validate(updateDto);
         Lead lead = validator.validateIdAndGet(id);
         mapper.mapUpdate(lead, updateDto);
-        Level level = groupLevelValidator.validateAndGet(updateDto.preferredCourseId());
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Level level = groupLevelValidator.validateAndGet(updateDto.preferredCourseId(), organizationId);
         lead.setPreferredCourse(level);
         Lead save = repository.save(lead);
         return mapper.toDto(save);
@@ -98,7 +100,8 @@ public class LeadService extends AbstractService<
     @Override
     public void delete(String id) {
         validator.validateId(id);
-        Integer integer = repository.softDelete(id);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Integer integer = repository.softDelete(id,organizationId);
         if (integer == 0) {
             throw new RestException(ErrorType.LEAD_NOT_FOUND, ErrorCodes.NotFound);
         }

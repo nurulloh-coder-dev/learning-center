@@ -1,0 +1,26 @@
+name: Sanity and Build Check
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  run-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Pull the repository code onto the virtual runner
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Verify directory layout and files
+      - name: Inspect Files
+        run: |
+          echo "Starting automated pipeline inspection..."
+          ls -la
+
+      # Test for unintentional secrets committed in tracking files
+      - name: Scan for Exposed Keys
+        run: |
+          echo "Running regex check for obvious API credentials..."
+          ! grep -ri --exclude-dir=".github" "AIzaSy" . || (echo "Potential Google API key detected!" && exit 1)

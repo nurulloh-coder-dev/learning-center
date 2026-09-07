@@ -42,8 +42,8 @@ public interface LeadRepository extends JpaRepository<Lead, String> {
 
     @Modifying
     @Transactional
-    @Query("update Lead l set l.deleted=true where l.id=:id")
-    Integer softDelete(String id);
+    @Query("update Lead l set l.deleted=true where l.id=:id and l.organizationId=:orgId")
+    Integer softDelete(String id,String orgId);
 
 
     @Query("""

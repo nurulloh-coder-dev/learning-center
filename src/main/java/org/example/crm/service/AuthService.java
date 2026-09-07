@@ -43,16 +43,12 @@ public class AuthService {
 
     final PasswordEncoder passwordEncoder;
 
-
-
-
-
-    public LoginResponse getLoginResponseResponseEntity(LoginRequest request,HttpServletResponse response) {
+    public LoginResponse getLoginResponseResponseEntity(LoginRequest request, HttpServletResponse response) {
         log.info("{} is trying to log in", request.getPhone());
         String phone = request.getPhone();
 
         User user = userRepository.findByPhoneAndDeletedFalse(phone)
-                .orElseThrow(() ->new RestException(ErrorType.INVALID_PHONE_NUMBER_OR_PASSWORD, ErrorCodes.BadRequest));
+                .orElseThrow(() -> new RestException(ErrorType.INVALID_PHONE_NUMBER_OR_PASSWORD, ErrorCodes.BadRequest));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RestException(ErrorType.INVALID_PHONE_NUMBER_OR_PASSWORD, ErrorCodes.BadRequest);
@@ -61,7 +57,7 @@ public class AuthService {
         Map<String, Object> claims = jwtUtils.prepareClaims(user);
         TokenDto accessToken = jwtUtils.generateToken(user.getPhone(), claims, "access");
         TokenDto refreshToken = jwtUtils.generateToken(user.getPhone(), claims, "refresh");
-        setRefreshCookie(response,refreshToken.getToken());
+        setRefreshCookie(response, refreshToken.getToken());
 
         return LoginResponse.builder()
                 .token(accessToken.getToken())

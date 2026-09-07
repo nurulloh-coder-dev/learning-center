@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 
 public record LessonDto(
         String id,
-        String lessonName,
-        String lessonNumber,
+        String topic,
+        String title,
         LocalDateTime lessonDate,
         Boolean isComplete,
         GroupDto group,

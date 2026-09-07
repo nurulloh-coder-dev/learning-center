@@ -47,7 +47,7 @@ public class GroupLevelService extends AbstractService<
     @Override
     public GroupLevelDto get(String id) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        validator.validateAndGet(id);
+        validator.validateAndGet(id,organizationId);
         Level level = repository.findLevelByIdAndOrganizationId(id, organizationId)
                 .orElseThrow(() -> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound));
         return mapper.toDto(level);
@@ -63,7 +63,8 @@ public class GroupLevelService extends AbstractService<
 
     @Override
     public GroupLevelDto update(GroupLevelUpdateDto updateDto, String id) {
-        Level level = validator.validateAndGet(id);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Level level = validator.validateAndGet(id,organizationId);
         mapper.mapUpdate(level,updateDto);
         repository.save(level);
         return mapper.toDto(level);
@@ -73,8 +74,7 @@ public class GroupLevelService extends AbstractService<
     @Transactional
     public void delete(String id) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Level level = validator.validateAndGet(id);
-
+        Level level = validator.validateAndGet(id,organizationId);
         repository.updateLevelDeleted(level.getId(), organizationId);
     }
 
