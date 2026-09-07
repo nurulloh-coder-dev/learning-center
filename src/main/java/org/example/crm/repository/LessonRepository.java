@@ -10,8 +10,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface LessonRepository extends JpaRepository<Lesson,String> {
-    @Query(value = "select l from Lesson l where l.deleted = false and (:search is null or l.teacher.user.fullName ilike concat('%',cast(:search as string),'%'))")
-    Page<Lesson> findAll(Pageable pageable, @Param("search") String search);
+    @Query(value = "select l from Lesson l where l.deleted = false and l.organizationId=:orgId and (:search is null or l.teacher.user.fullName ilike concat('%',cast(:search as string),'%'))")
+    Page<Lesson> findAll(Pageable pageable, @Param("search") String search, @Param("orgId") String orgId);
 
     Long countLessonsByDeleted(Boolean deleted);
 
@@ -28,4 +28,6 @@ public interface LessonRepository extends JpaRepository<Lesson,String> {
     @Query("SELECT COUNT(l.id) from Lesson l where l.organizationId =:orgId and l.deleted = false")
     Long countLessonsByOrgIdAndDeleted(@Param("orgId") String organizationId);
 
+    @Query("select l from Lesson l where l.organizationId=:orgId and l.id=:id and l.deleted=false ")
+    Optional<Lesson> findById(@Param("id") String id, @Param("orgId") String organizationId);
 }

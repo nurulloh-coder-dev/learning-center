@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 public class AttendanceValidator {
     private final AttendanceRepository repository;
 
-    public Attendance validateIdAndGet(String id) {
-       return repository.findById(id)
+    public Attendance validateIdAndGet(String id,String organizationId) {
+       return repository.findById(id,organizationId)
                 .orElseThrow(()->new RestException(ErrorType.ATTENDANCE_NOT_FOUND, ErrorCodes.NotFound));
 
     }

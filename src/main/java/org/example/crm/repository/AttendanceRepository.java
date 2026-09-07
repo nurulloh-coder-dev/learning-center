@@ -25,16 +25,16 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
             "attendanceStudents.student",
             "attendanceStudents.student.user"
     })
-    @Query("select a from Attendance a where a.deleted = false and (:search is null or a.lesson.topic ilike :search)")
-    Page<Attendance> findAll(Pageable pageable, @Param("search") String search);
+    @Query("select a from Attendance a where a.organizationId=:orgId and a.deleted = false and (:search is null or a.lesson.topic ilike :search)")
+    Page<Attendance> findAll(@Param("search") String search, @Param("orgId") String organizationId, Pageable pageable);
 
     @Query("select exists (select t from Attendance t where t.id =:id)")
     Optional<Boolean> checkId(@Param("id") String id);
 
     @Transactional
     @Modifying
-    @Query("update Attendance t set t.deleted = true where t.id =:id")
-    void softDelete(String id);
+    @Query("update Attendance t set t.deleted = true where t.id =:id and t.organizationId=:orgId")
+    void softDelete(@Param("id") String id,@Param("orgId") String organizationId);
 
     @Query("select count(a.id) from Attendance a where a.deleted = false")
     Optional<Integer> getCount();
@@ -56,7 +56,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
                    where l.group.id= :groupId and l.title like concat(:IntendedMonth,'.%')
                    order by a.createdAt asc
             """)
-    List<AttendanceProjection> findAllByGroupIdAndMonth(@Param("groupId") String groupId, String intendedMonth,@Param("minusMonths") Integer previousMonths);
+    List<AttendanceProjection> findAllByGroupIdAndMonth(@Param("groupId") String groupId, String intendedMonth, @Param("minusMonths") Integer previousMonths);
 
     @Query("""
              select s.id as studentId,
@@ -72,16 +72,18 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
     List<AttendanceStudentProjection> findAttendanceStudentsByAttId(@Param("attIds") List<String> attIds);
 
     @Query("""
-           select ast.status as status,
-                  ast.reason as reason,
-                  l.title as title,
-                  a.createdAt as date
-           from AttendanceStudent ast
-           join ast.attendance a
-           join a.lesson l
-                   where ast.student.user.id=:userId
-                         and l.group.id =:groupId
-                         and l.title like concat(:intendedMonth,'.%')""")
+            select ast.status as status,
+                   ast.reason as reason,
+                   l.title as title,
+                   a.createdAt as date
+            from AttendanceStudent ast
+            join ast.attendance a
+            join a.lesson l
+                    where ast.student.user.id=:userId
+                          and l.group.id =:groupId
+                          and l.title like concat(:intendedMonth,'.%')""")
     List<MyAttendanceProjection> getmyAttendance(String groupId, String userId, String intendedMonth);
 
+    @Query("select a from Attendance a where a.organizationId=:orgId and a.id=:id and a.deleted=false ")
+    Optional<Attendance> findById(@Param("id") String id, @Param("orgId") String organizationId);
 }
