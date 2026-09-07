@@ -27,7 +27,7 @@ public class CourseValidator {
     public void createValid(CourseCreateDto createDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         if (repository.existsByNameAndOrganizationIdAndDeletedFalse(createDto.name(), organizationId)) {
-            throw new RestException(ErrorType.COURSE_ALREADY_EXISTS, ErrorCodes.Conflict);
+            throw new RestException(ErrorType.COURSE_ALREADY_EXISTS, ErrorCodes.BadRequest);
         }
     }
 }

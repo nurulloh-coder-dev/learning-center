@@ -111,7 +111,7 @@ public class AuthService {
 
     public String changePassword(@Valid ChangePasswordRequest request, User user) {
 
-        if (request.confirmPassword().equals(request.newPassword())) {
+        if (!request.confirmPassword().equals(request.newPassword())) {
             throw new RestException(ErrorType.PASSWORDS_DO_NOT_MATCH, ErrorCodes.BadRequest);
         }
 

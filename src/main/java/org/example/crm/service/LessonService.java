@@ -73,7 +73,7 @@ public class LessonService extends AbstractService<
             List<Enrollment> enrollments = groupRepository.findAllEnrollmentsByGroupId(group.getId());
 
             for (Enrollment enrollment : enrollments) {
-                enrollment.setPaidAmount(BigDecimal.ZERO);
+                enrollment.setPaidAmount(enrollment.getPaidAmount().subtract(level.getMonthlyFee()));
                 enrollment.setMonthlyFee(group.getLevel().getMonthlyFee());
                 enrollment.setStatus(EnrollmentPaymentStatus.UNPAID);
                 enrollmentRepository.save(enrollment);
