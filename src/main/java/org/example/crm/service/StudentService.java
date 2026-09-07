@@ -122,7 +122,8 @@ public class StudentService extends AbstractService<
                 student.getId(),
                 userMapper.toDto(student.getUser()),
                 student.getParentPhone(),
-                enrollment.getPaidAmount().subtract(enrollment.getMonthlyFee())
+                enrollment.getPaidAmount().subtract(enrollment.getMonthlyFee()),
+                enrollment.getStatus()
         );
     }
 }
