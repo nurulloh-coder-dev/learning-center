@@ -63,7 +63,7 @@ public class CourseService extends AbstractService<
         User currentUser = userRepository.findByIdAndDeletedFalse(userId)
                 .orElseThrow(() -> new RestException(ErrorType.USER_NOT_FOUND, ErrorCodes.NotFound));
 
-        Course course = mapper.toEntity(createDto, currentUser.getBranch());
+        Course course = mapper.toEntity(createDto);
         return mapper.toDto(repository.save(course));
     }
 

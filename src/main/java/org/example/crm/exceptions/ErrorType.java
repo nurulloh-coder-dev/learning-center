@@ -60,7 +60,9 @@ public enum ErrorType {
     PERMISSION_ONLY_FOR_ADMINISTRATOR("permission.only.for.administrator"),
     ZERO_ON_BALANCE("zero.on.balance"),
     ENROLLMENT_ALREADY_EXISTS("enrollment.already.exists"),
-    STUDENT_ALREADY_ENROLLED_TO_THIS_GROUP("student.already.enrolled.to.this.group"),;
+    STUDENT_ALREADY_ENROLLED_TO_THIS_GROUP("student.already.enrolled.to.this.group"), COURSE_NOT_FOUND("course.not.found"),
+    COURSE_ALREADY_EXISTS("course.already.exists"),
+    INVALID_INPUT("invalid.input"),;
 
 
     private final String key;
