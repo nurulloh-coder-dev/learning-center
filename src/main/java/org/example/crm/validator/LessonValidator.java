@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 public class LessonValidator {
     private final LessonRepository repository;
 
-    public Lesson validateIdAndGet(String id) {
-        return repository.findById(id)
+    public Lesson validateIdAndGet(String id,String organizationId) {
+        return repository.findById(id,organizationId)
                 .orElseThrow(()-> new RestException(ErrorType.LESSON_NOT_FOUND, ErrorCodes.NotFound));
     }
 

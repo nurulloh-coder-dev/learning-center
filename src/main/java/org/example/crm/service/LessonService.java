@@ -43,13 +43,15 @@ public class LessonService extends AbstractService<
 
     @Override
     public Page<LessonDto> getAll(Pageable pageable, String search) {
-        Page<Lesson> all = repository.findAll(pageable, search);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Page<Lesson> all = repository.findAll(pageable,organizationId, search);
         return all.map(mapper::toDto);
     }
 
     @Override
     public LessonDto get(String id) {
-        Lesson lesson = validator.validateIdAndGet(id);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Lesson lesson = validator.validateIdAndGet(id,organizationId);
         return mapper.toDto(lesson);
     }
 
@@ -95,7 +97,8 @@ public class LessonService extends AbstractService<
 
     @Override
     public LessonDto update(LessonUpdateDto updateDto, String id) {
-        Lesson lesson = validator.validateIdAndGet(id);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Lesson lesson = validator.validateIdAndGet(id,organizationId);
         mapper.mapUpdate(lesson, updateDto);
         Lesson save = repository.save(lesson);
         return mapper.toDto(save);
@@ -103,7 +106,8 @@ public class LessonService extends AbstractService<
 
     @Override
     public void delete(String id) {
-        Lesson lesson = validator.validateIdAndGet(id);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Lesson lesson = validator.validateIdAndGet(id,organizationId);
         lesson.setDeleted(true);
         repository.save(lesson);
     }

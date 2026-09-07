@@ -71,8 +71,8 @@ public class ImageService extends AbstractService<
 
     public ImageDto uploadImage(@Valid MultipartFile file) throws IOException {
         String filename = file.getOriginalFilename();
-        boolean validExtension = filename != null && filename.toLowerCase().endsWith(".jpg")|| Objects.requireNonNull(filename).toLowerCase().endsWith(".png");
-        boolean validContentType = "application/pdf".equals(file.getContentType());
+        boolean validExtension = filename != null && (filename.toLowerCase().endsWith(".jpg")|| Objects.requireNonNull(filename).toLowerCase().endsWith(".png"));
+        boolean validContentType = "application/jpeg".equals(file.getContentType())||"application/png".equals(file.getContentType());
 
         if (!validExtension || !validContentType) {
             throw new RestException(ErrorType.INVALID_FILE_TYPE, ErrorCodes.BadRequest);

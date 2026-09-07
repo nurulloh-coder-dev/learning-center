@@ -96,4 +96,7 @@ public interface GroupLevelRepository extends JpaRepository<Level, String> {
                   where l.deleted = false and l.organizationId= :orgId
                   order by l.orderNumber desc""")
     List<LevelNamesProjection> getLevelNames(@Param("orgId") String organizationId);
+
+    @Query("select l from Level l where l.organizationId=:orgId and l.id=:id and l.deleted=false ")
+    Optional<Level> findById(@Param("id") String id, @Param("orgId") String organizationId);
 }

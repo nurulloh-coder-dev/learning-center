@@ -43,20 +43,24 @@ public class AttendanceService extends AbstractService<
 
     @Override
     public Page<AttendanceDto> getAll(Pageable pageable, String search) {
-        Page<Attendance> all = repository.findAll(pageable, search);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Page<Attendance> all = repository.findAll(search,organizationId,pageable);
         return all.map(mapper::toDto);
     }
 
     @Override
     public AttendanceDto get(String id) {
-        Attendance attendance = validator.validateIdAndGet(id);
+        String organizationId = userValidator.authenticateAndGetId();
+        Attendance attendance = validator.validateIdAndGet(id,organizationId);
+
         return mapper.toDto(attendance);
     }
 
     @Override
     @Transactional
     public AttendanceDto create(AttendanceCreateDto createDto) {
-        Lesson lesson = lessonValidator.validateIdAndGet(createDto.lessonId());
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Lesson lesson = lessonValidator.validateIdAndGet(createDto.lessonId(),organizationId);
 
         Attendance attendance = new Attendance();
         attendance.setLesson(lesson);
@@ -77,7 +81,8 @@ public class AttendanceService extends AbstractService<
 
     @Override
     public AttendanceDto update(AttendanceUpdateDto updateDto, String id) {
-        Attendance attendance = validator.validateIdAndGet(id);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Attendance attendance = validator.validateIdAndGet(id,organizationId);
         updateStudentAttendances(attendance, updateDto.attendanceStudents());
         Attendance save = repository.save(attendance);
         return mapper.toDto(save);
@@ -86,7 +91,8 @@ public class AttendanceService extends AbstractService<
     @Override
     public void delete(String id) {
         validator.validateId(id);
-        repository.softDelete(id);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        repository.softDelete(id,organizationId);
     }
 
     private void updateStudentAttendances(Attendance attendance, List<AttendanceStudentUpdateDto> attendanceStudentUpdateDtos) {

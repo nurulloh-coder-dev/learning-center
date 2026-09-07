@@ -17,8 +17,8 @@ import org.springframework.stereotype.Component;
 public class GroupLevelValidator {
     final GroupLevelRepository groupRepository;
 
-    public Level validateAndGet(String id) {
-        return groupRepository.findById(id)
+    public Level validateAndGet(String id,String organizationId) {
+        return groupRepository.findById(id,organizationId)
                 .orElseThrow(() -> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound));
     }
 
