@@ -77,6 +77,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, String> 
            where e.id=:id""")
     EnrollmentMonthlyFeeProjection getEnrollmentAndMonthlyFee(@Param("id") String enrollmentId);
 
-    @Query("select e.id from Enrollment e where e.deleted=false and e.group.id=:groupId")
-    List<String> getIdsByGroupId(String groupId);
+    @Query("select e from Enrollment e join fetch e.student where e.deleted=false and e.group.id=:groupId")
+    List<Enrollment> getAllByGroupId(String groupId);
 }

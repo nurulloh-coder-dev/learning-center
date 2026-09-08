@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -81,20 +82,29 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
 
     @Query("""
-        select s
-        from Student s
-        where s.user.id=:userId
-        
-""")
+                    select s
+                    from Student s
+                    where s.user.id=:userId
+            
+            """)
     Optional<Student> findByUserId(String id);
 
 
     @Query("""
-        select i
-        from Invoice i
-        join Enrollment e on i.enrollment.id = e.id
-        join Student s on e.student.id = s.id and s.id = :studentId
-        order by i.createdAt desc
-""")
+                    select i
+                    from Invoice i
+                    join Enrollment e on i.enrollment.id = e.id
+                    join Student s on e.student.id = s.id and s.id = :studentId
+                    order by i.createdAt desc
+            """)
     Optional<Invoice> findLatestInvoiceByStudentId(@NotNull String studentId);
+
+    @Transactional
+    @Modifying
+    @Query("""
+                UPDATE Student s
+                SET s.balance = COALESCE(s.balance, 0.0) + :amount
+                WHERE s.id = :studentId
+            """)
+    void setNewBalance(@Param("amount") BigDecimal amount, @Param("studentId") @NotNull String studentId);
 }

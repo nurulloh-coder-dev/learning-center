@@ -39,13 +39,8 @@ public class InvoiceMapper {
     public Invoice toEntity(InvoiceCreateDto createDto) {
         Invoice invoice = new Invoice();
         invoice.setInvoiceNumber(invoiceNumberService.generateInvoiceNumber());
-        String enrollmentId = createDto.enrollmentId();
-        var res = enrollmentRepository.getEnrollmentAndMonthlyFee(enrollmentId);
-        if (res == null || res.getEnrollment() == null) {
-            throw new RestException(ErrorType.ENROLLMENT_NOT_FOUND, ErrorCodes.InvalidParams);
-        }
-        invoice.setAmount(res.getMonthlyFee());
-        invoice.setEnrollment(res.getEnrollment());
+        invoice.setAmount(createDto.amount());
+        invoice.setEnrollment(createDto.enrollment());
         invoice.setPaymentStatus(InvoiceStatus.PENDING);
         return invoice;
     }
