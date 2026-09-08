@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
 import org.example.crm.entity.dto.student.StudentCreateDto;
-import org.example.crm.entity.model.Enrollment;
 import org.example.crm.entity.model.Invoice;
 import org.example.crm.entity.model.Student;
 import org.example.crm.entity.model.User;
@@ -127,8 +126,7 @@ public class StudentService extends AbstractService<
     }
 
     public Invoice getLatestInvoice(@NotNull String studentId) {
-        Invoice invoice = repository.findLatestInvoiceByStudentId(studentId)
+        return repository.findLatestInvoiceByStudentId(studentId)
                 .orElseThrow(() -> new RestException(ErrorType.INVOICE_NOT_FOUND, ErrorCodes.NotFound));
-        return invoice;
     }
 }
