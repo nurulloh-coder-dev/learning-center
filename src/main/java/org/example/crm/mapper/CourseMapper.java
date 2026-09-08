@@ -20,9 +20,6 @@ public interface CourseMapper {
     CourseDto toDtoFromProjection(CourseProjection projection);
 
     @IgnoreAuditFields
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "organizationId", ignore = true) // Handled by BaseEntity @PrePersist
     Course toEntity(CourseCreateDto createDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

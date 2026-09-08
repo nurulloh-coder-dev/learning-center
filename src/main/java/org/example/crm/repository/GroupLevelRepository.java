@@ -1,6 +1,5 @@
 package org.example.crm.repository;
 
-import jakarta.transaction.Transactional;
 import org.example.crm.entity.model.Level;
 import org.example.crm.projection.LevelNamesProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,78 +24,77 @@ public interface GroupLevelRepository extends JpaRepository<Level, String> {
     List<Level> findAllLevelsByOrganizationIdAndSearch(String organizationId, String search);
 
     @Query("""
-            select l
-            from Level l
-            where l.id = :id
-            and l.organizationId = :organizationId
-            """)
+        select l
+        from Level l
+        where l.id = :id
+        and l.organizationId = :organizationId
+        """)
     Optional<Level> findLevelByIdAndOrganizationId(String id, String organizationId);
 
 
     @Query("""
-                    select case when count(l) > 0 then true else false end
-                    from Level l
-                    where l.id = :id
-                    and l.orderNumber in (
-                        select l2.orderNumber
-                        from Level l2
-                        where l2.organizationId = l.organizationId
-                        and l2.deleted = false
-                    )
-                    and l.deleted = false
-            """)
+        select case when count(l) > 0 then true else false end
+        from Level l
+        where l.id = :id
+        and l.orderNumber in (
+            select l2.orderNumber
+            from Level l2
+            where l2.organizationId = l.organizationId
+            and l2.deleted = false
+        )
+        and l.deleted = false
+""")
     boolean checkLevelOrder(String id);
 
     @Query("""
-                    select max(l.orderNumber)
-                    from Level l
-                    where l.organizationId = :organizationId
-                    and l.deleted = false
-            """)
+        select max(l.orderNumber)
+        from Level l
+        where l.organizationId = :organizationId
+        and l.deleted = false
+""")
     Integer getMaxOrderNumberByOrganizationId(String organizationId);
 
     @Query("""
-                    select case when count(l) > 0 then true else false end
-                    from Level l
-                    where l.organizationId = :organizationId
-                    and lower(l.name) = lower(:name)
-                    and l.deleted = false
-            """)
+        select case when count(l) > 0 then true else false end
+        from Level l
+        where l.organizationId = :organizationId
+        and lower(l.name) = lower(:name)
+        and l.deleted = false
+""")
     boolean existsByOrganizationIdAndNameIgnoreCase(String organizationId, String name);
 
 
-    @Transactional
     @Modifying
-    @Query("UPDATE Level l SET l.deleted = true WHERE l.id = :id and l.organizationId=:orgId")
-    void updateLevelDeleted(String id, @Param("orgId") String organizationId);
+    @Query("UPDATE Level l SET l.deleted = true WHERE l.id = :id and l.organizationId = :organizationId")
+    void updateLevelDeleted(String id, String organizationId);
 
     @Query("""
-                   select l
-                   from Level l
-                     where l.organizationId = :organizationId and
-                     l.orderNumber > :orderNumber and
-                     l.deleted = false
-                     order by l.orderNumber asc
-            
-            """)
-    Optional<Level> getNextLevelForGroup(Integer orderNumber, String organizationId);
+       select l
+       from Level l
+         where l.organizationId = :organizationId and
+         l.orderNumber > :orderNumber and
+         l.deleted = false
+         order by l.orderNumber asc
+         
+""")
+    Optional<Level> getNextLevelForGroup( Integer orderNumber, String organizationId);
 
     @Query("""
-                select l
-                from Level l
-                where l.organizationId = :organizationId
-                  and l.deleted = false
-                order by l.orderNumber asc
-            """)
+    select l
+    from Level l
+    where l.organizationId = :organizationId
+      and l.deleted = false
+    order by l.orderNumber asc
+""")
     Optional<Level> getFirstLevelForGroup(
             @Param("organizationId") String organizationId
     );
 
     @Query("""
-            select l.id as id,
-                   l.name as name from Level l
-                   where l.deleted = false and l.organizationId= :orgId
-                   order by l.orderNumber desc""")
+           select l.id as id,
+                  l.name as name from Level l
+                  where l.deleted = false and l.organizationId= :orgId
+                  order by l.orderNumber desc""")
     List<LevelNamesProjection> getLevelNames(@Param("orgId") String organizationId);
 
     @Query("select l from Level l where l.organizationId=:orgId and l.id=:id and l.deleted=false ")

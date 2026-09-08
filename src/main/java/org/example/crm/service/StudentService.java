@@ -1,14 +1,22 @@
 package org.example.crm.service;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
 import org.example.crm.entity.dto.student.StudentCreateDto;
+import org.example.crm.entity.model.Enrollment;
+import org.example.crm.entity.model.Invoice;
 import org.example.crm.entity.model.Student;
 import org.example.crm.entity.model.User;
+import org.example.crm.exceptions.ErrorCodes;
+import org.example.crm.exceptions.ErrorType;
+import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.StudentMapper;
+import org.example.crm.mapper.UserMapper;
 import org.example.crm.projection.StudentProjection;
 import org.example.crm.projection.StudentShowProjection;
+import org.example.crm.repository.EnrollmentRepository;
 import org.example.crm.repository.StudentRepository;
 import org.example.crm.validator.StudentValidator;
 import org.example.crm.validator.UserValidator;
@@ -27,11 +35,15 @@ public class StudentService extends AbstractService<
 
     final UserService userService;
     private final UserValidator userValidator;
+    final EnrollmentRepository enrollmentRepository;
+    final UserMapper userMapper;
 
-    protected StudentService(StudentRepository repository, StudentMapper mapper, StudentValidator validator, UserService userService, UserValidator userValidator) {
+    protected StudentService(StudentRepository repository, StudentMapper mapper, StudentValidator validator, UserService userService, UserValidator userValidator, EnrollmentRepository enrollmentRepository, UserMapper userMapper) {
         super(repository, mapper, validator);
         this.userService = userService;
         this.userValidator = userValidator;
+        this.enrollmentRepository = enrollmentRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -103,9 +115,23 @@ public class StudentService extends AbstractService<
                 .toList();
     }
 
-    public StudentDto getMe() {
+    public StudentDto getMe(String groupId) {
         User userId = userValidator.authenticateAndGetUser();
         Student student = validator.validateStudentByUserId(userId.getId());
-        return mapper.toDto(student);
+        Enrollment enrollment = enrollmentRepository.findByStudentIdAndGroupId(student.getId(), groupId)
+                .orElseThrow(() -> new RestException(ErrorType.ENROLLMENT_NOT_FOUND, ErrorCodes.NotFound));
+        return new StudentDto(
+                student.getId(),
+                userMapper.toDto(student.getUser()),
+                student.getParentPhone(),
+                enrollment.getPaidAmount().subtract(enrollment.getMonthlyFee()),
+                enrollment.getStatus()
+        );
+    }
+
+    public Invoice getLatestInvoice(@NotNull String studentId) {
+        Invoice invoice = repository.findLatestInvoiceByStudentId(studentId)
+                .orElseThrow(() -> new RestException(ErrorType.INVOICE_NOT_FOUND, ErrorCodes.NotFound));
+        return invoice;
     }
 }
