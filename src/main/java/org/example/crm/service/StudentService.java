@@ -128,5 +128,6 @@ public class StudentService extends AbstractService<
     public Invoice getLatestInvoice(@NotNull String studentId) {
         return repository.findLatestInvoiceByStudentId(studentId)
                 .orElseThrow(() -> new RestException(ErrorType.INVOICE_NOT_FOUND, ErrorCodes.NotFound));
+
     }
 }
