@@ -5,6 +5,7 @@ import org.example.crm.entity.dto.lesson.LessonCreateDto;
 import org.example.crm.entity.dto.lesson.LessonDto;
 import org.example.crm.entity.dto.lesson.LessonUpdateDto;
 import org.example.crm.entity.enums.EnrollmentPaymentStatus;
+import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.entity.model.*;
 import org.example.crm.mapper.LessonMapper;
 import org.example.crm.repository.*;
@@ -29,9 +30,10 @@ public class LessonService extends AbstractService<
     final GroupLevelRepository groupLevelRepository;
     private final GroupValidator groupValidator;
     private final EnrollmentRepository enrollmentRepository;
+    private final InvoiceService invoiceService;
 
 
-    protected LessonService(LessonRepository repository, LessonMapper mapper, LessonValidator validator, TeacherRepository teacherRepository, GroupRepository groupRepository, UserValidator userValidator, GroupLevelRepository groupLevelRepository, GroupValidator groupValidator, EnrollmentRepository enrollmentRepository) {
+    protected LessonService(LessonRepository repository, LessonMapper mapper, LessonValidator validator, TeacherRepository teacherRepository, GroupRepository groupRepository, UserValidator userValidator, GroupLevelRepository groupLevelRepository, GroupValidator groupValidator, EnrollmentRepository enrollmentRepository, InvoiceService invoiceService) {
         super(repository, mapper, validator);
         this.teacherRepository = teacherRepository;
         this.groupRepository = groupRepository;
@@ -39,6 +41,7 @@ public class LessonService extends AbstractService<
         this.groupLevelRepository = groupLevelRepository;
         this.groupValidator = groupValidator;
         this.enrollmentRepository = enrollmentRepository;
+        this.invoiceService = invoiceService;
     }
 
     @Override
@@ -62,24 +65,13 @@ public class LessonService extends AbstractService<
         Group group = groupValidator.validateIdAndGet(createDto.groupId());
         Level level = group.getLevel();
         Integer lessonsInCurrMonth = repository.findLessonCountByGroupId(group.getId(), level.getName()).orElse(0) + 1;
-
-
         Lesson entity = toEntity(createDto,String.format("%s.%s",group.getCurrentMonth(),lessonsInCurrMonth),group);
         Lesson save = repository.save(entity);
-
         group.registerCompletedLesson(lessonsInCurrMonth, groupLevelRepository);
-        int lessonsPerMonth = level.getLessonCount() / level.getDurationInMonths();
-        if (lessonsPerMonth == lessonsInCurrMonth){
-            List<Enrollment> enrollments = groupRepository.findAllEnrollmentsByGroupId(group.getId());
-
-            for (Enrollment enrollment : enrollments) {
-                enrollment.setPaidAmount(BigDecimal.ZERO);
-                enrollment.setMonthlyFee(group.getLevel().getMonthlyFee());
-                enrollment.setStatus(EnrollmentPaymentStatus.UNPAID);
-                enrollmentRepository.save(enrollment);
-            }
-        }
         groupRepository.save(group);
+        if (!group.getStatus().equals(GroupStatus.COMPLETED)){
+            invoiceService.createGroupInvoice(group.getId());
+        }
         return mapper.toDto(save);
     }
 

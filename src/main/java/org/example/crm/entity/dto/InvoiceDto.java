@@ -14,7 +14,6 @@ public record InvoiceDto(
         String invoiceNumber,
         BigDecimal amount,
         LocalDateTime issuedAt,
-        InvoiceType type,
         EnrollmentDto enrollmentDto
 ) {
 }

@@ -29,11 +29,6 @@ public class Invoice extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private InvoiceStatus paymentStatus;
 
-    private LocalDateTime issuedAt = LocalDateTime.now();
-
-    @Enumerated(EnumType.STRING)
-    private InvoiceType type;
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Enrollment enrollment;
 

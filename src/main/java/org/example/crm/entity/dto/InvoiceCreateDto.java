@@ -1,10 +1,8 @@
 package org.example.crm.entity.dto;
 
-import java.math.BigDecimal;
+import jakarta.validation.constraints.NotNull;
 
 public record InvoiceCreateDto(
-        String studentId,
-        BigDecimal amount,
-        String groupId
+        @NotNull String enrollmentId
 ) {
 }
