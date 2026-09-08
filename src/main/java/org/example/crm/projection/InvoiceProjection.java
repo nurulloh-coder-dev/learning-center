@@ -14,10 +14,7 @@ public interface  InvoiceProjection {
     String getStudentId();
     String getGroupId();
     String getReason();
-    BigDecimal getMonthlyFee();
-    BigDecimal getPaidAmount();
-    EnrollmentPaymentStatus getEnrollmentStatus();
 
     BigDecimal getAmount();
-    LocalDateTime getIssuedAt();
+    LocalDateTime getCreatedAt();
 }

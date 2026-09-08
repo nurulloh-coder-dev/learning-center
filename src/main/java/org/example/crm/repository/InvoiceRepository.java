@@ -28,13 +28,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
             s.id as studentId,
             g.id as groupId,
             e.leavingReason as reason,
-            e.monthlyFee as monthlyFee,
-            e.paidAmount as paidAmount,
-            e.status as enrollmentStatus,
-    
             i.amount as amount,
-            i.issuedAt as issuedAt,
-            i.paymentStatus as status
+            i.createdAt as createAt
         from Invoice i
         join i.enrollment e
         join e.student s
@@ -49,8 +44,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
             or su.phone ilike :search
             or g.name ilike :search
             or i.invoiceNumber ilike :search )
-        and (i.issuedAt >= :from)
-        and (i.issuedAt <= :to)
+        and (i.createdAt >= :from)
+        and (i.createdAt <= :to)
         and (:status is null or i.paymentStatus = :status)
     """)
     Page<InvoiceProjection> getAllInvoicesByFilter(
