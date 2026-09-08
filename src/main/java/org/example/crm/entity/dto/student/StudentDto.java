@@ -9,11 +9,6 @@ import java.math.BigDecimal;
 public record StudentDto(String id,
                          UserDto userDto,
                          String parentPhone,
-                         BigDecimal balance,
-                         @Schema(
-                                 description = "Student payment status",
-                                 allowableValues = {"UNPAID", "PARTIAL", "PAID"}
-                         )
-                         EnrollmentPaymentStatus status
+                         BigDecimal balance
                          ) {
 }

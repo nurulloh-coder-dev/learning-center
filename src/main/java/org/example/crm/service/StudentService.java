@@ -115,17 +115,14 @@ public class StudentService extends AbstractService<
                 .toList();
     }
 
-    public StudentDto getMe(String groupId) {
+    public StudentDto getMe() {
         User userId = userValidator.authenticateAndGetUser();
         Student student = validator.validateStudentByUserId(userId.getId());
-        Enrollment enrollment = enrollmentRepository.findByStudentIdAndGroupId(student.getId(), groupId)
-                .orElseThrow(() -> new RestException(ErrorType.ENROLLMENT_NOT_FOUND, ErrorCodes.NotFound));
         return new StudentDto(
                 student.getId(),
                 userMapper.toDto(student.getUser()),
                 student.getParentPhone(),
-                enrollment.getPaidAmount().subtract(enrollment.getMonthlyFee()),
-                enrollment.getStatus()
+                student.getBalance()
         );
     }
 

@@ -85,8 +85,8 @@ public class StudentController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<StudentDto> getMe(@RequestParam String groupId) {
-        StudentDto student = studentService.getMe(groupId);
+    public ResponseEntity<StudentDto> getMe() {
+        StudentDto student = studentService.getMe();
         return ResponseEntity.ok(student);
     }
 }
