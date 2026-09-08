@@ -27,12 +27,4 @@ public class Enrollment extends BaseEntity {
     private Group group;
 
     private String leavingReason;
-
-    @Column(nullable = false)
-    private BigDecimal monthlyFee;
-
-    @Column(nullable = false)
-    private BigDecimal paidAmount;
-
-    private EnrollmentPaymentStatus status;
 }

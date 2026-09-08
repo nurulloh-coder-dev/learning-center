@@ -3,6 +3,7 @@ package org.example.crm.repository;
 import jakarta.transaction.Transactional;
 import org.example.crm.entity.model.Enrollment;
 import org.example.crm.projection.AnalyticEnrollmentProjection;
+import org.example.crm.projection.EnrollmentMonthlyFeeProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -68,4 +69,14 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, String> 
         and en.deleted = false and en.student.user.deleted = false
 """)
     List<Enrollment> findByStudentId(String studentId);
+
+    @Query("""
+           select e as enrollment,l.monthlyFee as monthlyFee
+           from Enrollment e
+           join e.group.level l
+           where e.id=:id""")
+    EnrollmentMonthlyFeeProjection getEnrollmentAndMonthlyFee(@Param("id") String enrollmentId);
+
+    @Query("select e from Enrollment e join fetch e.student where e.deleted=false and e.group.id=:groupId")
+    List<Enrollment> getAllByGroupId(String groupId);
 }

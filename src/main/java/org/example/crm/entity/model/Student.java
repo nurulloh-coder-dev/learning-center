@@ -21,6 +21,8 @@ public class Student extends IdEntity {
 
     private String parentPhone;
 
+    private BigDecimal balance;
+
     @OneToOne(optional = false,cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private User user;

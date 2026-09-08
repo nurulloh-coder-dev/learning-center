@@ -9,6 +9,7 @@ import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.TransactionMapper;
+import org.example.crm.repository.StudentRepository;
 import org.example.crm.repository.TransactionRepository;
 import org.example.crm.validator.OrganizationValidator;
 import org.example.crm.validator.TransactionValidator;
@@ -25,11 +26,13 @@ public class TransactionService extends AbstractService<
 
     private final UserValidator userValidator;
     private final OrganizationValidator organizationValidator;
+    private final StudentRepository studentRepository;
 
-    protected TransactionService(TransactionRepository repository, TransactionMapper mapper, TransactionValidator validator, UserValidator userValidator, OrganizationValidator organizationValidator) {
+    protected TransactionService(TransactionRepository repository, TransactionMapper mapper, TransactionValidator validator, UserValidator userValidator, OrganizationValidator organizationValidator, StudentRepository studentRepository) {
         super(repository, mapper, validator);
         this.userValidator = userValidator;
         this.organizationValidator = organizationValidator;
+        this.studentRepository = studentRepository;
     }
 
     @Override
@@ -53,6 +56,7 @@ public class TransactionService extends AbstractService<
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         organizationValidator.validateOrganizationMatch(transaction.getInvoice().getOrganizationId(), organizationId);
         Transaction save = repository.save(transaction);
+        studentRepository.setNewBalance(save.getAmount(),createDto.studentId());
         return mapper.toDto(save);
     }
 

@@ -1,5 +1,6 @@
 package org.example.crm.repository;
 
+import jakarta.transaction.Transactional;
 import org.example.crm.entity.enums.InvoiceStatus;
 import org.example.crm.entity.model.Invoice;
 import org.example.crm.projection.AnalyticInvoiceProjection;
@@ -7,12 +8,14 @@ import org.example.crm.projection.InvoiceProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, String> {
@@ -88,4 +91,12 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
                                                  LocalDateTime prevMonth,
                                                  LocalDateTime month,
                                                  LocalDateTime nextMonth);
+
+    @Query("select exists(select i.id from Invoice i where i.id=:id and i.organizationId=:orgId)")
+    boolean checkId(String id,@Param("orgId")String organizationId);
+
+    @Modifying
+    @Transactional
+    @Query("update Invoice i set i.deleted = true where i.id =:id")
+    void softDelete(String id);
 }

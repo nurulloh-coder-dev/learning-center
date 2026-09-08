@@ -17,4 +17,8 @@ public class InvoiceValidator {
         return repository.findById(id)
                 .orElseThrow(() -> new RestException(ErrorType.INVOICE_NOT_FOUND, ErrorCodes.NotFound));
     }
+
+    public void validateId(String id,String organizationId) {
+        repository.checkId(id,organizationId);
+    }
 }

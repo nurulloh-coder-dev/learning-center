@@ -5,12 +5,15 @@ import org.example.crm.entity.dto.lesson.LessonCreateDto;
 import org.example.crm.entity.dto.lesson.LessonDto;
 import org.example.crm.entity.dto.lesson.LessonUpdateDto;
 import org.example.crm.entity.enums.EnrollmentPaymentStatus;
+import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.entity.model.*;
+import org.example.crm.eventListeners.GroupCycleCompletedEvent;
 import org.example.crm.mapper.LessonMapper;
 import org.example.crm.repository.*;
 import org.example.crm.validator.GroupValidator;
 import org.example.crm.validator.LessonValidator;
 import org.example.crm.validator.UserValidator;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,17 +31,17 @@ public class LessonService extends AbstractService<
     private final UserValidator userValidator;
     final GroupLevelRepository groupLevelRepository;
     private final GroupValidator groupValidator;
-    private final EnrollmentRepository enrollmentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
 
-    protected LessonService(LessonRepository repository, LessonMapper mapper, LessonValidator validator, TeacherRepository teacherRepository, GroupRepository groupRepository, UserValidator userValidator, GroupLevelRepository groupLevelRepository, GroupValidator groupValidator, EnrollmentRepository enrollmentRepository) {
+    protected LessonService(LessonRepository repository, LessonMapper mapper, LessonValidator validator, TeacherRepository teacherRepository, GroupRepository groupRepository, UserValidator userValidator, GroupLevelRepository groupLevelRepository, GroupValidator groupValidator, ApplicationEventPublisher eventPublisher) {
         super(repository, mapper, validator);
         this.teacherRepository = teacherRepository;
         this.groupRepository = groupRepository;
         this.userValidator = userValidator;
         this.groupLevelRepository = groupLevelRepository;
         this.groupValidator = groupValidator;
-        this.enrollmentRepository = enrollmentRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -62,24 +65,15 @@ public class LessonService extends AbstractService<
         Group group = groupValidator.validateIdAndGet(createDto.groupId());
         Level level = group.getLevel();
         Integer lessonsInCurrMonth = repository.findLessonCountByGroupId(group.getId(), level.getName()).orElse(0) + 1;
-
-
         Lesson entity = toEntity(createDto,String.format("%s.%s",group.getCurrentMonth(),lessonsInCurrMonth),group);
         Lesson save = repository.save(entity);
-
         group.registerCompletedLesson(lessonsInCurrMonth, groupLevelRepository);
-        int lessonsPerMonth = level.getLessonCount() / level.getDurationInMonths();
-        if (lessonsPerMonth == lessonsInCurrMonth){
-            List<Enrollment> enrollments = groupRepository.findAllEnrollmentsByGroupId(group.getId());
-
-            for (Enrollment enrollment : enrollments) {
-                enrollment.setPaidAmount(enrollment.getPaidAmount().subtract(level.getMonthlyFee()));
-                enrollment.setMonthlyFee(group.getLevel().getMonthlyFee());
-                enrollment.setStatus(EnrollmentPaymentStatus.UNPAID);
-                enrollmentRepository.save(enrollment);
+        groupRepository.save(group);
+        if (!group.getStatus().equals(GroupStatus.COMPLETED)) {
+            if (lessonsInCurrMonth == level.getLessonCount() / level.getDurationInMonths()) {
+                eventPublisher.publishEvent(new GroupCycleCompletedEvent(group.getId(), level.getMonthlyFee()));
             }
         }
-        groupRepository.save(group);
         return mapper.toDto(save);
     }
 

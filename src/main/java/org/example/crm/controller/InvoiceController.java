@@ -44,13 +44,6 @@ public class InvoiceController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(createDto));
     }
 
-    @PostMapping("/return")
-    public ResponseEntity<InvoiceDto> returnInvoice(@RequestParam String studentId,
-                                                    @RequestParam String groupId) {
-        return ResponseEntity.ok(service.returnInvoice(studentId, groupId));
-    }
-
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInvoice(@PathVariable String id) {
         service.delete(id);
