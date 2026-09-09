@@ -50,7 +50,7 @@ public class InvoiceMapper {
                 projection.getId(),
                 projection.getInvoiceNumber(),
                 projection.getAmount(),
-                projection.getIssuedAt(),
+                projection.getCreatedAt(),
                 new EnrollmentDto(
                         projection.getEnrollmentId(),
                         projection.getStudentId(),

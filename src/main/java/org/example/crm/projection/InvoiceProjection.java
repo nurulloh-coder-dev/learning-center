@@ -13,7 +13,7 @@ public interface  InvoiceProjection {
     String getStudentFullName();
     String getGroupId();
     String getReason();
+
     BigDecimal getAmount();
-    LocalDateTime getIssuedAt();
-    InvoiceStatus getPaymentStatus();
+    LocalDateTime getCreatedAt();
 }

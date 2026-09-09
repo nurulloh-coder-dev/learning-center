@@ -42,7 +42,7 @@ public class RateLimitingFilter extends OncePerRequestFilter {
             return true;
         }
 
-        // 2. Bypass Swagger UI, OpenAPI docs, and static web assets
+        // 2. Bypass Swagger UI, OpenAPI docs, static web assets, and auth endpoints
         return path.startsWith("/v3/api-docs")
                 || path.startsWith("/swagger-ui")
                 || path.endsWith(".css")
