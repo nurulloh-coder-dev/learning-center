@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class EnrollmentValidator {
     private final EnrollmentRepository repository;
+    private final UserValidator userValidator;
 
     public void validateId(String id) {
         Boolean exists = repository.checkId(id).orElse(false);
@@ -21,7 +22,12 @@ public class EnrollmentValidator {
     }
 
     public Enrollment validateIdAndGet(String id) {
-        return repository.findById(id)
+        Enrollment enrollment = repository.findById(id)
                 .orElseThrow(() -> new RestException(ErrorType.ENROLLMENT_NOT_FOUND, ErrorCodes.NotFound));
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        if (!enrollment.getOrganizationId().equals(organizationId)){
+            throw new RestException(ErrorType.FORBIDDEN,ErrorCodes.Forbidden);
+        }
+        return enrollment;
     }
 }

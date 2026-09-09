@@ -1,5 +1,6 @@
 package org.example.crm.repository;
 
+import jakarta.validation.constraints.NotNull;
 import org.example.crm.entity.model.Level;
 import org.example.crm.projection.LevelNamesProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -99,4 +100,7 @@ public interface GroupLevelRepository extends JpaRepository<Level, String> {
 
     @Query("select l from Level l where l.organizationId=:orgId and l.id=:id and l.deleted=false ")
     Optional<Level> findById(@Param("id") String id, @Param("orgId") String organizationId);
+
+    @Query("select l.name from Level l where l.id=:id and l.organizationId=:orgId and l.deleted=false")
+    Optional<String> checkAndGetName(@Param("id") String levelId,@Param("orgId")String organizationId);
 }

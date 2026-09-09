@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
 import org.example.crm.entity.enums.InvoiceStatus;
-import org.example.crm.entity.enums.InvoiceType;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "invoices")
@@ -32,5 +30,7 @@ public class Invoice extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Enrollment enrollment;
 
+    private String level;
 
+    private Integer month;
 }
