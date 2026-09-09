@@ -213,12 +213,13 @@ public class DataInitializer {
         invoice1.setInvoiceNumber("INV-001");
         invoice1.setAmount(new BigDecimal("150.00"));
         invoice1.setPaymentStatus(InvoiceStatus.PAID);
+        invoice1.setEnrollment(enrollment1);
         invoiceRepository.save(invoice1);
 
         Invoice invoice2 = new Invoice();
         invoice2.setInvoiceNumber("INV-002");
         invoice2.setAmount(new BigDecimal("150.00"));
-        invoice2.setEnrollment(enrollment1);
+        invoice2.setEnrollment(enrollment2);
         invoiceRepository.save(invoice2);
 
         Invoice invoice3 = new Invoice();
