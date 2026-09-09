@@ -97,11 +97,12 @@ public class InvoiceService extends AbstractService<
 
 
     @Transactional
-    public void createGroupInvoice(String groupId, BigDecimal monthlyFee) {
+    public void createGroupInvoice(String groupId) {
+        Group group = groupValidator.validateIdAndGet(groupId);
+        BigDecimal monthlyFee = group.getLevel().getMonthlyFee();
         if (monthlyFee == null || monthlyFee.compareTo(BigDecimal.ZERO) <= 0) {
             throw new RestException(ErrorType.INVALID_INPUT, ErrorCodes.BadRequest);
         }
-        Group group = groupValidator.validateIdAndGet(groupId);
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         if (!group.getOrganizationId().equals(organizationId)) {
             throw new RestException(ErrorType.FORBIDDEN, ErrorCodes.Forbidden);

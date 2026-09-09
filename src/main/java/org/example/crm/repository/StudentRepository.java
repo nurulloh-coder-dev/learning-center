@@ -20,13 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StudentRepository extends JpaRepository<Student, String> {
-    @Query("""
-                SELECT s FROM Student s
-                JOIN s.user u
-                WHERE u.deleted = false
-                  AND (:search IS NULL OR :search = '' OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')))
-            """)
-    Page<StudentProjection> searchStudents(@Param("search") String search, Pageable pageable);
 
 
     @Query("SELECT s FROM Student s WHERE s.id IN " +

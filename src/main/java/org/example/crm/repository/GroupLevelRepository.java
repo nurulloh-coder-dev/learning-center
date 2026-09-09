@@ -1,6 +1,5 @@
 package org.example.crm.repository;
 
-import jakarta.validation.constraints.NotNull;
 import org.example.crm.entity.model.Level;
 import org.example.crm.projection.LevelNamesProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,20 +31,6 @@ public interface GroupLevelRepository extends JpaRepository<Level, String> {
         """)
     Optional<Level> findLevelByIdAndOrganizationId(String id, String organizationId);
 
-
-    @Query("""
-        select case when count(l) > 0 then true else false end
-        from Level l
-        where l.id = :id
-        and l.orderNumber in (
-            select l2.orderNumber
-            from Level l2
-            where l2.organizationId = l.organizationId
-            and l2.deleted = false
-        )
-        and l.deleted = false
-""")
-    boolean checkLevelOrder(String id);
 
     @Query("""
         select max(l.orderNumber)

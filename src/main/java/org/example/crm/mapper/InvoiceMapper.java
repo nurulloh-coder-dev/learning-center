@@ -40,8 +40,8 @@ public class InvoiceMapper {
                 invoice.getInvoiceNumber(),
                 invoice.getAmount(),
                 invoice.getCreatedAt(),
-                invoice.getEnrollment() != null ? enrollmentMapper.toDto(invoice.getEnrollment()) : null
-
+                invoice.getEnrollment() != null ? enrollmentMapper.toDto(invoice.getEnrollment()) : null,
+                invoice.getPaymentStatus()
         );
     }
 
@@ -54,9 +54,11 @@ public class InvoiceMapper {
                 new EnrollmentDto(
                         projection.getEnrollmentId(),
                         projection.getStudentId(),
+                        projection.getStudentFullName(),
                         projection.getGroupId(),
                         projection.getReason()
-                )
+                ),
+                projection.getPaymentStatus()
         );
     }
 

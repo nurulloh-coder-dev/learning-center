@@ -84,22 +84,16 @@ public class StudentService extends AbstractService<
 
     @Override
     public void delete(String id) {
-
-
         validator.validateId(id);
         repository.softDelete(id);
     }
 
     public Long getAllCount() {
-
-
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         return repository.countStudentsByOrganizationId(organizationId);
     }
 
     public List<StudentDto> getStudentsByGroupId(String groupId) {
-
-
         List<StudentShowProjection> studentByGroupId = repository.getStudentShowByGroupId(groupId);
         return studentByGroupId
                 .stream()
@@ -115,23 +109,19 @@ public class StudentService extends AbstractService<
                 .toList();
     }
 
-    public StudentDto getMe(String groupId) {
-        User userId = userValidator.authenticateAndGetUser();
-        Student student = validator.validateStudentByUserId(userId.getId());
-        Enrollment enrollment = enrollmentRepository.findByStudentIdAndGroupId(student.getId(), groupId)
-                .orElseThrow(() -> new RestException(ErrorType.ENROLLMENT_NOT_FOUND, ErrorCodes.NotFound));
+    public StudentDto getMe() {
+        User user = userValidator.authenticateAndGetUser();
+        Student student = validator.validateStudentByUserId(user.getId());
         return new StudentDto(
                 student.getId(),
                 userMapper.toDto(student.getUser()),
                 student.getParentPhone(),
-                enrollment.getPaidAmount().subtract(enrollment.getMonthlyFee()),
-                enrollment.getStatus()
+                student.getBalance()
         );
     }
 
     public Invoice getLatestInvoice(@NotNull String studentId) {
-        Invoice invoice = repository.findLatestInvoiceByStudentId(studentId)
+        return repository.findLatestInvoiceByStudentId(studentId)
                 .orElseThrow(() -> new RestException(ErrorType.INVOICE_NOT_FOUND, ErrorCodes.NotFound));
-        return invoice;
     }
 }
