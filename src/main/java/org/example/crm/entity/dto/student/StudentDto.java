@@ -7,5 +7,6 @@ import java.math.BigDecimal;
 public record StudentDto(String id,
                          UserDto userDto,
                          String parentPhone,
-                         BigDecimal balance){
+                         BigDecimal balance
+                         ) {
 }
