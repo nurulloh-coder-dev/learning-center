@@ -29,7 +29,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
             g.id as groupId,
             e.leavingReason as reason,
             i.amount as amount,
-            i.createdAt as createAt
+            i.createdAt as createAt,
+            i.paymentStatus as paymentStatus
         from Invoice i
         join i.enrollment e
         join e.student s
