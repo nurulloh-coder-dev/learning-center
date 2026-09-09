@@ -3,7 +3,6 @@ package org.example.crm.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.crm.entity.dto.InvoiceCreateDto;
 import org.example.crm.entity.dto.InvoiceDto;
-import org.example.crm.entity.dto.InvoiceUpdateDto;
 import org.example.crm.entity.enums.InvoiceStatus;
 import org.example.crm.service.InvoiceService;
 import org.springframework.data.domain.Page;
@@ -42,6 +41,12 @@ public class InvoiceController {
     @PostMapping
     public ResponseEntity<InvoiceDto> createInvoice(@RequestBody InvoiceCreateDto createDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(createDto));
+    }
+
+    @PostMapping("/{groupId}")
+    public ResponseEntity<Void> createGroupInvoice(@PathVariable String groupId){
+        service.createGroupInvoice(groupId);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

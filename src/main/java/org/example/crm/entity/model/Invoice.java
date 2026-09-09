@@ -30,5 +30,7 @@ public class Invoice extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Enrollment enrollment;
 
+    private String level;
 
+    private Integer month;
 }

@@ -10,5 +10,6 @@ public interface EnrollmentMapper {
 
     @Mapping(source = "student.id",target = "studentId")
     @Mapping(source = "group.id",target = "groupId")
+    @Mapping(source = "student.user.fullName",target = "studentFullName")
     EnrollmentDto toDto(Enrollment enrollment);
 }

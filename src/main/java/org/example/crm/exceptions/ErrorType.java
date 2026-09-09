@@ -63,7 +63,8 @@ public enum ErrorType {
     STUDENT_ALREADY_ENROLLED_TO_THIS_GROUP("student.already.enrolled.to.this.group"), COURSE_NOT_FOUND("course.not.found"),
     COURSE_ALREADY_EXISTS("course.already.exists"),
     INVALID_INPUT("invalid.input"),
-    TRANSACTION_NOT_FOUND("transaction.not.found"),;
+    TRANSACTION_NOT_FOUND("transaction.not.found"),
+    INVOICE_ALREADY_CREATED("invoice.already.created");
 
 
     private final String key;

@@ -9,11 +9,10 @@ import java.math.BigDecimal;
 
 public record TransactionCreateDto(
         @NotNull
-        @Schema(allowableValues = {"PAID", "RETURNED"})
+        @Schema(allowableValues = {"PAID", "RETURNED","MONTHLY_FEE"})
         TransactionType type,
 
         @NotNull
-        @DecimalMin(value = "0.0", message = "amount cannot be negative")
         BigDecimal amount,
 
         @NotNull

@@ -1,5 +1,6 @@
 package org.example.crm.validator;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.example.crm.config.CustomUserDetails;
 import org.example.crm.entity.dto.groupLevel.GroupLevelCreateDto;
@@ -15,23 +16,23 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class GroupLevelValidator {
-    final GroupLevelRepository groupRepository;
+    final GroupLevelRepository repository;
 
     public Level validateAndGet(String id,String organizationId) {
-        return groupRepository.findById(id,organizationId)
+        return repository.findById(id,organizationId)
                 .orElseThrow(() -> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound));
     }
 
     public void validateForCreate(GroupLevelCreateDto createDto) {
         String organizationId = authenticateAndGetOrganizationId();
 
-        Integer maxOrderNumber = groupRepository.getMaxOrderNumberByOrganizationId(organizationId);
+        Integer maxOrderNumber = repository.getMaxOrderNumberByOrganizationId(organizationId);
         if (createDto.orderNumber() == null
                 || (maxOrderNumber != null && createDto.orderNumber() <= maxOrderNumber)) {
             throw new RestException(ErrorType.GROUP_LEVEL_ORDER_ALREADY_EXISTS, ErrorCodes.BadRequest);
         }
 
-        if (groupRepository.existsByOrganizationIdAndNameIgnoreCase(organizationId, createDto.name())) {
+        if (repository.existsByOrganizationIdAndNameIgnoreCase(organizationId, createDto.name())) {
             throw new RestException(ErrorType.GROUP_LEVEL_NAME_ALREADY_EXISTS, ErrorCodes.AlreadyExists);
         }
 
@@ -51,5 +52,11 @@ public class GroupLevelValidator {
             return principal.getOrganizationId();
         }
         throw new RestException(ErrorType.UNAUTHORIZED, ErrorCodes.Unauthorized);
+    }
+
+    public String validateIdAndGetName(@NotNull String levelId) {
+        String organizationId = authenticateAndGetOrganizationId();
+        return repository.checkAndGetName(levelId, organizationId)
+                .orElseThrow(() -> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound));
     }
 }

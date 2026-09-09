@@ -23,9 +23,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
         select
             i.id as id,
             i.invoiceNumber as invoiceNumber,
-    
             e.id as enrollmentId,
             s.id as studentId,
+            su.fullName as fullName,
             g.id as groupId,
             e.leavingReason as reason,
             i.amount as amount,
@@ -94,4 +94,14 @@ public interface InvoiceRepository extends JpaRepository<Invoice, String> {
     @Transactional
     @Query("update Invoice i set i.deleted = true where i.id =:id")
     void softDelete(String id);
+
+    @Query("""
+           select exists (
+                      select i.id from Invoice i
+                      join i.enrollment e
+                      where e.group.id=:groupId
+                      and i.level=:levelName
+                      and i.month=:month
+                      and i.deleted=false)""")
+    boolean checkIfAlreadyCreated(String groupId, String levelName, Integer currentMonth);
 }

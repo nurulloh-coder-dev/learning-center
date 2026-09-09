@@ -8,6 +8,7 @@ import org.example.crm.entity.dto.transaction.TransactionCreateDto;
 import org.example.crm.entity.enums.InvoiceStatus;
 import org.example.crm.entity.enums.TransactionType;
 import org.example.crm.entity.model.Enrollment;
+import org.example.crm.entity.model.Group;
 import org.example.crm.entity.model.Invoice;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
@@ -17,6 +18,7 @@ import org.example.crm.projection.InvoiceProjection;
 import org.example.crm.repository.EnrollmentRepository;
 import org.example.crm.repository.InvoiceRepository;
 import org.example.crm.repository.StudentRepository;
+import org.example.crm.validator.GroupValidator;
 import org.example.crm.validator.InvoiceValidator;
 import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
@@ -38,14 +40,16 @@ public class InvoiceService extends AbstractService<
     private final EnrollmentRepository enrollmentRepository;
     private final UserValidator userValidator;
     private final TransactionService transactionService;
+    private final GroupValidator groupValidator;
 
-    protected InvoiceService(InvoiceRepository repository, InvoiceMapper mapper, InvoiceValidator validator, StudentRepository studentRepository, EnrollmentService enrollmentService, EnrollmentRepository enrollmentRepository, UserValidator userValidator, TransactionService transactionService) {
+    protected InvoiceService(InvoiceRepository repository, InvoiceMapper mapper, InvoiceValidator validator, StudentRepository studentRepository, EnrollmentService enrollmentService, EnrollmentRepository enrollmentRepository, UserValidator userValidator, TransactionService transactionService, GroupValidator groupValidator) {
         super(repository, mapper, validator);
         this.studentRepository = studentRepository;
         this.enrollmentService = enrollmentService;
         this.enrollmentRepository = enrollmentRepository;
         this.userValidator = userValidator;
         this.transactionService = transactionService;
+        this.groupValidator = groupValidator;
     }
 
     private String wrapSearch(String search) {
@@ -93,18 +97,28 @@ public class InvoiceService extends AbstractService<
 
 
     @Transactional
-    public void createGroupInvoice(String groupId, BigDecimal monthlyFee) {
+    public void createGroupInvoice(String groupId) {
+        Group group = groupValidator.validateIdAndGet(groupId);
+        BigDecimal monthlyFee = group.getLevel().getMonthlyFee();
         if (monthlyFee == null || monthlyFee.compareTo(BigDecimal.ZERO) <= 0) {
             throw new RestException(ErrorType.INVALID_INPUT, ErrorCodes.BadRequest);
         }
-
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        if (!group.getOrganizationId().equals(organizationId)) {
+            throw new RestException(ErrorType.FORBIDDEN, ErrorCodes.Forbidden);
+        }
+        String levelName = group.getLevel().getName();
+        boolean alreadyCreated = repository.checkIfAlreadyCreated(groupId, levelName, group.getCurrentMonth());
+        if (alreadyCreated){
+            throw new RestException(ErrorType.INVOICE_ALREADY_CREATED,ErrorCodes.AlreadyExists);
+        }
         List<Enrollment> enrollments = enrollmentRepository.getAllByGroupId(groupId);
         if (enrollments.isEmpty()) {
             throw new RestException(ErrorType.ENROLLMENT_NOT_FOUND, ErrorCodes.NotFound);
         }
 
         List<Invoice> invoices = enrollments.stream()
-                .map(e -> mapper.toEntity(new InvoiceCreateDto(e, monthlyFee)))
+                .map(e -> mapper.toEntity(new InvoiceCreateDto(e.getId(), monthlyFee, levelName, group.getCurrentMonth())))
                 .toList();
         repository.saveAll(invoices);
 

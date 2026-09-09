@@ -83,22 +83,16 @@ public class StudentService extends AbstractService<
 
     @Override
     public void delete(String id) {
-
-
         validator.validateId(id);
         repository.softDelete(id);
     }
 
     public Long getAllCount() {
-
-
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         return repository.countStudentsByOrganizationId(organizationId);
     }
 
     public List<StudentDto> getStudentsByGroupId(String groupId) {
-
-
         List<StudentShowProjection> studentByGroupId = repository.getStudentShowByGroupId(groupId);
         return studentByGroupId
                 .stream()

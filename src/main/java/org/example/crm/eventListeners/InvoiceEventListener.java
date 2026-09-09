@@ -16,6 +16,6 @@ public class InvoiceEventListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleGroupBilling(GroupCycleCompletedEvent event) {
-        invoiceService.createGroupInvoice(event.groupId(), event.monthlyFee());
+        invoiceService.createGroupInvoice(event.groupId());
     }
 }

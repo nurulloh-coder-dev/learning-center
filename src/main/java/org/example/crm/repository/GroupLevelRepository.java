@@ -33,20 +33,6 @@ public interface GroupLevelRepository extends JpaRepository<Level, String> {
 
 
     @Query("""
-        select case when count(l) > 0 then true else false end
-        from Level l
-        where l.id = :id
-        and l.orderNumber in (
-            select l2.orderNumber
-            from Level l2
-            where l2.organizationId = l.organizationId
-            and l2.deleted = false
-        )
-        and l.deleted = false
-""")
-    boolean checkLevelOrder(String id);
-
-    @Query("""
         select max(l.orderNumber)
         from Level l
         where l.organizationId = :organizationId
@@ -99,4 +85,7 @@ public interface GroupLevelRepository extends JpaRepository<Level, String> {
 
     @Query("select l from Level l where l.organizationId=:orgId and l.id=:id and l.deleted=false ")
     Optional<Level> findById(@Param("id") String id, @Param("orgId") String organizationId);
+
+    @Query("select l.name from Level l where l.id=:id and l.organizationId=:orgId and l.deleted=false")
+    Optional<String> checkAndGetName(@Param("id") String levelId,@Param("orgId")String organizationId);
 }

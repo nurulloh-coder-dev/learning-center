@@ -1,17 +1,16 @@
 package org.example.crm.projection;
 
-import org.example.crm.entity.enums.*;
+import org.example.crm.entity.enums.InvoiceStatus;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public interface  InvoiceProjection {
     String getId();
     String getInvoiceNumber();
     String getEnrollmentId();
     String getStudentId();
+    String getStudentFullName();
     String getGroupId();
     String getReason();
 
