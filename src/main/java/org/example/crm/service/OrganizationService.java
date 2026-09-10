@@ -1,6 +1,7 @@
 package org.example.crm.service;
 
 
+import org.example.crm.entity.dto.IdNameDto;
 import org.example.crm.entity.dto.organization.OrganizationCreateDto;
 import org.example.crm.entity.dto.organization.OrganizationDto;
 import org.example.crm.entity.dto.organization.OrganizationUpdateDto;
@@ -13,6 +14,8 @@ import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class OrganizationService extends AbstractService<
@@ -62,5 +65,14 @@ public class OrganizationService extends AbstractService<
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         validator.validateOrganizationMatch(id, organizationId);
         repository.softDelete(id);
+    }
+
+    public List<IdNameDto> getByName() {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        validator.validateAndGetId(organizationId);
+        List<Organization> organizations = repository.findAll();
+        return organizations.stream()
+                .map(organization -> new IdNameDto(organization.getId(), organization.getName()))
+                .toList();
     }
 }

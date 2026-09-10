@@ -1,9 +1,9 @@
 package org.example.crm.service;
 
 import org.example.crm.entity.dto.user.UserCreateDto;
+import org.example.crm.entity.dto.user.UserCreatedResponseDto;
 import org.example.crm.entity.dto.user.UserDto;
 import org.example.crm.entity.dto.user.UserUpdateDto;
-import org.example.crm.entity.model.Organization;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.model.Branch;
@@ -18,8 +18,10 @@ import org.example.crm.validator.OrganizationValidator;
 import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.security.SecureRandom;
 
 @Service
 public class UserService extends AbstractService<
@@ -30,12 +32,21 @@ public class UserService extends AbstractService<
     final BranchRepository branchRepository;
     final BranchValidator branchValidator;
     final OrganizationValidator organizationValidator;
+    final PasswordEncoder passwordEncoder;
 
-    protected UserService(UserRepository repository, UserMapper mapper, UserValidator validator, BranchRepository branchRepository, BranchValidator branchValidator, OrganizationValidator organizationValidator) {
+    private static final String CHARACTERS =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+                    "abcdefghijklmnopqrstuvwxyz" +
+                    "0123456789";
+
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    protected UserService(UserRepository repository, UserMapper mapper, UserValidator validator, BranchRepository branchRepository, BranchValidator branchValidator, OrganizationValidator organizationValidator, PasswordEncoder passwordEncoder) {
         super(repository, mapper, validator);
         this.branchRepository = branchRepository;
         this.branchValidator = branchValidator;
         this.organizationValidator = organizationValidator;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -52,13 +63,25 @@ public class UserService extends AbstractService<
 
     @Override
     public UserDto create(UserCreateDto createDto) {
+        return null;
+    }
+
+
+    public UserCreatedResponseDto createUser(UserCreateDto createDto) {
         validator.validate(createDto);
         User entity = mapper.toEntity(createDto);
         validator.validateUserPermission(entity);
+        String password = generatePassword(10);
+        entity.setPassword(passwordEncoder.encode(password));
         Branch branch = branchValidator.validateIdAndGet(createDto.branchId());
         entity.setBranch(branch);
         User save = repository.save(entity);
-        return mapper.toDto(save);
+        return new UserCreatedResponseDto(
+                save.getId(),
+                save.getFullName(),
+                save.getPhone(),
+                password
+        );
     }
 
     @Override
@@ -79,5 +102,16 @@ public class UserService extends AbstractService<
         if (rowsUpdated == 0) {
             throw new RestException(ErrorType.FORBIDDEN, ErrorCodes.Unauthorized);
         }
+    }
+
+    public static String generatePassword(int length) {
+        StringBuilder password = new StringBuilder(length);
+
+        for (int i = 0; i < length; i++) {
+            int index = RANDOM.nextInt(CHARACTERS.length());
+            password.append(CHARACTERS.charAt(index));
+        }
+
+        return password.toString();
     }
 }

@@ -60,4 +60,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Transactional
     @Query("UPDATE User u SET u.imageUrl =:imageUrl where u.id=:userId and u.deleted = false")
     void updateUserImage(@Param("userId") String userId, @Param("imageUrl") String presignedUrl);
+
+    boolean existsByPhone(String phone);
 }
