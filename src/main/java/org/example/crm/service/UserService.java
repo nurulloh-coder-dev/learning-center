@@ -9,6 +9,7 @@ import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.model.Branch;
 import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.RestException;
+import org.example.crm.filters.UserFilterDto;
 import org.example.crm.mapper.UserMapper;
 import org.example.crm.repository.BranchRepository;
 import org.example.crm.repository.UserRepository;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Service;
 public class UserService extends AbstractService<
         UserRepository,
         UserMapper,
-        UserValidator> implements CrudService<UserCreateDto, UserUpdateDto, UserDto, String> {
+        UserValidator> implements CrudService<UserFilterDto, UserCreateDto, UserUpdateDto, UserDto, String, Page<UserDto>> {
 
     final BranchRepository branchRepository;
     final BranchValidator branchValidator;
@@ -38,8 +39,8 @@ public class UserService extends AbstractService<
     }
 
     @Override
-    public Page<UserDto> getAll(Pageable pageable, String search) {
-        Page<User> all = repository.findAll(pageable, search);
+    public Page<UserDto> getAll(Pageable pageable, UserFilterDto filterDto) {
+        Page<User> all = repository.findAll(pageable, filterDto.search());
         return all.map(mapper::toDto);
     }
 

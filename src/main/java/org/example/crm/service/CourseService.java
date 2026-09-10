@@ -9,6 +9,7 @@ import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
+import org.example.crm.filters.CourseFilterDto;
 import org.example.crm.mapper.CourseMapper;
 import org.example.crm.projection.CourseProjection;
 import org.example.crm.repository.CourseRepository;
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Service;
 public class CourseService extends AbstractService<
         CourseRepository,
         CourseMapper,
-        CourseValidator> implements CrudService<CourseCreateDto, CourseUpdateDto, CourseDto, String> {
+        CourseValidator> implements CrudService<CourseFilterDto, CourseCreateDto, CourseUpdateDto, CourseDto, String, Page<CourseDto>> {
 
     private final UserValidator userValidator;
     private final UserRepository userRepository;
@@ -39,11 +40,11 @@ public class CourseService extends AbstractService<
     }
 
     @Override
-    public Page<CourseDto> getAll(Pageable pageable, String search) {
+    public Page<CourseDto> getAll(Pageable pageable, CourseFilterDto filterDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
 
-        String searchPattern = (search != null && !search.isBlank())
-                ? "%" + search.trim().toLowerCase() + "%"
+        String searchPattern = (filterDto.search() != null && !filterDto.search().isBlank())
+                ? "%" + filterDto.search().trim().toLowerCase() + "%"
                 : null;
 
         Page<CourseProjection> courses = repository.getAllByFilter(organizationId, searchPattern, pageable);

@@ -5,6 +5,7 @@ import org.example.crm.entity.dto.TimeTableCreateDto;
 import org.example.crm.entity.dto.TimeTableUpdateDto;
 import org.example.crm.entity.dto.timeTable.TimeTableDto;
 import org.example.crm.entity.enums.DayType;
+import org.example.crm.filters.TimeTableFilterDto;
 import org.example.crm.service.TimeTableService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class TimeTableController {
     public ResponseEntity<List<TimeTableDto>> findAll(@RequestParam(required = false) DayType dayType,
                                       @RequestParam(required = false, defaultValue = "00:00") LocalTime start,
                                       @RequestParam(required = false, defaultValue = "23:59:59") LocalTime end) {
-        return ResponseEntity.ok(service.getAll(dayType,start,end));
+        return ResponseEntity.ok(service.getAll(null,new TimeTableFilterDto(dayType,start,end)));
     }
 
     @GetMapping("/{id}")

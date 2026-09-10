@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.crm.entity.dto.organization.OrganizationCreateDto;
 import org.example.crm.entity.dto.organization.OrganizationDto;
 import org.example.crm.entity.dto.organization.OrganizationUpdateDto;
+import org.example.crm.filters.OrganizationFilterDto;
 import org.example.crm.service.OrganizationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +25,7 @@ public class OrganizationController {
     public ResponseEntity<Page<OrganizationDto>> getAll(
             @PageableDefault(size = 10, sort = "createdAt") Pageable pageable,
             @RequestParam(required = false) String search) {
-        return ResponseEntity.ok(organizationService.getAll(pageable, search));
+        return ResponseEntity.ok(organizationService.getAll(pageable, new OrganizationFilterDto(search)));
     }
 
     @GetMapping("/{id}")

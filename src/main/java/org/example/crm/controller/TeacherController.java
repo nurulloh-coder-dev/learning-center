@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.crm.entity.dto.teacher.TeacherCreateDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.teacher.TeacherUpdateDto;
+import org.example.crm.filters.TeacherFilterDto;
 import org.example.crm.service.TeacherService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,7 @@ public class TeacherController {
             Pageable pageable,
             @RequestParam(required = false) String search
     ) {
-        Page<TeacherDto> teachers = teacherService.getAll(pageable, search);
+        Page<TeacherDto> teachers = teacherService.getAll(pageable, new TeacherFilterDto(search));
         return ResponseEntity.ok(teachers);
     }
 

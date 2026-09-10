@@ -25,10 +25,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, String> 
     void softDelete(@Param("reason") String reason, @Param("id") String id);
 
     @Query("select e from Enrollment e where (:groupId is null or e.group.id =:groupId) and e.student.user.fullName ilike concat('%',:fullName,'%')")
-    Page<Enrollment> findAllBySearch(@Param("groupId") String groupId, Pageable pageable,@Param("fullName") String search);
-
-    @Query("select e from Enrollment e where e.student.user.fullName ilike concat('%',:fullName,'%')")
-    Page<Enrollment> findAllBySearch(@Param("orgId") String organizationId, @Param("fullName") String search, Pageable pageable);
+    Page<Enrollment> findAllBySearch(@Param("orgId") String organizationId, @Param("groupId") String groupId, @Param("fullName") String search, Pageable pageable);
 
 
     @Query("""
@@ -55,26 +52,26 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, String> 
             LocalDateTime startNextMonth);
 
     @Query("""
-        select en
-        from Enrollment en
-        where en.student.id = :studentId and en.group.id = :groupId
-        and en.deleted = false and en.student.user.deleted = false and en.group.deleted = false
-""")
+                    select en
+                    from Enrollment en
+                    where en.student.id = :studentId and en.group.id = :groupId
+                    and en.deleted = false and en.student.user.deleted = false and en.group.deleted = false
+            """)
     Optional<Enrollment> findByStudentIdAndGroupId(String studentId, String groupId);
 
     @Query("""
-        select en
-        from Enrollment en
-        where en.student.id = :studentId
-        and en.deleted = false and en.student.user.deleted = false
-""")
+                    select en
+                    from Enrollment en
+                    where en.student.id = :studentId
+                    and en.deleted = false and en.student.user.deleted = false
+            """)
     List<Enrollment> findByStudentId(String studentId);
 
     @Query("""
-           select e as enrollment,l.monthlyFee as monthlyFee
-           from Enrollment e
-           join e.group.level l
-           where e.id=:id""")
+            select e as enrollment,l.monthlyFee as monthlyFee
+            from Enrollment e
+            join e.group.level l
+            where e.id=:id""")
     EnrollmentMonthlyFeeProjection getEnrollmentAndMonthlyFee(@Param("id") String enrollmentId);
 
     @Query("select e from Enrollment e join fetch e.student where e.deleted=false and e.group.id=:groupId")

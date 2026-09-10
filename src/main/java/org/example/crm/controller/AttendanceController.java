@@ -3,6 +3,7 @@ package org.example.crm.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.example.crm.entity.dto.attendance.*;
+import org.example.crm.filters.AttendanceFilterDto;
 import org.example.crm.service.AttendanceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +33,7 @@ public class AttendanceController {
             @RequestParam(required = false) String search
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<AttendanceDto> attendances = service.getAll(pageable, search);
+        Page<AttendanceDto> attendances = service.getAll(pageable, new AttendanceFilterDto(search));
         return ResponseEntity.ok(attendances);
     }
 

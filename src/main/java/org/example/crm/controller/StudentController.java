@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.crm.entity.dto.student.StudentCreateDto;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
+import org.example.crm.filters.StudentFilterDto;
 import org.example.crm.service.StudentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,7 @@ public class StudentController {
             Pageable pageable,
             @RequestParam(required = false) String search
     ) {
-        Page<StudentDto> students = studentService.getAll(pageable, search);
+        Page<StudentDto> students = studentService.getAll(pageable, new StudentFilterDto(search));
         return ResponseEntity.ok(students);
     }
 

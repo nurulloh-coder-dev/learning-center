@@ -2,11 +2,9 @@ package org.example.crm.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.crm.entity.dto.group.FullGroupDto;
-import org.example.crm.entity.dto.group.GroupCreateDto;
-import org.example.crm.entity.dto.group.GroupDto;
-import org.example.crm.entity.dto.group.GroupUpdateDto;
+import org.example.crm.entity.dto.group.*;
 import org.example.crm.entity.enums.GroupStatus;
+import org.example.crm.filters.GroupFilterDto;
 import org.example.crm.projection.GroupNameProjection;
 import org.example.crm.service.GroupService;
 import org.springframework.data.domain.Page;
@@ -31,7 +29,7 @@ public class GroupController {
                                                        @RequestParam(required = false) GroupStatus status,
                                                        @RequestParam(required = false) String level) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(service.getAll(pageable, search, status, level));
+        return ResponseEntity.ok(service.getAll(pageable, new GroupFilterDto(search,status,level)));
     }
 
     @GetMapping("/{id}")

@@ -3,6 +3,7 @@ package org.example.crm.controller;
 import jakarta.validation.Valid;
 import org.example.crm.entity.dto.enrollment.EnrollmentCreateDto;
 import org.example.crm.entity.dto.enrollment.EnrollmentDto;
+import org.example.crm.filters.EnrollmentFilterDto;
 import org.example.crm.entity.dto.enrollment.EnrollmentUpdateDto;
 import org.example.crm.service.EnrollmentService;
 import org.springframework.data.domain.Page;
@@ -17,10 +18,10 @@ import java.util.List;
 @RequestMapping("api/v1/enrollments")
 public class EnrollmentController {
 
-    private final EnrollmentService enrollmentService;
+    private final EnrollmentService service;
 
-    public EnrollmentController(EnrollmentService enrollmentService) {
-        this.enrollmentService = enrollmentService;
+    public EnrollmentController(EnrollmentService service) {
+        this.service = service;
     }
 
     @GetMapping
@@ -29,19 +30,19 @@ public class EnrollmentController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String groupId
     ) {
-        Page<EnrollmentDto> enrollments = groupId == null ? enrollmentService.getAll(pageable, search) : enrollmentService.getAll(pageable, search, groupId);
+        Page<EnrollmentDto> enrollments = service.getAll(pageable,new EnrollmentFilterDto(search,groupId));
         return ResponseEntity.ok(enrollments);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<EnrollmentDto> getById(@PathVariable String id) {
-        EnrollmentDto enrollment = enrollmentService.get(id);
+        EnrollmentDto enrollment = service.get(id);
         return ResponseEntity.ok(enrollment);
     }
 
     @PostMapping
     public ResponseEntity<EnrollmentDto> create(@Valid @RequestBody EnrollmentCreateDto createDto) {
-        EnrollmentDto createdEnrollment = enrollmentService.create(createDto);
+        EnrollmentDto createdEnrollment = service.create(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdEnrollment);
     }
 
@@ -51,18 +52,18 @@ public class EnrollmentController {
             @PathVariable String id,
             @Valid @RequestBody EnrollmentUpdateDto updateDto
     ) {
-        EnrollmentDto updatedEnrollment = enrollmentService.update(updateDto, id);
+        EnrollmentDto updatedEnrollment = service.update(updateDto, id);
         return ResponseEntity.ok(updatedEnrollment);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id, @RequestParam String reason) {
-        enrollmentService.delete(id,reason);
+        service.delete(id,reason);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/student/{studentId}")
     public ResponseEntity<List<EnrollmentDto>> getByStudentId(@PathVariable String studentId) {
-        return ResponseEntity.ok(enrollmentService.getByStudentId(studentId));
+        return ResponseEntity.ok(service.getByStudentId(studentId));
     }
 }

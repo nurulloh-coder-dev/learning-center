@@ -64,7 +64,9 @@ public enum ErrorType {
     COURSE_ALREADY_EXISTS("course.already.exists"),
     INVALID_INPUT("invalid.input"),
     TRANSACTION_NOT_FOUND("transaction.not.found"),
-    INVOICE_ALREADY_CREATED("invoice.already.created");
+    INVOICE_ALREADY_CREATED("invoice.already.created"),
+    INVOICE_ALREADY_PAID("invoice.already.paid"),
+    INVOICE_REQUIRED("invoice.required");
 
 
     private final String key;

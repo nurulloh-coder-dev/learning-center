@@ -11,6 +11,7 @@ public record TransactionDto(
         String id,
         TransactionType type,
         BigDecimal amount,
+        String note,
         InvoiceDto invoice,
         StudentDto user,
         LocalDateTime createdAt

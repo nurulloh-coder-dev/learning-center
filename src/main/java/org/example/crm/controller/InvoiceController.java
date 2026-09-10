@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.crm.entity.dto.InvoiceCreateDto;
 import org.example.crm.entity.dto.InvoiceDto;
 import org.example.crm.entity.enums.InvoiceStatus;
+import org.example.crm.filters.InvoiceFilterDto;
 import org.example.crm.service.InvoiceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +31,7 @@ public class InvoiceController {
                                                            @RequestParam(defaultValue = "0") Integer page,
                                                            @RequestParam(defaultValue = "20") Integer size) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(service.getAllInvoices(search, from, to, status, pageable));
+        return ResponseEntity.ok(service.getAll(pageable,new InvoiceFilterDto(from, to, status, search)));
     }
 
     @GetMapping("/{id}")

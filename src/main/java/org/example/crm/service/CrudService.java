@@ -1,14 +1,15 @@
 package org.example.crm.service;
 
 import jakarta.validation.Valid;
+import org.example.crm.filters.SearchFilterDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-public interface CrudService<CD extends Record, UD extends Record, D extends Record, I> {
+public interface CrudService<FD extends Record,CD extends Record, UD extends Record, D extends Record, I, R> {
 
-    Page<D> getAll(Pageable pageable, String search);
+    R getAll(Pageable pageable, FD filterDto);
 
     D get(I id);
 

@@ -2,8 +2,8 @@ package org.example.crm.service;
 
 import org.example.crm.entity.dto.enrollment.EnrollmentCreateDto;
 import org.example.crm.entity.dto.enrollment.EnrollmentDto;
+import org.example.crm.filters.EnrollmentFilterDto;
 import org.example.crm.entity.dto.enrollment.EnrollmentUpdateDto;
-import org.example.crm.entity.enums.EnrollmentPaymentStatus;
 import org.example.crm.entity.model.Enrollment;
 import org.example.crm.entity.model.Group;
 import org.example.crm.entity.model.Student;
@@ -21,14 +21,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 public class EnrollmentService extends AbstractService<
         EnrollmentRepository,
         EnrollmentMapper,
-        EnrollmentValidator> implements CrudService<EnrollmentCreateDto, EnrollmentUpdateDto, EnrollmentDto, String> {
+        EnrollmentValidator> implements CrudService<EnrollmentFilterDto, EnrollmentCreateDto, EnrollmentUpdateDto, EnrollmentDto, String, Page<EnrollmentDto>> {
 
     private final StudentValidator studentValidator;
     private final GroupValidator groupValidator;
@@ -44,14 +43,9 @@ public class EnrollmentService extends AbstractService<
     }
 
     @Override
-    public Page<EnrollmentDto> getAll(Pageable pageable, String search) {
+    public Page<EnrollmentDto> getAll(Pageable pageable, EnrollmentFilterDto filterDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Page<Enrollment> allBySearch = repository.findAllBySearch(organizationId, search, pageable);
-        return allBySearch.map(mapper::toDto);
-    }
-
-    public Page<EnrollmentDto> getAll(Pageable pageable, String search, String groupId) {
-        Page<Enrollment> allBySearch = repository.findAllBySearch(groupId, pageable, search);
+        Page<Enrollment> allBySearch = repository.findAllBySearch(organizationId, filterDto.groupId(), filterDto.search(), pageable);
         return allBySearch.map(mapper::toDto);
     }
 

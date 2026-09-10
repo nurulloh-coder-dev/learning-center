@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.crm.entity.dto.lesson.LessonCreateDto;
 import org.example.crm.entity.dto.lesson.LessonDto;
 import org.example.crm.entity.dto.lesson.LessonUpdateDto;
+import org.example.crm.filters.LessonFilterDto;
 import org.example.crm.service.LessonService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +29,7 @@ public class LessonController {
             Pageable pageable,
             @RequestParam(required = false) String search
     ) {
-        Page<LessonDto> lessons = lessonService.getAll(pageable, search);
+        Page<LessonDto> lessons = lessonService.getAll(pageable, new LessonFilterDto(search));
         return ResponseEntity.ok(lessons);
     }
 

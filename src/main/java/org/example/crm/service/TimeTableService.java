@@ -6,6 +6,7 @@ import org.example.crm.entity.dto.TimeTableUpdateDto;
 import org.example.crm.entity.dto.timeTable.TimeTableDto;
 import org.example.crm.entity.enums.DayType;
 import org.example.crm.entity.model.TimeTable;
+import org.example.crm.filters.TimeTableFilterDto;
 import org.example.crm.mapper.TimeTableMapper;
 import org.example.crm.projection.TimeTableProjection;
 import org.example.crm.repository.TimeTableRepository;
@@ -21,15 +22,18 @@ import java.util.List;
 public class TimeTableService extends AbstractService<
         TimeTableRepository,
         TimeTableMapper,
-        TimeTableValidator> implements CrudService<TimeTableCreateDto, TimeTableUpdateDto, TimeTableDto, String> {
+        TimeTableValidator> implements CrudService<TimeTableFilterDto, TimeTableCreateDto, TimeTableUpdateDto, TimeTableDto, String, List<TimeTableDto>> {
 
     protected TimeTableService(TimeTableRepository repository, TimeTableMapper mapper, TimeTableValidator validator) {
         super(repository, mapper, validator);
     }
 
     @Override
-    public Page<TimeTableDto> getAll(Pageable pageable, String search) {
-        return null;
+    public List<TimeTableDto> getAll(Pageable pageable, TimeTableFilterDto filterDto) {
+        List<TimeTableProjection> projection = repository.getAllTimeTableByFilter(filterDto.dayType(), filterDto.start(), filterDto.end());
+        return projection.stream()
+                .map(mapper::toDtoFromProjection)
+                .toList();
     }
 
     @Override
@@ -59,12 +63,5 @@ public class TimeTableService extends AbstractService<
     public void delete(String id) {
         TimeTable timeTable = validator.validateAndGet(id);
         repository.updateDeleted(timeTable.getId());
-    }
-
-    public List<TimeTableDto> getAll(DayType dayType, LocalTime start, LocalTime end) {
-        List<TimeTableProjection> projection = repository.getAllTimeTableByFilter(dayType,start,end);
-        return projection.stream()
-                .map(mapper::toDtoFromProjection)
-                .toList();
     }
 }

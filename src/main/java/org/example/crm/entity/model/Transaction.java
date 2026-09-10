@@ -1,8 +1,6 @@
 package org.example.crm.entity.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,14 +18,21 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class Transaction extends BaseEntity {
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, length = 32)
     private TransactionType type;
 
+    @Column(name = "amount", nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @Column(name = "note", length = 500)
+    private String note;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoice_id")
     private Invoice invoice;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Student user;
-
+    @JoinColumn(name = "student_id", nullable = false)
+    private Student student;
 }
