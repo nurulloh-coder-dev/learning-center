@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.crm.entity.dto.transaction.TransactionCreateDto;
 import org.example.crm.entity.dto.transaction.TransactionDto;
+import org.example.crm.filters.TransactionFilterDto;
 import org.example.crm.entity.dto.transaction.TransactionUpdateDto;
+import org.example.crm.entity.enums.TransactionType;
 import org.example.crm.service.TransactionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,10 +28,11 @@ public class TransactionController {
     public ResponseEntity<Page<TransactionDto>> getAll(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "10") TransactionType type,
             @RequestParam(required = false) String search
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<TransactionDto> transactions = transactionService.getAll(pageable, search);
+        Page<TransactionDto> transactions = transactionService.getAll(pageable, new TransactionFilterDto(type,search));
         return ResponseEntity.ok(transactions);
     }
 

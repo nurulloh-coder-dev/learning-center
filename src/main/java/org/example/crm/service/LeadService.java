@@ -19,6 +19,7 @@ import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
+import org.example.crm.filters.LeadFilterDto;
 import org.example.crm.mapper.LeadMapper;
 import org.example.crm.projection.LeadProjection;
 import org.example.crm.repository.LeadRepository;
@@ -36,7 +37,7 @@ import java.time.LocalDateTime;
 public class LeadService extends AbstractService<
         LeadRepository,
         LeadMapper,
-        LeadValidator> implements CrudService<LeadCreateDto, LeadUpdateDto, LeadDto, String> {
+        LeadValidator> implements CrudService<LeadFilterDto, LeadCreateDto, LeadUpdateDto, LeadDto, String, Page<LeadDto>> {
 
     private final UserValidator userValidator;
     private final EnrollmentService enrollmentService;
@@ -54,16 +55,12 @@ public class LeadService extends AbstractService<
     }
 
     @Override
-    public Page<LeadDto> getAll(Pageable pageable, String search) {
-        return null;
-    }
-
-    public Page<LeadDto> getAll(Pageable pageable, String search, LeadStatus status) {
+    public Page<LeadDto> getAll(Pageable pageable, LeadFilterDto filterDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        String searchPattern = (search != null && !search.isBlank())
-                ? "%" + search.trim().toLowerCase() + "%"
+        String searchPattern = (filterDto.search() != null && !filterDto.search().isBlank())
+                ? "%" + filterDto.search().trim().toLowerCase() + "%"
                 : null;
-        Page<LeadProjection> all = repository.findAll(organizationId, searchPattern, status, pageable);
+        Page<LeadProjection> all = repository.findAll(organizationId, searchPattern, filterDto.status(), pageable);
         Page<LeadDto> map = all.map(mapper::toDto);
         map.getContent().forEach(l -> System.out.println("lead->" + l));
         return map;
@@ -80,7 +77,7 @@ public class LeadService extends AbstractService<
         validator.validate(createDto);
         Lead entity = mapper.toEntity(createDto);
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Level level = groupLevelValidator.validateAndGet(createDto.preferredCourseId(),organizationId);
+        Level level = groupLevelValidator.validateAndGet(createDto.preferredCourseId(), organizationId);
         entity.setPreferredCourse(level);
         return mapper.toDto(repository.save(entity));
     }
@@ -101,7 +98,7 @@ public class LeadService extends AbstractService<
     public void delete(String id) {
         validator.validateId(id);
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Integer integer = repository.softDelete(id,organizationId);
+        Integer integer = repository.softDelete(id, organizationId);
         if (integer == 0) {
             throw new RestException(ErrorType.LEAD_NOT_FOUND, ErrorCodes.NotFound);
         }

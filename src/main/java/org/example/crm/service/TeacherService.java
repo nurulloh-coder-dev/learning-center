@@ -11,6 +11,7 @@ import org.example.crm.entity.model.Teacher;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
+import org.example.crm.filters.TeacherFilterDto;
 import org.example.crm.mapper.TeacherMapper;
 import org.example.crm.repository.TeacherRepository;
 import org.example.crm.repository.UserRepository;
@@ -27,7 +28,7 @@ import java.util.List;
 public class TeacherService extends AbstractService<
         TeacherRepository,
         TeacherMapper,
-        TeacherValidator> implements CrudService<TeacherCreateDto, TeacherUpdateDto, TeacherDto, String> {
+        TeacherValidator> implements CrudService<TeacherFilterDto, TeacherCreateDto, TeacherUpdateDto, TeacherDto, String, Page<TeacherDto>> {
 
     final UserValidator userValidator;
     final UserRepository userRepository;
@@ -41,11 +42,11 @@ public class TeacherService extends AbstractService<
     }
 
     @Override
-    public Page<TeacherDto> getAll(Pageable pageable, String search) {
+    public Page<TeacherDto> getAll(Pageable pageable, TeacherFilterDto filterDto) {
 
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         log.info("orgId of current user {}", organizationId);
-        Page<Teacher> all = repository.findAllBySearch(organizationId, search, pageable);
+        Page<Teacher> all = repository.findAllBySearch(organizationId, filterDto.search(), pageable);
         System.out.println(all);
         return all.map(mapper::toDto);
     }
@@ -55,7 +56,7 @@ public class TeacherService extends AbstractService<
 
 
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Teacher teacher = validator.validateIdAndGetOrg(id,organizationId);
+        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
 
         return mapper.toDto(teacher);
     }
@@ -82,7 +83,7 @@ public class TeacherService extends AbstractService<
     public void delete(String id) {
 
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        validator.validateId(id,organizationId);
+        validator.validateId(id, organizationId);
         repository.softDelete(id);
     }
 
@@ -115,7 +116,6 @@ public class TeacherService extends AbstractService<
     public TeacherDto update(@Valid TeacherUpdateDto updateDto, String id, String organizationId) {
 
 
-
         Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
         mapper.mapUpdate(teacher, updateDto);
         return mapper.toDto(repository.save(teacher));
@@ -132,7 +132,7 @@ public class TeacherService extends AbstractService<
 
     public List<StudentDto> getMyGroup(String groupId) {
         String userId = userValidator.authenticateAndGetId();
-        validator.validateGroupAndTeacher(userId,groupId);
+        validator.validateGroupAndTeacher(userId, groupId);
         return studentService.getStudentsByGroupId(groupId);
     }
 }

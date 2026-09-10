@@ -5,6 +5,7 @@ import org.example.crm.entity.dto.organization.OrganizationCreateDto;
 import org.example.crm.entity.dto.organization.OrganizationDto;
 import org.example.crm.entity.dto.organization.OrganizationUpdateDto;
 import org.example.crm.entity.model.Organization;
+import org.example.crm.filters.OrganizationFilterDto;
 import org.example.crm.mapper.OrganizationMapper;
 import org.example.crm.repository.OrganizationRepository;
 import org.example.crm.validator.OrganizationValidator;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class OrganizationService extends AbstractService<
         OrganizationRepository,
         OrganizationMapper,
-        OrganizationValidator> implements CrudService<OrganizationCreateDto, OrganizationUpdateDto, OrganizationDto, String> {
+        OrganizationValidator> implements CrudService<OrganizationFilterDto, OrganizationCreateDto, OrganizationUpdateDto, OrganizationDto, String, Page<OrganizationDto>> {
     private final UserValidator userValidator;
 
     protected OrganizationService(OrganizationRepository repository, OrganizationMapper mapper, OrganizationValidator validator, UserValidator userValidator) {
@@ -26,8 +27,8 @@ public class OrganizationService extends AbstractService<
     }
 
     @Override
-    public Page<OrganizationDto> getAll(Pageable pageable, String search) {
-        Page<Organization> all = repository.findAll(search, pageable);
+    public Page<OrganizationDto> getAll(Pageable pageable, OrganizationFilterDto filterDto) {
+        Page<Organization> all = repository.findAll(filterDto.search(), pageable);
         return all.map(mapper::toDto);
     }
 
@@ -50,7 +51,7 @@ public class OrganizationService extends AbstractService<
     public OrganizationDto update(OrganizationUpdateDto updateDto, String id) {
         validator.validate(updateDto);
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        validator.validateOrganizationMatch(id,organizationId);
+        validator.validateOrganizationMatch(id, organizationId);
         Organization organization = validator.validateAndGetId(id);
         mapper.mapUpdate(organization, updateDto);
         return mapper.toDto(repository.save(organization));

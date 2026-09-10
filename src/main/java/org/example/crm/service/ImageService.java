@@ -4,11 +4,11 @@ import jakarta.validation.Valid;
 import org.example.crm.entity.dto.image.ImageCreateDto;
 import org.example.crm.entity.dto.image.ImageDto;
 import org.example.crm.entity.dto.image.ImageUpdateDto;
-import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.model.Image;
 import org.example.crm.exceptions.RestException;
+import org.example.crm.filters.SearchFilterDto;
 import org.example.crm.mapper.ImageMapper;
 import org.example.crm.projection.ImageProjection;
 import org.example.crm.repository.ImageRepository;
@@ -21,13 +21,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.util.List;
 
 @Service
 public class ImageService extends AbstractService<
         ImageRepository,
         ImageMapper,
-        ImageValidator> implements CrudService<ImageCreateDto, ImageUpdateDto, ImageDto,String>{
+        ImageValidator> implements CrudService<SearchFilterDto, ImageCreateDto, ImageUpdateDto, ImageDto, String, List<ImageDto>> {
 
     private final S3Service s3Service;
     private final UserValidator userValidator;
@@ -41,10 +41,12 @@ public class ImageService extends AbstractService<
     }
 
     @Override
-    public Page<ImageDto> getAll(Pageable pageable, String search) {
+    public List<ImageDto> getAll(Pageable pageable, SearchFilterDto search) {
         String userId = userValidator.authenticateAndGetId();
-        Page<ImageProjection> allByUserId = repository.findAllByUserId(userId,pageable);
-        return allByUserId.map(mapper::toDto);
+        List<ImageProjection> allByUserId = repository.findAllByUserId(userId);
+        return allByUserId.stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
     @Override
@@ -66,7 +68,7 @@ public class ImageService extends AbstractService<
     public void delete(String id) {
         validator.validateId(id);
         String userId = userValidator.authenticateAndGetId();
-        repository.softDelete(id,userId);
+        repository.softDelete(id, userId);
     }
 
     public ImageDto uploadImage(@Valid MultipartFile file) throws IOException {
@@ -88,7 +90,7 @@ public class ImageService extends AbstractService<
         String presignedUrl = s3Service.getPublicUrl(key);
         image.setImageUrl(presignedUrl);
         String userId = userValidator.authenticateAndGetId();
-        userRepository.updateUserImage(userId,presignedUrl);
+        userRepository.updateUserImage(userId, presignedUrl);
         Image save = repository.save(image);
         return mapper.toDto(save);
     }
@@ -96,6 +98,6 @@ public class ImageService extends AbstractService<
     public void updateMainImg(String id) {
         validator.validateId(id);
         String userId = userValidator.authenticateAndGetId();
-        repository.updateMainImg(id,userId);
+        repository.updateMainImg(id, userId);
     }
 }

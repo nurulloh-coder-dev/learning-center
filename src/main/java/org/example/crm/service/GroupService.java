@@ -1,20 +1,17 @@
 package org.example.crm.service;
 
 import jakarta.transaction.Transactional;
-import org.example.crm.entity.dto.group.FullGroupDto;
+import org.example.crm.entity.dto.group.*;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.enums.DayType;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
-import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.entity.model.TimeTable;
 import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.RestException;
+import org.example.crm.filters.GroupFilterDto;
 import org.example.crm.projection.GroupNameProjection;
 import org.example.crm.projection.GroupProjection;
-import org.example.crm.entity.dto.group.GroupDto;
-import org.example.crm.entity.dto.group.GroupCreateDto;
-import org.example.crm.entity.dto.group.GroupUpdateDto;
 import org.example.crm.entity.model.Group;
 import org.example.crm.mapper.GroupMapper;
 import org.example.crm.repository.GroupRepository;
@@ -38,7 +35,7 @@ import java.util.Optional;
 public class GroupService extends AbstractService<
         GroupRepository,
         GroupMapper,
-        GroupValidator> implements CrudService<GroupCreateDto, GroupUpdateDto, GroupDto, String> {
+        GroupValidator> implements CrudService<GroupFilterDto, GroupCreateDto, GroupUpdateDto, GroupDto, String, Page<GroupDto>> {
 
     private final UserValidator userValidator;
     private final StudentService studentService;
@@ -54,24 +51,17 @@ public class GroupService extends AbstractService<
     }
 
     @Override
-    public Page<GroupDto> getAll(Pageable pageable, String search) {
-//        Page<GroupProjection> projectionPage = repository.getAllByFilter(search, pageable);
-//        return projectionPage.
-//                map(mapper::toDtoFromProjection);
-        return null;
-    }
-
-    public Page<GroupDto> getAll(Pageable pageable, String search, GroupStatus status, String level) {
+    public Page<GroupDto> getAll(Pageable pageable, GroupFilterDto filterDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
 
-        String searchPattern = (search != null && !search.isBlank())
-                ? "%" + search.trim().toLowerCase() + "%"
+        String searchPattern = (filterDto.search() != null && !filterDto.search().isBlank())
+                ? "%" + filterDto.search().trim().toLowerCase() + "%"
                 : null;
 
         Page<GroupProjection> groups = repository.getAllByFilter(
                 organizationId,
-                status,
-                level,
+                filterDto.status(),
+                filterDto.level(),
                 searchPattern,
                 pageable
         );
@@ -182,7 +172,7 @@ public class GroupService extends AbstractService<
         String userId = userValidator.authenticateAndGetId();
         List<Group> myGroups = repository.getMyGroups(userId);
         return myGroups.stream()
-                .map(g->mapper.toDto(g,null))
+                .map(g -> mapper.toDto(g, null))
                 .toList();
     }
 }

@@ -8,6 +8,7 @@ import org.example.crm.entity.model.Attendance;
 import org.example.crm.entity.model.AttendanceStudent;
 import org.example.crm.entity.model.Lesson;
 import org.example.crm.entity.model.Student;
+import org.example.crm.filters.AttendanceFilterDto;
 import org.example.crm.mapper.AttendanceMapper;
 import org.example.crm.projection.AttendanceProjection;
 import org.example.crm.projection.AttendanceStudentProjection;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 public class AttendanceService extends AbstractService<
         AttendanceRepository,
         AttendanceMapper,
-        AttendanceValidator> implements CrudService<AttendanceCreateDto, AttendanceUpdateDto, AttendanceDto, String> {
+        AttendanceValidator> implements CrudService<AttendanceFilterDto, AttendanceCreateDto, AttendanceUpdateDto, AttendanceDto, String, Page<AttendanceDto>> {
 
     private final LessonValidator lessonValidator;
     private final StudentValidator studentValidator;
@@ -42,16 +43,16 @@ public class AttendanceService extends AbstractService<
     }
 
     @Override
-    public Page<AttendanceDto> getAll(Pageable pageable, String search) {
+    public Page<AttendanceDto> getAll(Pageable pageable, AttendanceFilterDto filterDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Page<Attendance> all = repository.findAll(search,organizationId,pageable);
+        Page<Attendance> all = repository.findAll(filterDto.search(), organizationId, pageable);
         return all.map(mapper::toDto);
     }
 
     @Override
     public AttendanceDto get(String id) {
         String organizationId = userValidator.authenticateAndGetId();
-        Attendance attendance = validator.validateIdAndGet(id,organizationId);
+        Attendance attendance = validator.validateIdAndGet(id, organizationId);
 
         return mapper.toDto(attendance);
     }
@@ -60,7 +61,7 @@ public class AttendanceService extends AbstractService<
     @Transactional
     public AttendanceDto create(AttendanceCreateDto createDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Lesson lesson = lessonValidator.validateIdAndGet(createDto.lessonId(),organizationId);
+        Lesson lesson = lessonValidator.validateIdAndGet(createDto.lessonId(), organizationId);
 
         Attendance attendance = new Attendance();
         attendance.setLesson(lesson);
@@ -82,7 +83,7 @@ public class AttendanceService extends AbstractService<
     @Override
     public AttendanceDto update(AttendanceUpdateDto updateDto, String id) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Attendance attendance = validator.validateIdAndGet(id,organizationId);
+        Attendance attendance = validator.validateIdAndGet(id, organizationId);
         updateStudentAttendances(attendance, updateDto.attendanceStudents());
         Attendance save = repository.save(attendance);
         return mapper.toDto(save);
@@ -92,7 +93,7 @@ public class AttendanceService extends AbstractService<
     public void delete(String id) {
         validator.validateId(id);
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        repository.softDelete(id,organizationId);
+        repository.softDelete(id, organizationId);
     }
 
     private void updateStudentAttendances(Attendance attendance, List<AttendanceStudentUpdateDto> attendanceStudentUpdateDtos) {

@@ -9,13 +9,18 @@ import java.math.BigDecimal;
 
 public record TransactionCreateDto(
         @NotNull
-        @Schema(allowableValues = {"PAID", "RETURNED","MONTHLY_FEE"})
+        @Schema(allowableValues = {"PAID", "RETURNED","MONTHLY_FEE","CORRECTION"})
         TransactionType type,
 
         @NotNull
         BigDecimal amount,
 
+        String note,
+
         @NotNull
-        String studentId
+        String studentId,
+
+        @NotNull
+        String invoiceId
 ) {
 }

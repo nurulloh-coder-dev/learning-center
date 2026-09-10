@@ -58,7 +58,7 @@ public class InvoiceMapper {
                         projection.getGroupId(),
                         projection.getReason()
                 ),
-                projection.getPaymentStatus()
+                projection.getInvoiceStatus()
         );
     }
 

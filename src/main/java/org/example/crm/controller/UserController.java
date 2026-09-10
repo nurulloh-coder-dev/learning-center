@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.example.crm.entity.dto.user.UserCreateDto;
 import org.example.crm.entity.dto.user.UserDto;
 import org.example.crm.entity.dto.user.UserUpdateDto;
+import org.example.crm.filters.UserFilterDto;
 import org.example.crm.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +29,7 @@ public class UserController {
             Pageable pageable,
             @RequestParam(required = false) String search
     ) {
-        Page<UserDto> users = userService.getAll(pageable, search);
+        Page<UserDto> users = userService.getAll(pageable, new UserFilterDto(search));
         return ResponseEntity.ok(users);
     }
 

@@ -8,6 +8,7 @@ import org.example.crm.entity.dto.lead.LeadDto;
 import org.example.crm.entity.dto.lead.LeadRejectDto;
 import org.example.crm.entity.dto.lead.LeadUpdateDto;
 import org.example.crm.entity.enums.LeadStatus;
+import org.example.crm.filters.LeadFilterDto;
 import org.example.crm.service.LeadService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +33,7 @@ public class LeadController {
             @PageableDefault Pageable pageable,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) LeadStatus status) {
-        return ResponseEntity.ok(service.getAll(pageable, search, status));
+        return ResponseEntity.ok(service.getAll(pageable,new LeadFilterDto( search, status)));
     }
 
     @GetMapping("/{id}")

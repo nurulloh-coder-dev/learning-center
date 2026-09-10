@@ -7,6 +7,7 @@ import org.example.crm.entity.dto.lesson.LessonUpdateDto;
 import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.entity.model.*;
 import org.example.crm.eventListeners.GroupCycleCompletedEvent;
+import org.example.crm.filters.LessonFilterDto;
 import org.example.crm.mapper.LessonMapper;
 import org.example.crm.repository.*;
 import org.example.crm.validator.GroupValidator;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Service;
 public class LessonService extends AbstractService<
         LessonRepository,
         LessonMapper,
-        LessonValidator> implements CrudService<LessonCreateDto, LessonUpdateDto, LessonDto, String> {
+        LessonValidator> implements CrudService<LessonFilterDto, LessonCreateDto, LessonUpdateDto, LessonDto, String, Page<LessonDto>> {
     final TeacherRepository teacherRepository;
     private final GroupRepository groupRepository;
     private final UserValidator userValidator;
@@ -41,9 +42,9 @@ public class LessonService extends AbstractService<
     }
 
     @Override
-    public Page<LessonDto> getAll(Pageable pageable, String search) {
+    public Page<LessonDto> getAll(Pageable pageable, LessonFilterDto filterDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Page<Lesson> all = repository.findAll(pageable, organizationId, search);
+        Page<Lesson> all = repository.findAll(pageable, organizationId, filterDto.search());
         return all.map(mapper::toDto);
     }
 

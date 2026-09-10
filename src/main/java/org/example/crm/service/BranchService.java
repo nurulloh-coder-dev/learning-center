@@ -3,9 +3,9 @@ package org.example.crm.service;
 import jakarta.transaction.Transactional;
 import org.example.crm.entity.dto.branch.BranchCreateDto;
 import org.example.crm.entity.dto.branch.BranchDto;
+import org.example.crm.filters.BranchFilterDto;
 import org.example.crm.entity.dto.branch.BranchUpdateDto;
 import org.example.crm.entity.model.Branch;
-import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 public class BranchService extends AbstractService<
         BranchRepository,
         BranchMapper,
-        BranchValidator> implements CrudService<BranchCreateDto, BranchUpdateDto, BranchDto, String> {
+        BranchValidator> implements CrudService<BranchFilterDto, BranchCreateDto, BranchUpdateDto, BranchDto, String, Page<BranchDto>> {
 
     private final UserValidator userValidator;
     private final OrganizationValidator organizationValidator;
@@ -34,9 +34,9 @@ public class BranchService extends AbstractService<
     }
 
     @Override
-    public Page<BranchDto> getAll(Pageable pageable, String search) {
+    public Page<BranchDto> getAll(Pageable pageable, BranchFilterDto filterDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        Page<Branch> branches = repository.findAll(search, organizationId, pageable);
+        Page<Branch> branches = repository.findAll(filterDto.search(), organizationId, pageable);
         return branches.map(mapper::toDto);
     }
 

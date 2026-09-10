@@ -8,6 +8,7 @@ import org.example.crm.entity.dto.groupLevel.GroupLevelDto;
 import org.example.crm.entity.dto.groupLevel.GroupLevelNameDto;
 import org.example.crm.entity.dto.groupLevel.GroupLevelUpdateDto;
 import org.example.crm.entity.request.GroupLevelList;
+import org.example.crm.filters.SearchFilterDto;
 import org.example.crm.service.GroupLevelService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

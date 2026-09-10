@@ -2,11 +2,10 @@ package org.example.crm.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.crm.annotation.CurrentUser;
 import org.example.crm.entity.dto.branch.BranchCreateDto;
 import org.example.crm.entity.dto.branch.BranchDto;
+import org.example.crm.filters.BranchFilterDto;
 import org.example.crm.entity.dto.branch.BranchUpdateDto;
-import org.example.crm.entity.model.User;
 import org.example.crm.service.BranchService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,7 +30,7 @@ public class BranchController {
             @RequestParam(required = false) String search
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<BranchDto> lessons = branchService.getAll(pageable, search);
+        Page<BranchDto> lessons = branchService.getAll(pageable, new BranchFilterDto(search));
         return ResponseEntity.ok(lessons);
     }
 

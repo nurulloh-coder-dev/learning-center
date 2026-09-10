@@ -1,6 +1,7 @@
 package org.example.crm.validator;
 
 import lombok.RequiredArgsConstructor;
+import org.example.crm.entity.enums.InvoiceStatus;
 import org.example.crm.entity.model.Transaction;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
@@ -23,6 +24,12 @@ public class TransactionValidator {
         Boolean exists = transactionRepository.checkId(id).orElse(false);
         if (!exists) {
             throw new RestException(ErrorType.TRANSACTION_NOT_FOUND, ErrorCodes.NotFound);
+        }
+    }
+
+    public void validate(Transaction transaction) {
+        if (transaction.getInvoice().getPaymentStatus().equals(InvoiceStatus.PAID)){
+            throw new RestException(ErrorType.INVOICE_ALREADY_PAID,ErrorCodes.BadRequest);
         }
     }
 }

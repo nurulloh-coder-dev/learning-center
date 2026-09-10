@@ -11,6 +11,7 @@ import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
+import org.example.crm.filters.StudentFilterDto;
 import org.example.crm.mapper.StudentMapper;
 import org.example.crm.mapper.UserMapper;
 import org.example.crm.projection.StudentProjection;
@@ -30,7 +31,7 @@ import java.util.List;
 public class StudentService extends AbstractService<
         StudentRepository,
         StudentMapper,
-        StudentValidator> implements CrudService<StudentCreateDto, StudentUpdateDto, StudentDto, String> {
+        StudentValidator> implements CrudService<StudentFilterDto, StudentCreateDto, StudentUpdateDto, StudentDto, String, Page<StudentDto>> {
 
     final UserService userService;
     private final UserValidator userValidator;
@@ -46,11 +47,10 @@ public class StudentService extends AbstractService<
     }
 
     @Override
-    public Page<StudentDto> getAll(Pageable pageable, String search) {
-
+    public Page<StudentDto> getAll(Pageable pageable, StudentFilterDto filterDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         log.info("org id of current user {}", organizationId);
-        Page<StudentProjection> all = repository.searchStudentsByOrganization(search, organizationId, pageable);
+        Page<StudentProjection> all = repository.searchStudentsByOrganization(filterDto.search(), organizationId, pageable);
         System.out.println(all);
         return all.map(mapper::toDtoProj);
     }
