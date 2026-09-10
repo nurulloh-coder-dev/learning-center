@@ -26,7 +26,9 @@ public class UserValidator {
     }
 
     public void validate(UserCreateDto createDto) {
-
+        if (repository.existsByPhone(createDto.phone())) {
+            throw new RestException(ErrorType.USER_ALREADY_EXISTS, ErrorCodes.BadRequest);
+        }
     }
 
     public User authenticateAndGetUser(){

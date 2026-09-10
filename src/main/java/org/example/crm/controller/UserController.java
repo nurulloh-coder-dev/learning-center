@@ -2,6 +2,7 @@ package org.example.crm.controller;
 
 import jakarta.validation.Valid;
 import org.example.crm.entity.dto.user.UserCreateDto;
+import org.example.crm.entity.dto.user.UserCreatedResponseDto;
 import org.example.crm.entity.dto.user.UserDto;
 import org.example.crm.entity.dto.user.UserUpdateDto;
 import org.example.crm.filters.UserFilterDto;
@@ -41,8 +42,8 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('EMPLOYEE_MANAGEMENT')")
     @PostMapping
-    public ResponseEntity<UserDto> create(@Valid @RequestBody UserCreateDto createDto) {
-        UserDto createdUser = userService.create(createDto);
+    public ResponseEntity<UserCreatedResponseDto> create(@Valid @RequestBody UserCreateDto createDto) {
+        UserCreatedResponseDto createdUser = userService.createUser(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 

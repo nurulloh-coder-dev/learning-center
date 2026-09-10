@@ -2,6 +2,7 @@ package org.example.crm.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.crm.entity.dto.IdNameDto;
 import org.example.crm.entity.dto.organization.OrganizationCreateDto;
 import org.example.crm.entity.dto.organization.OrganizationDto;
 import org.example.crm.entity.dto.organization.OrganizationUpdateDto;
@@ -13,6 +14,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/organizations")
@@ -50,5 +53,12 @@ public class OrganizationController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         organizationService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/name")
+    public ResponseEntity<List<IdNameDto>> getByName() {
+        List<IdNameDto> organization = organizationService.getByName();
+        return ResponseEntity.ok(organization);
     }
 }
