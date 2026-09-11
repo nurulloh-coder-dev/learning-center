@@ -68,8 +68,6 @@ public class OrganizationService extends AbstractService<
     }
 
     public List<IdNameDto> getByName() {
-        String organizationId = userValidator.authenticateAndGetOrganizationId();
-        validator.validateAndGetId(organizationId);
         List<Organization> organizations = repository.findAll();
         return organizations.stream()
                 .map(organization -> new IdNameDto(organization.getId(), organization.getName()))
