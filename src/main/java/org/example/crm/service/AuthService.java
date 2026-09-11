@@ -25,6 +25,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -32,6 +33,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Validated
 public class AuthService {
 
 
@@ -45,7 +47,7 @@ public class AuthService {
 
     final PasswordEncoder passwordEncoder;
 
-    public LoginResponse getLoginResponseResponseEntity(LoginRequest request, HttpServletResponse response) {
+    public LoginResponse getLoginResponseResponseEntity(@Valid LoginRequest request, HttpServletResponse response) {
         log.info("{} is trying to log in", request.getPhone());
         String phone = request.getPhone();
 

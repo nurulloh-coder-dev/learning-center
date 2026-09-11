@@ -34,6 +34,7 @@ public class SecurityConfig {
 
     private final String[] WHITE_LIST = new String[]{
             "/api/v1/auth/login",
+            "/api/v1/organization/name",
             "/api/v1/auth/refresh-token",
             "/v3/api-docs/**",
             "/v3/api-docs",
