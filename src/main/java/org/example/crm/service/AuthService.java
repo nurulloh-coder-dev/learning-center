@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.crm.config.JwtUtils;
 import org.example.crm.entity.dto.user.UserDto;
+import org.example.crm.entity.enums.Role;
 import org.example.crm.entity.login.LoginRequest;
 import org.example.crm.entity.login.LoginResponse;
 import org.example.crm.entity.login.TokenDto;
@@ -58,7 +59,10 @@ public class AuthService {
             throw new RestException(ErrorType.INVALID_PHONE_NUMBER_OR_PASSWORD, ErrorCodes.BadRequest);
         }
 
-        Map<String, Object> claims = jwtUtils.prepareClaims(user);
+        if (user.getRole() == Role.STUDENT || user.getRole() == Role.TEACHER) {
+
+        }
+        Map<String, Object> claims = jwtUtils.prepareClaims(user, request.getOrganizationId());
         TokenDto accessToken = jwtUtils.generateToken(user.getPhone(), claims, "access");
         TokenDto refreshToken = jwtUtils.generateToken(user.getPhone(), claims, "refresh");
         setRefreshCookie(response, refreshToken.getToken());
@@ -89,9 +93,11 @@ public class AuthService {
         User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new RestException(ErrorType.PHONE_NUMBER_NOT_FOUND, ErrorCodes.NotFound));
 
-        TokenDto access = jwtUtils.generateToken(phone, jwtUtils.prepareClaims(user), "access");
+        String organizationId = claims.get("organizationId", String.class);
 
-        Map<String, Object> refreshClaims = jwtUtils.prepareClaims(user);
+        TokenDto access = jwtUtils.generateToken(phone, jwtUtils.prepareClaims(user, organizationId), "access");
+
+        Map<String, Object> refreshClaims = jwtUtils.prepareClaims(user, organizationId);
         TokenDto refresh = jwtUtils.generateToken(phone, refreshClaims, refreshTokenExpiration);
 
         setRefreshCookie(response, refresh.getToken());

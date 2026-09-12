@@ -30,7 +30,7 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     List<Student> getStudentByPhone(@Param("phone") String phone);
 
     @Query("select exists (select s.id from Student s where s.id =:id)")
-    Optional<Boolean> checkId(@Param("id") String id);
+    boolean checkId(@Param("id") String id);
 
 
     @Query("""
@@ -70,8 +70,8 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     @Modifying
     @Transactional
-    @Query("update Student s set s.user.deleted = true where s.id=:id")
-    void softDelete(String id);
+    @Query("update Student s set s.deleted = true where s.id=:id and s.organizationId=:orgId")
+    void softDelete(String id, @Param("orgId") String organizationId);
 
 
     @Query("""
@@ -100,4 +100,7 @@ public interface StudentRepository extends JpaRepository<Student, String> {
                 WHERE s.id = :studentId
             """)
     void setNewBalance(@Param("amount") BigDecimal amount, @Param("studentId") @NotNull String studentId);
+
+    @Query("select s.organizationId from Student s where s.user.id=:userId and s.organizationId=:orgId")
+    Optional<String> findOrgId(@Param("userId") String id, @Param("orgId") String organizationId);
 }

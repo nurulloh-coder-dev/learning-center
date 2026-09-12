@@ -20,7 +20,7 @@ public class StudentValidator {
     }
 
     public void validateId(String id) {
-        Boolean exists = repository.checkId(id).orElse(false);
+        boolean exists = repository.checkId(id);
         if (!exists){
             throw new RestException(ErrorType.STUDENT_NOT_FOUND, ErrorCodes.NotFound);
         }

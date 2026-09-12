@@ -64,7 +64,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
 
     @Modifying
     @Transactional
-    @Query("update Teacher t set t.user.deleted = true where t.id=:id")
+    @Query("update Teacher t set t.deleted = true where t.id=:id")
     void softDelete(String id);
 
     @Query("select exists(select t.id from Teacher t join t.user u where t.id=:id and u.deleted=false and u.organizationId=:organizationId)")
@@ -78,4 +78,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
                   AND g.deleted = false
             """)
     boolean validateGroupAndTeacher(@Param("userId") String userId, @Param("groupId") String groupId);
+
+    @Query("select t.organizationId from Teacher t where t.user.id=:userId and t.organizationId=:orgId")
+    Optional<String> findOrgId(@Param("userId") String id, @Param("orgId") String organizationId);
 }

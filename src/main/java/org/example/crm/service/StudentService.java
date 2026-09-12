@@ -84,7 +84,8 @@ public class StudentService extends AbstractService<
     @Override
     public void delete(String id) {
         validator.validateId(id);
-        repository.softDelete(id);
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        repository.softDelete(id, organizationId);
     }
 
     public Long getAllCount() {

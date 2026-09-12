@@ -5,6 +5,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.example.crm.entity.login.TokenDto;
 import org.example.crm.entity.model.User;
+import org.example.crm.exceptions.ErrorCodes;
+import org.example.crm.exceptions.ErrorType;
+import org.example.crm.exceptions.RestException;
+import org.example.crm.repository.StudentRepository;
+import org.example.crm.repository.TeacherRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +22,8 @@ import java.util.Map;
 @Component
 public class JwtUtils {
 
+    private final StudentRepository studentRepository;
+    private final TeacherRepository teacherRepository;
     @Value("${jwt.access.token.expire.date:180}")
     private Long accessTokenExpiration;
 
@@ -28,6 +35,11 @@ public class JwtUtils {
 
     @Value("${jwt.refresh.token.secretKey}")
     private String refreshToken;
+
+    public JwtUtils(StudentRepository studentRepository, TeacherRepository teacherRepository) {
+        this.studentRepository = studentRepository;
+        this.teacherRepository = teacherRepository;
+    }
 
     public Claims extractClaims(String token) {
         return Jwts.parser()
@@ -56,17 +68,27 @@ public class JwtUtils {
         return subject != null && !claims.getExpiration().before(new Date());
     }
 
-    public Map<String, Object> prepareClaims(User user) {
+    public Map<String, Object> prepareClaims(User user, String organizationId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getId());
         claims.put("role", user.getRole().name());
-        if (user.getOrganizationId() != null) {
-            claims.put("organizationId", user.getOrganizationId());
-        }
-        if (user.getPermissions() !=null){
+        claims.put("organizationId", setOrganizationId(user, organizationId));
+        if (user.getPermissions() != null) {
             claims.put("permissions", user.getPermissions());
         }
         return claims;
+    }
+
+    public String setOrganizationId(User user, String loginChosenOrgId) {
+        String organizationId = switch (user.getRole()) {
+            case TEACHER -> teacherRepository.findOrgId(user.getId(), loginChosenOrgId).orElse(null);
+            case STUDENT -> studentRepository.findOrgId(user.getId(), loginChosenOrgId).orElse(null);
+            default -> loginChosenOrgId;
+        };
+        if (organizationId == null) {
+            throw new RestException(ErrorType.FORBIDDEN, ErrorCodes.Forbidden);
+        }
+        return organizationId;
     }
 
     //    public Map<String, Object> prepareClaims(UserDto user) {

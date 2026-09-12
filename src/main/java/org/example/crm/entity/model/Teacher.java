@@ -16,10 +16,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Teacher extends IdEntity {
+public class Teacher extends BaseEntity {
 
 
-    @OneToOne(optional = false, cascade = CascadeType.PERSIST)
+    @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
     private User user;
 

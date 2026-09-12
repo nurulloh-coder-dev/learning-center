@@ -81,7 +81,6 @@ public class TeacherService extends AbstractService<
 
     @Override
     public void delete(String id) {
-
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         validator.validateId(id, organizationId);
         repository.softDelete(id);
