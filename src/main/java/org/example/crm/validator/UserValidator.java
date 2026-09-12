@@ -2,6 +2,7 @@ package org.example.crm.validator;
 
 import lombok.RequiredArgsConstructor;
 import org.example.crm.config.CustomUserDetails;
+import org.example.crm.entity.dto.user.AdminUserCreateDto;
 import org.example.crm.entity.dto.user.UserCreateDto;
 import org.example.crm.entity.enums.AdministratorPermission;
 import org.example.crm.entity.enums.Role;
@@ -84,6 +85,12 @@ public class UserValidator {
     public void validateIfCurrentUser(User user, String id) {
         if (!user.getId().equals(id)) {
             throw new RestException(ErrorType.FORBIDDEN, ErrorCodes.Forbidden);
+        }
+    }
+
+    public void validate(AdminUserCreateDto userCreateDto) {
+        if (repository.existsByPhone(userCreateDto.phone())) {
+            throw new RestException(ErrorType.USER_ALREADY_EXISTS, ErrorCodes.BadRequest);
         }
     }
 }

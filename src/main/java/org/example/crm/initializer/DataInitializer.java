@@ -13,10 +13,12 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
-////implements CommandLineRunner
+//implements CommandLineRunner
 public class DataInitializer  {
 
     final UserRepository userRepository;
@@ -29,9 +31,10 @@ public class DataInitializer  {
     final AttendanceRepository attendanceRepository;
     final OrganizationRepository organizationRepository;
     final PasswordEncoder passwordEncoder;
+    final BranchRepository branchRepository;
     final EntityManager entityManager;
-    static Organization organization = new Organization("org", "phone", "email", "website");
-//
+    Organization organization = new Organization("org", "phone", "email", "website");
+
 
 //    @Override
     @Transactional
@@ -49,7 +52,10 @@ public class DataInitializer  {
         developer.setPassword(encodedPassword);
         developer.setRole(Role.DEVELOPER);
         developer.setFullName("developer");
+        developer.setPermissions(new ArrayList<>(Arrays.asList(AdministratorPermission.EMPLOYEE_MANAGEMENT, AdministratorPermission.INVOICE_MANAGEMENT,
+                AdministratorPermission.LEAD_MANAGEMENT,AdministratorPermission.STUDENT_MANAGEMENT,AdministratorPermission.TEACHER_MANAGEMENT)));
         userRepository.save(developer);
+
 
 
         User adminUser = new User();
@@ -114,6 +120,19 @@ public class DataInitializer  {
         studentUser4.setRole(Role.STUDENT);
         studentUser4.setBirthDate(LocalDate.of(2012, 1, 30));
         userRepository.save(studentUser4);
+
+
+        // ============ BRANCHES ============
+        Branch branch1 = new Branch();
+        branch1.setOrganizationId(organization.getId());
+        branch1.setName("Main Branch");
+        branch1.setAddress("123 Main St");
+        branch1.setLongitude(40.7128);
+        branch1.setLatitude(-74.0060);
+        branch1.setGoogleMapsUrl("https://www.google.com/maps/place/123+Main+St");
+        branch1.setGooglePlaceId("ChIJd8BlQ2BZwokRAFUEcm_qrcA");
+        branchRepository.save(branch1);
+
 
         // ============ TEACHERS ============
         Teacher teacher1 = new Teacher();
