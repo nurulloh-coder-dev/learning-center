@@ -1,9 +1,8 @@
 package org.example.crm.service;
 
-import org.example.crm.entity.dto.user.UserCreateDto;
-import org.example.crm.entity.dto.user.UserCreatedResponseDto;
-import org.example.crm.entity.dto.user.UserDto;
-import org.example.crm.entity.dto.user.UserUpdateDto;
+import org.example.crm.entity.dto.user.*;
+import org.example.crm.entity.enums.AdministratorPermission;
+import org.example.crm.entity.enums.Role;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.model.Branch;
@@ -22,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 @Service
 public class UserService extends AbstractService<
@@ -113,5 +114,33 @@ public class UserService extends AbstractService<
         }
 
         return password.toString();
+    }
+
+    public UserDto createSuperAdmin(String organizationId, AdminUserCreateDto userCreateDto) {
+
+        String userOrganization = validator.authenticateAndGetOrganizationId();
+        organizationValidator.validateAndGetId(organizationId);
+        if (!userOrganization.equals(organizationId)) {
+            throw new RestException(ErrorType.WRONG_ORGANIZATION, ErrorCodes.BadRequest);
+        }
+        validator.validate(userCreateDto);
+        User entity = mapper.toEntity(userCreateDto);
+        entity.setOrganizationId(organizationId);
+        entity.setPassword(passwordEncoder.encode(userCreateDto.password()));
+        Branch branch = branchValidator.validateIdAndGet(userCreateDto.branchId());
+        entity.setBranch(branch);
+        entity.setRole(Role.SUPER_ADMIN);
+        entity.setPermissions(new ArrayList<>(Arrays.asList(AdministratorPermission.EMPLOYEE_MANAGEMENT, AdministratorPermission.INVOICE_MANAGEMENT,
+                AdministratorPermission.LEAD_MANAGEMENT,AdministratorPermission.STUDENT_MANAGEMENT,AdministratorPermission.TEACHER_MANAGEMENT)));
+        User save = repository.save(entity);
+        return new UserDto(
+                save.getId(),
+                userCreateDto.branchId(),
+                null,
+                save.getFullName(),
+                save.getPhone(),
+                null,
+                save.getRole()
+        );
     }
 }

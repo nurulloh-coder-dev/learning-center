@@ -19,6 +19,7 @@ import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.UserMapper;
+import org.example.crm.repository.OrganizationRepository;
 import org.example.crm.repository.UserRepository;
 import org.example.crm.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +43,7 @@ public class AuthService {
     private final JwtUtils jwtUtils;
     private final UserMapper userMapper;
     private final UserValidator userValidator;
+    final OrganizationRepository organizationRepository;
 
     @Value("${jwt.refresh.token.expire.date:86400}")
     private Long refreshTokenExpiration;
@@ -57,6 +59,11 @@ public class AuthService {
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RestException(ErrorType.INVALID_PHONE_NUMBER_OR_PASSWORD, ErrorCodes.BadRequest);
+        }
+
+        boolean b = organizationRepository.existsById(request.getOrganizationId());
+        if (!b) {
+            throw new RestException(ErrorType.ORGANIZATION_NOT_FOUND, ErrorCodes.NotFound);
         }
         Map<String, Object> claims = jwtUtils.prepareClaims(user, request.getOrganizationId());
         TokenDto accessToken = jwtUtils.generateToken(user.getPhone(), claims, "access");

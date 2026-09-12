@@ -1,6 +1,7 @@
 package org.example.crm.mapper;
 
 import org.example.crm.annotation.IgnoreAuditFields;
+import org.example.crm.entity.dto.user.AdminUserCreateDto;
 import org.example.crm.entity.dto.user.UserCreateDto;
 import org.example.crm.entity.dto.user.UserDto;
 import org.example.crm.entity.dto.user.UserUpdateDto;
@@ -25,4 +26,8 @@ public abstract class UserMapper {
     @Mapping(target = "birthDate", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     public abstract void mapUpdate(@MappingTarget User user, UserUpdateDto updateDto);
+
+    @IgnoreAuditFields
+    @Mapping(target = "branch", ignore = true)
+    public abstract User toEntity(AdminUserCreateDto userCreateDto);
 }
