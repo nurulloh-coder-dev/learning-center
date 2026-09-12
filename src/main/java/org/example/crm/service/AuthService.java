@@ -58,10 +58,6 @@ public class AuthService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RestException(ErrorType.INVALID_PHONE_NUMBER_OR_PASSWORD, ErrorCodes.BadRequest);
         }
-
-        if (user.getRole() == Role.STUDENT || user.getRole() == Role.TEACHER) {
-
-        }
         Map<String, Object> claims = jwtUtils.prepareClaims(user, request.getOrganizationId());
         TokenDto accessToken = jwtUtils.generateToken(user.getPhone(), claims, "access");
         TokenDto refreshToken = jwtUtils.generateToken(user.getPhone(), claims, "refresh");
