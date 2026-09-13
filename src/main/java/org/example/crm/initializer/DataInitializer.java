@@ -18,8 +18,8 @@ import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
-//implements CommandLineRunner
-public class DataInitializer  {
+//
+public class DataInitializer implements CommandLineRunner {
 
     final UserRepository userRepository;
     final TeacherRepository teacherRepository;
@@ -34,15 +34,18 @@ public class DataInitializer  {
     final BranchRepository branchRepository;
     final EntityManager entityManager;
     Organization organization = new Organization("org", "phone", "email", "website");
+    Organization organization1 = new Organization("org1", "phone1", "email1", "website1");
 
 
-//    @Override
+
+    @Override
     @Transactional
     public void run(String... args) {
 
 //        if (userRepository.count() > 0) return;
 
         organizationRepository.save(organization);
+        organizationRepository.save(organization1);
         String encodedPassword = passwordEncoder.encode("root1234");
 
 
@@ -187,9 +190,9 @@ public class DataInitializer  {
         studentRepository.save(student1);
 
         Student student2 = new Student();
-        student2.setOrganizationId(organization.getId());
-        student2.setUser(studentUser2);
-        student2.setParentPhone("+998901234581");
+        student2.setOrganizationId(organization1.getId());
+        student2.setUser(studentUser1);
+        student2.setParentPhone("+998901234580");
         studentRepository.save(student2);
 
         Student student3 = new Student();

@@ -8,11 +8,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.crm.config.JwtUtils;
+import org.example.crm.entity.dto.IdNameDto;
 import org.example.crm.entity.dto.user.UserDto;
 import org.example.crm.entity.enums.Role;
 import org.example.crm.entity.login.LoginRequest;
 import org.example.crm.entity.login.LoginResponse;
 import org.example.crm.entity.login.TokenDto;
+import org.example.crm.entity.model.Student;
 import org.example.crm.entity.model.User;
 import org.example.crm.entity.request.ChangePasswordRequest;
 import org.example.crm.exceptions.ErrorCodes;
@@ -20,6 +22,7 @@ import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.UserMapper;
 import org.example.crm.repository.OrganizationRepository;
+import org.example.crm.repository.StudentRepository;
 import org.example.crm.repository.UserRepository;
 import org.example.crm.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -44,6 +48,7 @@ public class AuthService {
     private final UserMapper userMapper;
     private final UserValidator userValidator;
     final OrganizationRepository organizationRepository;
+    final StudentRepository studentRepository;
 
     @Value("${jwt.refresh.token.expire.date:86400}")
     private Long refreshTokenExpiration;
@@ -61,19 +66,35 @@ public class AuthService {
             throw new RestException(ErrorType.INVALID_PHONE_NUMBER_OR_PASSWORD, ErrorCodes.BadRequest);
         }
 
-        boolean b = organizationRepository.existsById(request.getOrganizationId());
-        if (!b) {
-            throw new RestException(ErrorType.ORGANIZATION_NOT_FOUND, ErrorCodes.NotFound);
-        }
-        Map<String, Object> claims = jwtUtils.prepareClaims(user, request.getOrganizationId());
-        TokenDto accessToken = jwtUtils.generateToken(user.getPhone(), claims, "access");
-        TokenDto refreshToken = jwtUtils.generateToken(user.getPhone(), claims, "refresh");
-        setRefreshCookie(response, refreshToken.getToken());
+        List<Student> studentList = studentRepository.findAllByUserId(user.getId());
 
-        return LoginResponse.builder()
-                .token(accessToken.getToken())
-                .expiry(accessToken.getExpiry())
-                .build();
+        if (user.getRole().equals(Role.STUDENT)&& !studentList.isEmpty()) {
+            if (studentList.size() > 1) {
+                List<String> orgId = studentList.stream().map(Student::getOrganizationId).toList();
+                List<IdNameDto> idNameDtos = organizationRepository.findAllById(orgId).stream().map(
+                        organization -> IdNameDto.builder()
+                                .id(organization.getId())
+                                .name(organization.getName())
+                                .build()).toList();
+
+                return LoginResponse.builder()
+                        .token(null)
+                        .expiry(null)
+                        .requiresOrganizationSelection(true)
+                        .organizations(idNameDtos)
+                        .build();
+            }
+
+            Student student = studentList.get(0);
+            if (!student.getOrganizationId().equals(user.getOrganizationId())) {
+                throw new RestException(ErrorType.WRONG_ORGANIZATION, ErrorCodes.Forbidden);
+            }
+
+        }
+
+        return getLoginResponse(user.getOrganizationId(), response, user);
+
+
     }
 
 
@@ -141,5 +162,39 @@ public class AuthService {
     public UserDto getMe() {
         User user = userValidator.authenticateAndGetUser();
         return userMapper.toDto(user);
+    }
+
+    public LoginResponse selectOrganization(String organizationId, LoginRequest request, HttpServletResponse response) {
+        User user = userRepository.findByPhoneAndDeletedFalse(request.getPhone())
+                .orElseThrow(() -> new RestException(ErrorType.INVALID_PHONE_NUMBER_OR_PASSWORD, ErrorCodes.BadRequest));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RestException(ErrorType.INVALID_PHONE_NUMBER_OR_PASSWORD, ErrorCodes.BadRequest);
+        }
+
+        boolean b = organizationRepository.existsById(organizationId);
+        if (!b) {
+            throw new RestException(ErrorType.ORGANIZATION_NOT_FOUND, ErrorCodes.NotFound);
+        }
+        studentRepository.findStudentByOrganizationIdAndUserId(organizationId, user.getId())
+                .orElseThrow(() -> new RestException(ErrorType.STUDENT_NOT_FOUND, ErrorCodes.NotFound));
+
+
+        return getLoginResponse(organizationId, response, user);
+    }
+
+    private LoginResponse getLoginResponse(String organizationId, HttpServletResponse response, User user) {
+        Map<String, Object> claims = jwtUtils.prepareClaims(user, organizationId);
+        TokenDto accessToken = jwtUtils.generateToken(user.getPhone(), claims, "access");
+        TokenDto refreshToken = jwtUtils.generateToken(user.getPhone(), claims, "refresh");
+        setRefreshCookie(response, refreshToken.getToken());
+
+
+        return LoginResponse.builder()
+                .token(accessToken.getToken())
+                .expiry(accessToken.getExpiry())
+                .requiresOrganizationSelection(false)
+                .organizations(null)
+                .build();
     }
 }
