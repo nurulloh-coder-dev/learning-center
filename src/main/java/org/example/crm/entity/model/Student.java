@@ -24,7 +24,7 @@ public class Student extends BaseEntity {
     private BigDecimal balance;
 
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", unique = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
 }

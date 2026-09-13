@@ -11,7 +11,4 @@ public class LoginRequest {
 
     @NotBlank(message = "Password is required")
     private String password;
-
-    @NotBlank(message = "Organization ID is required")
-    private String organizationId;
 }

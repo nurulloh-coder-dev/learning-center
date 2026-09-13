@@ -31,6 +31,16 @@ public class AuthController {
         return ResponseEntity.ok(loginResponseResponseEntity);
     }
 
+    @PostMapping("/select-organization")
+    public ResponseEntity<LoginResponse> selectOrganization(
+            @RequestParam String organizationId,
+            @RequestBody LoginRequest request,
+            HttpServletResponse response
+    ) {
+        LoginResponse loginResponseResponseEntity = authService.selectOrganization(organizationId, request,response);
+        return ResponseEntity.ok(loginResponseResponseEntity);
+    }
+
     @PostMapping("/refresh-token")
     public ResponseEntity<LoginResponse> refreshToken(HttpServletRequest request,
                                                       HttpServletResponse response) {

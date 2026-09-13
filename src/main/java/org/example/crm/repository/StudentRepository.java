@@ -103,4 +103,22 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
     @Query("select s.organizationId from Student s where s.user.id=:userId and s.organizationId=:orgId")
     Optional<String> findOrgId(@Param("userId") String id, @Param("orgId") String organizationId);
+
+
+    @Query("""
+                select count(s.id)
+                from Student s
+                where s.user.id=:userId
+""")
+    Long countStudentsByUser_Id(String id);
+
+
+    @Query("""
+            select s
+                from Student s
+                where s.user.id=:userId
+            """)
+    List<Student> findAllByUserId(String userId);
+
+    Optional<Student> findStudentByOrganizationIdAndUserId(String organizationId, String userId);
 }
