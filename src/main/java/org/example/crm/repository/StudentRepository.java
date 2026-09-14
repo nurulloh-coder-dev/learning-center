@@ -3,7 +3,6 @@ package org.example.crm.repository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.example.crm.entity.model.Invoice;
-import org.example.crm.entity.model.Organization;
 import org.example.crm.entity.model.Student;
 import org.example.crm.projection.AnalyticStudentProjection;
 import org.example.crm.projection.OrganizationProjection;
