@@ -22,7 +22,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("""
                                 select u
                                 from User u
-                                left join fetch u.branch
                                 where u.phone = :phone
                                 and u.deleted = false
             """)
@@ -42,7 +41,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("""
                     select u
                     from User u
-                     left join fetch u.branch
                      where u.id = :s
                      and u.deleted = false
             """)
@@ -50,11 +48,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("select exists (select u.id from User u where u.id=:id and u.deleted = false)")
     Optional<Boolean> checkId(@Param("id") String id);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE User u set u.deleted = true where u.id=:id and u.organizationId = :orgId")
-    int softDelete(@Param("id") String id, @Param("orgId") String organizationId);
 
     @Modifying
     @Transactional

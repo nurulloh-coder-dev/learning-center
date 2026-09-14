@@ -1,20 +1,22 @@
 package org.example.crm.entity.dto.group;
 
-import org.example.crm.entity.dto.teacher.TeacherDto;
+
+import org.example.crm.entity.dto.teacher.TeacherIdNameDto;
 import org.example.crm.entity.dto.timeTable.TimeTableDto;
 import org.example.crm.entity.enums.GroupStatus;
 
 import java.time.LocalDate;
 
-public record GroupDto(
+public record GroupOverviewDto(
         String id,
         String name,
         String room,
         LocalDate startDate,
-        TeacherDto teacher,
-        TimeTableDto timeTable,
         GroupStatus status,
-        String level,
-        Integer currentMonth
-) {
-}
+        String levelName,
+        TeacherIdNameDto teacher,
+        TimeTableDto timeTable,
+        Integer currentMonth,
+        Integer lessonsCount,
+        Integer activeStudentsCount
+) {}

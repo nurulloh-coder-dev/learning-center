@@ -26,12 +26,14 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                             g.id AS id,
                             g.name AS name,
                             g.room AS room,
+                            g.startDate as startDate,
                             g.teacher AS teacher,
                             g.timeTable AS timeTable,
                             g.status AS status,
-                            lev.id AS levelId,
+                            lev.name AS levelName,
                             g.currentMonth AS currentMonth,
-                            COUNT(l.id) AS lessonsCount
+                            COUNT(distinct l.id) AS lessonsCount,
+                            COUNT(distinct e.id) as studentCount
                         FROM Group g
                         JOIN g.level lev
                         LEFT JOIN Lesson l ON l.group = g
@@ -39,6 +41,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                         LEFT JOIN g.teacher t
                         LEFT JOIN t.user tu
                         LEFT JOIN g.timeTable tt
+                        LEFT JOIN Enrollment e on e.group.id=g.id and e.deleted=false
                         WHERE g.organizationId = :organizationId
                           AND (:status IS NULL OR g.status = :status)
                           AND (:level IS NULL OR lev.name = :level)
@@ -50,23 +53,6 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                           )
                         GROUP BY g.id, g.name, g.room, g.status, lev.id, g.currentMonth, t.id, tt.id
                     """
-//            countQuery = """
-//                        SELECT COUNT(DISTINCT g.id)
-//                        FROM Group g
-//                        JOIN g.level lev
-//                        JOIN g.branch b
-//                        LEFT JOIN g.teacher t
-//                        LEFT JOIN t.user tu
-//                        WHERE g.organizationId = :organizationId
-//                          AND (:status IS NULL OR g.status = :status)
-//                          AND (:level IS NULL OR lev.name = :level)
-//                          AND (
-//                               CAST(:search AS string) IS NULL
-//                               OR LOWER(g.name) LIKE LOWER(CAST(:search AS string))
-//                               OR LOWER(g.room) LIKE LOWER(CAST(:search AS string))
-//                               OR (tu.id IS NOT NULL AND LOWER(tu.fullName) LIKE LOWER(CAST(:search AS string)))
-//                          )
-//                    """
     )
     Page<GroupProjection> getAllByFilter(
             @Param("organizationId") String organizationId,

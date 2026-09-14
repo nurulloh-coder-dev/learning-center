@@ -24,6 +24,7 @@ import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -33,15 +34,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Validated
 @Service
 public class GroupService extends AbstractService<
         GroupRepository,
         GroupMapper,
-        GroupValidator> implements CrudService<GroupFilterDto, GroupCreateDto, GroupUpdateDto, GroupDto, String, Page<GroupDto>> {
+        GroupValidator> implements CrudService<GroupFilterDto, GroupCreateDto, GroupUpdateDto, GroupDto, String, Page<GroupOverviewDto>> {
 
     private final UserValidator userValidator;
     private final StudentService studentService;
-    private final LessonRepository lessonRepository;
     final UserRepository userRepository;
     private final UserOrganizationRepository userOrganizationRepository;
 
@@ -49,13 +50,12 @@ public class GroupService extends AbstractService<
         super(repository, mapper, validator);
         this.userValidator = userValidator;
         this.studentService = studentService;
-        this.lessonRepository = lessonRepository;
         this.userRepository = userRepository;
         this.userOrganizationRepository = userOrganizationRepository;
     }
 
     @Override
-    public Page<GroupDto> getAll(Pageable pageable, GroupFilterDto filterDto) {
+    public Page<GroupOverviewDto> getAll(Pageable pageable, GroupFilterDto filterDto) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
 
         String searchPattern = (filterDto.search() != null && !filterDto.search().isBlank())
@@ -76,8 +76,7 @@ public class GroupService extends AbstractService<
     @Override
     public GroupDto get(String id) {
         Group group = validator.validateIdAndGet(id);
-        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
-        return mapper.toDto(group, lessonsCount);
+        return mapper.toDto(group);
     }
 
     @Override
@@ -88,17 +87,14 @@ public class GroupService extends AbstractService<
         UserOrganization userOrganization = userOrganizationRepository.findByUserIdAndOrgId(userId, organizationId)
                 .orElseThrow(() -> new RestException(ErrorType.USER_ORGANIZATION_MISMATCH, ErrorCodes.AccessDenied));
         Group group = mapper.toEntity(createDto, userOrganization.getBranch());
-
-        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
-        return mapper.toDto(repository.save(group), lessonsCount);
+        return mapper.toDto(repository.save(group));
     }
 
     @Override
     public GroupDto update(GroupUpdateDto updateDto, String id) {
         Group group = validator.validateIdAndGet(id);
         mapper.mapUpdate(group, updateDto);
-        Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
-        return mapper.toDto(repository.save(group), lessonsCount);
+        return mapper.toDto(repository.save(group));
     }
 
     @Override
@@ -124,7 +120,6 @@ public class GroupService extends AbstractService<
         GroupDto groupDto;
         Group group;
         List<StudentDto> studentsByGroupId;
-        Integer lessonsCount;
         if (groupId == null) {
             String userId = userValidator.authenticateAndGetId();
             List<Group> allByTeacherId = repository.findAllByTeacherUserId(userId);
@@ -143,8 +138,7 @@ public class GroupService extends AbstractService<
         } else {
             group = validator.validateIdAndGet(groupId);
         }
-        lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
-        groupDto = mapper.toDto(group, lessonsCount);
+        groupDto = mapper.toDto(group);
         studentsByGroupId = studentService.getStudentsByGroupId(groupDto.id());
         return new FullGroupDto(studentsByGroupId, groupDto);
     }
@@ -178,7 +172,7 @@ public class GroupService extends AbstractService<
         String userId = userValidator.authenticateAndGetId();
         List<Group> myGroups = repository.getMyGroups(userId);
         return myGroups.stream()
-                .map(g -> mapper.toDto(g, null))
+                .map(mapper::toDto)
                 .toList();
     }
 }

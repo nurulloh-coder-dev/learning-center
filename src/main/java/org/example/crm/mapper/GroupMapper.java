@@ -1,6 +1,8 @@
 package org.example.crm.mapper;
 
 import lombok.RequiredArgsConstructor;
+import org.example.crm.entity.dto.group.GroupOverviewDto;
+import org.example.crm.entity.dto.teacher.TeacherIdNameDto;
 import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.entity.model.Branch;
 import org.example.crm.exceptions.ErrorCodes;
@@ -24,12 +26,12 @@ public class GroupMapper {
     final TeacherMapper teacherMapper;
     final TimeTableMapper timeTableMapper;
     final GroupLevelRepository groupLevelRepository;
-    private final GroupLevelMapper groupLevelMapper;
 
     public Group toEntity(GroupCreateDto createDto, Branch branch) {
         return new Group(
                 createDto.name(),
                 createDto.room(),
+                createDto.startDate(),
                 teacherRepository.findById(createDto.teacherId())
                         .orElseThrow(() -> new RestException(ErrorType.TEACHER_NOT_FOUND, ErrorCodes.NotFound)),
                 timeTableRepository.save(timeTableMapper.toEntity(createDto.timeTable())),
@@ -42,39 +44,44 @@ public class GroupMapper {
         );
     }
 
-    public GroupDto toDto(Group save,Integer lessonsCount) {
+    public GroupDto toDto(Group save) {
         return new GroupDto(
                 save.getId(),
                 save.getName(),
                 save.getRoom(),
+                save.getStartDate(),
                 teacherMapper.toDto(save.getTeacher()),
                 timeTableMapper.toDto(save.getTimeTable()),
                 save.getStatus(),
-                groupLevelMapper.toDto(save.getLevel()),
-                save.getCurrentMonth(),
-                lessonsCount
+                save.getLevel().getName(),
+                save.getCurrentMonth()
         );
     }
 
-    public GroupDto toDtoFromProjection(GroupProjection projection) {
-        return new GroupDto(
+    public GroupOverviewDto toDtoFromProjection(GroupProjection projection) {
+        return new GroupOverviewDto(
                 projection.getId(),
                 projection.getName(),
                 projection.getRoom(),
-                teacherMapper.toDto(projection.getTeacher()),
-                timeTableMapper.toDto(projection.getTimeTable()),
+                projection.getStartDate(),
                 projection.getStatus(),
-                groupLevelMapper.toDto(groupLevelRepository.findById(projection.getLevelId())
-                        .orElseThrow(()-> new RestException(ErrorType.GROUP_LEVEL_NOT_FOUND, ErrorCodes.NotFound))),
+                projection.getLevelName(),
+                new TeacherIdNameDto(projection.getTeacherId(), projection.getTeacherFullName()),
+                timeTableMapper.toDto(projection.getTimeTable()),
                 projection.getCurrentMonth(),
-                projection.getLessonsCount()
+                projection.getLessonsCount(),
+                projection.getStudentCount()
         );
     }
 
     public void mapUpdate(Group group, GroupUpdateDto updateDto) {
         if (updateDto.teacherId() != null)
             group.setTeacher(teacherRepository.findById(updateDto.teacherId()).orElseThrow(() -> new RestException(ErrorType.TEACHER_NOT_FOUND, ErrorCodes.NotFound)));
-        timeTableMapper.update(group.getTimeTable(), updateDto.timeTable());
-        timeTableRepository.save(group.getTimeTable());
+        group.setStartDate(updateDto.startDate());
+        group.setRoom(updateDto.room());
+        if (updateDto.timeTable() != null) {
+            timeTableMapper.update(group.getTimeTable(), updateDto.timeTable());
+            timeTableRepository.save(group.getTimeTable());
+        }
     }
 }

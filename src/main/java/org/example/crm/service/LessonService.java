@@ -7,6 +7,9 @@ import org.example.crm.entity.dto.lesson.LessonUpdateDto;
 import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.entity.model.*;
 import org.example.crm.eventListeners.GroupCycleCompletedEvent;
+import org.example.crm.exceptions.ErrorCodes;
+import org.example.crm.exceptions.ErrorType;
+import org.example.crm.exceptions.RestException;
 import org.example.crm.filters.LessonFilterDto;
 import org.example.crm.mapper.LessonMapper;
 import org.example.crm.repository.*;
@@ -17,6 +20,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 
 @Service
 public class LessonService extends AbstractService<
@@ -60,6 +65,9 @@ public class LessonService extends AbstractService<
     public LessonDto create(LessonCreateDto createDto) {
         validator.validate(createDto);
         Group group = groupValidator.validateIdAndGet(createDto.groupId());
+        if (LocalDate.now().isBefore(group.getStartDate())){
+            throw new RestException(ErrorType.GROUP_IS_NOT_STARTED, ErrorCodes.BadRequest);
+        }
         Level level = group.getLevel();
         Integer lessonsInCurrMonth = repository.findLessonCountByGroupId(group.getId(), level.getName()).orElse(0) + 1;
         Lesson entity = toEntity(createDto, String.format("%s.%s", group.getCurrentMonth(), lessonsInCurrMonth), group);

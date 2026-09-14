@@ -26,6 +26,8 @@ public class Group extends TenantEntity {
 
     private String room;
 
+    private LocalDate startDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
@@ -49,12 +51,13 @@ public class Group extends TenantEntity {
 
     public void registerCompletedLesson(Integer lessonsInCurrLevel,
                                         GroupLevelRepository groupLevelRepository) {
+        if (this.getStatus() == GroupStatus.STARTING) this.setStatus(GroupStatus.ONGOING);
         if (lessonsInCurrLevel == 0 || lessonsInCurrLevel % this.getLevel().getDurationInMonths() != 0) {
             return;
         }
-        if (this.currentMonth >= this.getLevel().getLessonCount()/this.getLevel().getDurationInMonths()) {
+        if (this.currentMonth >= this.getLevel().getLessonCount() / this.getLevel().getDurationInMonths()) {
             Level nextLevel = groupLevelRepository.getNextLevelForGroup(
-                    this.getLevel().getOrderNumber(),this.getOrganizationId()).orElse(null);
+                    this.getLevel().getOrderNumber(), this.getOrganizationId()).orElse(null);
             if (nextLevel == null) {
                 this.setStatus(GroupStatus.COMPLETED);
             } else {

@@ -90,12 +90,6 @@ public class UserService extends AbstractService<
 
     @Override
     public void delete(String id) {
-        validator.validateId(id);
-        String organizationId = validator.authenticateAndGetOrganizationId();
-        int rowsUpdated = repository.softDelete(id, organizationId);
-        if (rowsUpdated == 0) {
-            throw new RestException(ErrorType.FORBIDDEN, ErrorCodes.Unauthorized);
-        }
     }
 
     public static String generatePassword(int length) {
