@@ -23,13 +23,13 @@ public class GroupController {
     final GroupService service;
 
     @GetMapping
-    public ResponseEntity<Page<GroupDto>> getAllGroups(@RequestParam(required = false) String search,
-                                                       @RequestParam(defaultValue = "0") int page,
-                                                       @RequestParam(defaultValue = "20") int size,
-                                                       @RequestParam(required = false) GroupStatus status,
-                                                       @RequestParam(required = false) String level) {
+    public ResponseEntity<Page<GroupOverviewDto>> getAllGroups(@RequestParam(required = false) String search,
+                                                               @RequestParam(defaultValue = "0") int page,
+                                                               @RequestParam(defaultValue = "20") int size,
+                                                               @RequestParam(required = false) GroupStatus status,
+                                                               @RequestParam(required = false) String level) {
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(service.getAll(pageable, new GroupFilterDto(search,status,level)));
+        return ResponseEntity.ok(service.getAll(pageable, new GroupFilterDto(search, status, level)));
     }
 
     @GetMapping("/{id}")
@@ -72,7 +72,7 @@ public class GroupController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<GroupDto>> getMyGroups(){
+    public ResponseEntity<List<GroupDto>> getMyGroups() {
         List<GroupDto> myGroups = service.getMyGroups();
         return ResponseEntity.ok(myGroups);
     }
