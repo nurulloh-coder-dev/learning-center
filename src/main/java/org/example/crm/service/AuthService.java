@@ -8,14 +8,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.crm.config.JwtUtils;
-import org.example.crm.entity.dto.IdNameDto;
+import org.example.crm.entity.dto.organization.OrganizationViewDto;
 import org.example.crm.entity.dto.user.UserDto;
-import org.example.crm.entity.enums.Role;
 import org.example.crm.entity.login.LoginRequest;
 import org.example.crm.entity.login.LoginResponse;
 import org.example.crm.entity.login.TokenDto;
-import org.example.crm.entity.model.Student;
 import org.example.crm.entity.model.User;
+import org.example.crm.entity.model.UserOrganization;
 import org.example.crm.entity.request.ChangePasswordRequest;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
@@ -23,6 +22,7 @@ import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.UserMapper;
 import org.example.crm.repository.OrganizationRepository;
 import org.example.crm.repository.StudentRepository;
+import org.example.crm.repository.UserOrganizationRepository;
 import org.example.crm.repository.UserRepository;
 import org.example.crm.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,6 +49,7 @@ public class AuthService {
     private final UserValidator userValidator;
     final OrganizationRepository organizationRepository;
     final StudentRepository studentRepository;
+    final UserOrganizationRepository userOrganizationRepository;
 
     @Value("${jwt.refresh.token.expire.date:86400}")
     private Long refreshTokenExpiration;
@@ -66,35 +67,22 @@ public class AuthService {
             throw new RestException(ErrorType.INVALID_PHONE_NUMBER_OR_PASSWORD, ErrorCodes.BadRequest);
         }
 
-        List<Student> studentList = studentRepository.findAllByUserId(user.getId());
-
-        if (user.getRole().equals(Role.STUDENT)&& !studentList.isEmpty()) {
-            if (studentList.size() > 1) {
-                List<String> orgId = studentList.stream().map(Student::getOrganizationId).toList();
-                List<IdNameDto> idNameDtos = organizationRepository.findAllById(orgId).stream().map(
-                        organization -> IdNameDto.builder()
-                                .id(organization.getId())
-                                .name(organization.getName())
-                                .build()).toList();
-
-                return LoginResponse.builder()
-                        .token(null)
-                        .expiry(null)
-                        .requiresOrganizationSelection(true)
-                        .organizations(idNameDtos)
-                        .build();
-            }
-
-            Student student = studentList.get(0);
-            if (!student.getOrganizationId().equals(user.getOrganizationId())) {
-                throw new RestException(ErrorType.WRONG_ORGANIZATION, ErrorCodes.Forbidden);
-            }
-
+        List<UserOrganization> allByUserId = userOrganizationRepository.findAllByUserIdAndDeletedFalse(user.getId());
+        if (allByUserId.isEmpty()) {
+            throw new RestException(ErrorType.ORGANIZATION_NOT_FOUND, ErrorCodes.NotFound);
         }
+        if (allByUserId.size() == 1) {
+            UserOrganization userOrganization = allByUserId.get(0);
+            getLoginResponse(response, userOrganization);
+        }
+        List<OrganizationViewDto> organizationViewDtos = allByUserId.stream()
+                .map(u -> new OrganizationViewDto(u.getOrganization().getId(), u.getOrganization().getName(), u.getRole()))
+                .toList();
 
-        return getLoginResponse(user.getOrganizationId(), response, user);
-
-
+        return LoginResponse.builder()
+                .requiresOrganizationSelection(true)
+                .organizations(organizationViewDtos)
+                .build();
     }
 
 
@@ -118,10 +106,12 @@ public class AuthService {
                 .orElseThrow(() -> new RestException(ErrorType.PHONE_NUMBER_NOT_FOUND, ErrorCodes.NotFound));
 
         String organizationId = claims.get("organizationId", String.class);
+        UserOrganization userOrganization = userOrganizationRepository.findByUserIdAndOrgId(user.getId(), organizationId)
+                .orElseThrow(() -> new RestException(ErrorType.USER_ORGANIZATION_MISMATCH, ErrorCodes.AccessDenied));
 
-        TokenDto access = jwtUtils.generateToken(phone, jwtUtils.prepareClaims(user, organizationId), "access");
+        TokenDto access = jwtUtils.generateToken(phone, jwtUtils.prepareClaims(userOrganization), "access");
 
-        Map<String, Object> refreshClaims = jwtUtils.prepareClaims(user, organizationId);
+        Map<String, Object> refreshClaims = jwtUtils.prepareClaims(userOrganization);
         TokenDto refresh = jwtUtils.generateToken(phone, refreshClaims, refreshTokenExpiration);
 
         setRefreshCookie(response, refresh.getToken());
@@ -176,17 +166,18 @@ public class AuthService {
         if (!b) {
             throw new RestException(ErrorType.ORGANIZATION_NOT_FOUND, ErrorCodes.NotFound);
         }
-        studentRepository.findStudentByOrganizationIdAndUserId(organizationId, user.getId())
-                .orElseThrow(() -> new RestException(ErrorType.STUDENT_NOT_FOUND, ErrorCodes.NotFound));
+        UserOrganization userOrganization = userOrganizationRepository.findByUserIdAndOrgId(user.getId(), organizationId)
+                .orElseThrow(() -> new RestException(ErrorType.USER_ORGANIZATION_MISMATCH, ErrorCodes.AccessDenied));
 
 
-        return getLoginResponse(organizationId, response, user);
+        return getLoginResponse(response, userOrganization);
     }
 
-    private LoginResponse getLoginResponse(String organizationId, HttpServletResponse response, User user) {
-        Map<String, Object> claims = jwtUtils.prepareClaims(user, organizationId);
-        TokenDto accessToken = jwtUtils.generateToken(user.getPhone(), claims, "access");
-        TokenDto refreshToken = jwtUtils.generateToken(user.getPhone(), claims, "refresh");
+    private LoginResponse getLoginResponse(HttpServletResponse response, UserOrganization userOrganization) {
+        Map<String, Object> claims = jwtUtils.prepareClaims(userOrganization);
+        String phone = userOrganization.getUser().getPhone();
+        TokenDto accessToken = jwtUtils.generateToken(phone, claims, "access");
+        TokenDto refreshToken = jwtUtils.generateToken(phone, claims, "refresh");
         setRefreshCookie(response, refreshToken.getToken());
 
 

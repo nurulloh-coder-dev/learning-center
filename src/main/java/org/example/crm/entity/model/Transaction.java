@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 import org.example.crm.entity.enums.InvoiceStatus;
 import org.example.crm.entity.enums.TransactionType;
 
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Transaction extends BaseEntity {
+public class Transaction extends TenantEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 32)

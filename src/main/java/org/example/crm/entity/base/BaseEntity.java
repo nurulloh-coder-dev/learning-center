@@ -37,20 +37,6 @@ public abstract class BaseEntity extends IdEntity{
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @Column(name = "organization_id", updatable = false)
-    private String organizationId;
-
+    @Column(nullable = false)
     private Boolean deleted = Boolean.FALSE;
-
-    @PrePersist
-    public void setOrganizationIdOnPersist() {
-        if (this.organizationId == null) {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-                if (auth.getPrincipal() instanceof CustomUserDetails custom) {
-                    this.organizationId = custom.getOrganizationId();
-                }
-            }
-        }
-    }
 }

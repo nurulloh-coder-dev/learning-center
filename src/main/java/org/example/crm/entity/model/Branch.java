@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 
 import java.math.BigDecimal;
 
@@ -17,7 +18,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Branch  extends BaseEntity {
+public class Branch  extends TenantEntity {
     @Column(nullable = false)
     private String name;
 

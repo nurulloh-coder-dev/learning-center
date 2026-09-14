@@ -1,6 +1,7 @@
 package org.example.crm.mapper;
 
 import org.example.crm.annotation.IgnoreAuditFields;
+import org.example.crm.annotation.IgnoreTenantAuditFields;
 import org.example.crm.entity.dto.lead.LeadCreateDto;
 import org.example.crm.entity.dto.lead.LeadDto;
 import org.example.crm.entity.dto.lead.LeadUpdateDto;
@@ -22,7 +23,7 @@ public interface LeadMapper {
     @Mapping(target = "preferredCourse", ignore = true)
     LeadDto toDto(LeadProjection leadProjection);
 
-    @IgnoreAuditFields
+    @IgnoreTenantAuditFields
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "preferredCourse", ignore = true)
     Lead toEntity(LeadCreateDto createDto);
@@ -30,7 +31,7 @@ public interface LeadMapper {
     @Mapping(target = "preferredCourse", source = "preferredCourse.name")
     LeadDto toDto(Lead lead);
 
-    @IgnoreAuditFields
+    @IgnoreTenantAuditFields
     @Mapping(target = "preferredCourse", ignore = true)
     void mapUpdate(@MappingTarget Lead lead, LeadUpdateDto updateDto);
 }

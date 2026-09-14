@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 import org.example.crm.entity.enums.InvoiceStatus;
 
 import java.math.BigDecimal;
@@ -16,7 +17,7 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Invoice extends BaseEntity {
+public class Invoice extends TenantEntity {
 
     @Column(unique = true, nullable = false)
     private String invoiceNumber;

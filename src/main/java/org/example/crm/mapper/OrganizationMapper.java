@@ -16,5 +16,6 @@ public interface OrganizationMapper {
     @IgnoreAuditFields
     Organization toEntity(OrganizationCreateDto createDto);
 
+    @IgnoreAuditFields
     void mapUpdate(@MappingTarget Organization organization, OrganizationUpdateDto organizationUpdateDto);
 }

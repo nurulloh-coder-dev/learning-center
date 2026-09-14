@@ -68,7 +68,7 @@ public enum ErrorType {
     INVOICE_ALREADY_CREATED("invoice.already.created"),
     INVOICE_ALREADY_PAID("invoice.already.paid"),
     INVOICE_REQUIRED("invoice.required"),
-    WRONG_ORGANIZATION("wrong.organization"),;
+    USER_ORGANIZATION_MISMATCH("user.organization.mismatch"),;
 
 
     private final String key;

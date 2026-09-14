@@ -1,6 +1,7 @@
 package org.example.crm.mapper;
 
 import org.example.crm.annotation.IgnoreAuditFields;
+import org.example.crm.annotation.IgnoreTenantAuditFields;
 import org.example.crm.entity.dto.student.StudentCreateDto;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
@@ -24,9 +25,11 @@ public interface StudentMapper {
     StudentDto toDto(Student student);
 
 
+    @IgnoreTenantAuditFields
     @Mapping(source = "userCreateDto", target = "user")
     Student toEntity(StudentCreateDto studentDto);
 
+    @IgnoreTenantAuditFields
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void mapUpdate(@MappingTarget Student student, StudentUpdateDto updateDto);
 

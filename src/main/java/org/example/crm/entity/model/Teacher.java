@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Teacher extends BaseEntity {
+public class Teacher extends TenantEntity {
 
 
     @ManyToOne(optional = false, cascade = CascadeType.PERSIST)

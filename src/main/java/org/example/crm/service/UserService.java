@@ -1,11 +1,9 @@
 package org.example.crm.service;
 
 import org.example.crm.entity.dto.user.*;
-import org.example.crm.entity.enums.AdministratorPermission;
 import org.example.crm.entity.enums.Role;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
-import org.example.crm.entity.model.Branch;
 import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.filters.UserFilterDto;
@@ -21,8 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 @Service
 public class UserService extends AbstractService<
@@ -74,8 +70,6 @@ public class UserService extends AbstractService<
         validator.validateUserPermission(entity);
         String password = generatePassword(10);
         entity.setPassword(passwordEncoder.encode(password));
-        Branch branch = branchValidator.validateIdAndGet(createDto.branchId());
-        entity.setBranch(branch);
         User save = repository.save(entity);
         return new UserCreatedResponseDto(
                 save.getId(),
@@ -90,7 +84,6 @@ public class UserService extends AbstractService<
         User user = validator.authenticateAndGetUser();
         String organizationId = validator.authenticateAndGetOrganizationId();
         validator.validateIfCurrentUser(user, id);
-        organizationValidator.validateOrganizationMatch(user.getOrganizationId(), organizationId);
         mapper.mapUpdate(user, updateDto);
         return mapper.toDto(repository.save(user));
     }
@@ -121,17 +114,11 @@ public class UserService extends AbstractService<
         String userOrganization = validator.authenticateAndGetOrganizationId();
         organizationValidator.validateAndGetId(organizationId);
         if (!userOrganization.equals(organizationId)) {
-            throw new RestException(ErrorType.WRONG_ORGANIZATION, ErrorCodes.BadRequest);
+            throw new RestException(ErrorType.USER_ORGANIZATION_MISMATCH, ErrorCodes.BadRequest);
         }
         validator.validate(userCreateDto);
         User entity = mapper.toEntity(userCreateDto);
-        entity.setOrganizationId(organizationId);
         entity.setPassword(passwordEncoder.encode(userCreateDto.password()));
-        Branch branch = branchValidator.validateIdAndGet(userCreateDto.branchId());
-        entity.setBranch(branch);
-        entity.setRole(Role.SUPER_ADMIN);
-        entity.setPermissions(new ArrayList<>(Arrays.asList(AdministratorPermission.EMPLOYEE_MANAGEMENT, AdministratorPermission.INVOICE_MANAGEMENT,
-                AdministratorPermission.LEAD_MANAGEMENT,AdministratorPermission.STUDENT_MANAGEMENT,AdministratorPermission.TEACHER_MANAGEMENT)));
         User save = repository.save(entity);
         return new UserDto(
                 save.getId(),
@@ -140,7 +127,7 @@ public class UserService extends AbstractService<
                 save.getFullName(),
                 save.getPhone(),
                 null,
-                save.getRole()
+                Role.SUPER_ADMIN
         );
     }
 }

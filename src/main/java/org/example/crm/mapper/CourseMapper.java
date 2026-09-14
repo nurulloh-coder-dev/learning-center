@@ -1,6 +1,7 @@
 package org.example.crm.mapper;
 
 import org.example.crm.annotation.IgnoreAuditFields;
+import org.example.crm.annotation.IgnoreTenantAuditFields;
 import org.example.crm.entity.dto.course.CourseCreateDto;
 import org.example.crm.entity.dto.course.CourseDto;
 import org.example.crm.entity.dto.course.CourseUpdateDto;
@@ -19,7 +20,7 @@ public interface CourseMapper {
 
     CourseDto toDtoFromProjection(CourseProjection projection);
 
-    @IgnoreAuditFields
+    @IgnoreTenantAuditFields
     Course toEntity(CourseCreateDto createDto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 import org.example.crm.entity.enums.LeadSource;
 import org.example.crm.entity.enums.LeadStatus;
 import org.example.crm.entity.enums.RejectionReason;
@@ -21,7 +22,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @ToString
-public class Lead extends BaseEntity {
+public class Lead extends TenantEntity {
     private String fullName;
     private String phone;
     @Enumerated(EnumType.STRING)

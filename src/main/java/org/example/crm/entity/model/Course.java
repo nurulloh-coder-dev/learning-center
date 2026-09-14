@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 
 @Entity
 @Getter
@@ -21,7 +22,7 @@ import org.example.crm.entity.base.BaseEntity;
                 )
         }
 )
-public class Course extends BaseEntity {
+public class Course extends TenantEntity {
 
     private String name;
 

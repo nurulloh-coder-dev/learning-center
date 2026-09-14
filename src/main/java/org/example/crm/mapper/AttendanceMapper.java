@@ -1,6 +1,7 @@
 package org.example.crm.mapper;
 
 import org.example.crm.annotation.IgnoreAuditFields;
+import org.example.crm.annotation.IgnoreTenantAuditFields;
 import org.example.crm.entity.dto.attendance.AttendanceCreateDto;
 import org.example.crm.entity.dto.attendance.AttendanceDto;
 import org.example.crm.entity.dto.attendance.MyAttendanceDto;
@@ -19,7 +20,7 @@ public interface AttendanceMapper {
     AttendanceDto toDto(Attendance attendance);
 
 
-    @IgnoreAuditFields
+    @IgnoreTenantAuditFields
     @Mapping(target = "lesson", ignore = true)
     @Mapping(target = "attendanceStudents", ignore = true)
     Attendance toEntity(AttendanceCreateDto createDto);

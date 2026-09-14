@@ -7,13 +7,14 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 
 import java.math.BigDecimal;
 
 @Entity
 @Setter
 @Getter
-public class Level extends BaseEntity {
+public class Level extends TenantEntity {
     @Column(nullable = false)
     private String name;
 

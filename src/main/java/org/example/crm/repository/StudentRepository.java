@@ -3,8 +3,10 @@ package org.example.crm.repository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import org.example.crm.entity.model.Invoice;
+import org.example.crm.entity.model.Organization;
 import org.example.crm.entity.model.Student;
 import org.example.crm.projection.AnalyticStudentProjection;
+import org.example.crm.projection.OrganizationProjection;
 import org.example.crm.projection.StudentProjection;
 import org.example.crm.projection.StudentShowProjection;
 import org.springframework.data.domain.Page;
@@ -106,19 +108,22 @@ public interface StudentRepository extends JpaRepository<Student, String> {
 
 
     @Query("""
-                select count(s.id)
-                from Student s
-                where s.user.id=:userId
-""")
+                            select count(s.id)
+                            from Student s
+                            where s.user.id=:userId
+            """)
     Long countStudentsByUser_Id(String id);
 
 
     @Query("""
-            select s
+                select distinct o.id as id, o.name as name
                 from Student s
-                where s.user.id=:userId
+                inner join Organization o on o.id = s.organizationId
+                where s.user.id = :userId
+                  and s.deleted = false
+                  and o.deleted = false
             """)
-    List<Student> findAllByUserId(String userId);
+    List<OrganizationProjection> findAllStudentOrganizationsByUserId(@Param("userId") String userId);
 
     Optional<Student> findStudentByOrganizationIdAndUserId(String organizationId, String userId);
 }

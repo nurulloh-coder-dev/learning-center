@@ -1,6 +1,7 @@
 package org.example.crm.mapper;
 
 import org.example.crm.annotation.IgnoreAuditFields;
+import org.example.crm.annotation.IgnoreTenantAuditFields;
 import org.example.crm.entity.dto.lesson.LessonCreateDto;
 import org.example.crm.entity.dto.lesson.LessonDto;
 import org.example.crm.entity.dto.lesson.LessonUpdateDto;
@@ -13,10 +14,10 @@ public interface LessonMapper {
     @Mapping(source = "createdAt", target = "lessonDate")
     LessonDto toDto(Lesson lesson);
 
-    @IgnoreAuditFields
+    @IgnoreTenantAuditFields
     Lesson toEntity(LessonCreateDto createDto);
 
-    @IgnoreAuditFields
+    @IgnoreTenantAuditFields
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void mapUpdate(@MappingTarget Lesson lesson, LessonUpdateDto updateDto);
 }

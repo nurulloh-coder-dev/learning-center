@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 import org.example.crm.entity.enums.AttendanceStatus;
 
 @Entity
@@ -17,7 +18,7 @@ import org.example.crm.entity.enums.AttendanceStatus;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AttendanceStudent extends BaseEntity {
+public class AttendanceStudent extends TenantEntity {
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

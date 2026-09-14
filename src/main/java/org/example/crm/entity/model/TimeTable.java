@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 import org.example.crm.entity.enums.DayType;
 
 import java.time.LocalTime;
@@ -16,7 +17,7 @@ import java.time.LocalTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TimeTable extends BaseEntity {
+public class TimeTable extends TenantEntity {
 
     @Column(name = "day_type")
     @Enumerated(EnumType.STRING)

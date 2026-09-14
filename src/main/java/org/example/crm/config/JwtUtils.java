@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.example.crm.entity.login.TokenDto;
 import org.example.crm.entity.model.User;
+import org.example.crm.entity.model.UserOrganization;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
@@ -68,27 +69,15 @@ public class JwtUtils {
         return subject != null && !claims.getExpiration().before(new Date());
     }
 
-    public Map<String, Object> prepareClaims(User user, String organizationId) {
+    public Map<String, Object> prepareClaims(UserOrganization userOrganization) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());
-        claims.put("role", user.getRole().name());
-        claims.put("organizationId", setOrganizationId(user, organizationId));
-        if (user.getPermissions() != null) {
-            claims.put("permissions", user.getPermissions());
+        claims.put("userId", userOrganization.getUser().getId());
+        claims.put("role", userOrganization.getRole().name());
+        claims.put("organizationId", userOrganization.getOrganization().getId());
+        if (userOrganization.getPermissions() != null) {
+            claims.put("permissions", userOrganization.getPermissions());
         }
         return claims;
-    }
-
-    public String setOrganizationId(User user, String loginChosenOrgId) {
-        String organizationId = switch (user.getRole()) {
-            case TEACHER -> teacherRepository.findOrgId(user.getId(), loginChosenOrgId).orElse(null);
-            case STUDENT -> studentRepository.findOrgId(user.getId(), loginChosenOrgId).orElse(null);
-            default -> loginChosenOrgId;
-        };
-        if (organizationId == null) {
-            throw new RestException(ErrorType.FORBIDDEN, ErrorCodes.Forbidden);
-        }
-        return organizationId;
     }
 
     //    public Map<String, Object> prepareClaims(UserDto user) {

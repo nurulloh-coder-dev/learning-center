@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 
 @Entity
 @Table(name = "lessons")
@@ -13,7 +14,7 @@ import org.example.crm.entity.base.BaseEntity;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Lesson extends BaseEntity {
+public class Lesson extends TenantEntity {
 
 
     private String title;

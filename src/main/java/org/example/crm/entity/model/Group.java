@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.base.TenantEntity;
 import org.example.crm.entity.enums.GroupStatus;
 import org.example.crm.repository.GroupLevelRepository;
 import org.example.crm.repository.GroupRepository;
@@ -18,7 +19,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Group extends BaseEntity {
+public class Group extends TenantEntity {
 
     @Column(nullable = false)
     private String name;

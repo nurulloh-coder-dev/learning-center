@@ -69,17 +69,7 @@ public class UserValidator {
     }
 
     public void validateUserPermission(User entity) {
-        if (entity.getPermissions() != null && !entity.getRole().equals(Role.ADMINISTRATOR)){
-            throw new RestException(ErrorType.PERMISSION_ONLY_FOR_ADMINISTRATOR, ErrorCodes.BadRequest);
-        }
-    }
 
-    public void validateAdministratorPermission(User entity, AdministratorPermission permission) {
-        if (entity.getRole().equals(Role.ADMINISTRATOR)){
-            entity.getPermissions().stream()
-                    .filter(p -> p.equals(permission))
-                    .findFirst().orElseThrow(() -> new RestException(ErrorType.NO_PERMISSION,  ErrorCodes.BadRequest));
-        }
     }
 
     public void validateIfCurrentUser(User user, String id) {

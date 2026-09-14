@@ -2,6 +2,7 @@ package org.example.crm.mapper;
 
 
 import org.example.crm.annotation.IgnoreAuditFields;
+import org.example.crm.annotation.IgnoreTenantAuditFields;
 import org.example.crm.entity.dto.branch.BranchCreateDto;
 import org.example.crm.entity.dto.branch.BranchDto;
 import org.example.crm.entity.dto.branch.BranchUpdateDto;
@@ -21,7 +22,7 @@ public interface BranchMapper {
     BranchDto toDto(Branch branch);
 
 
-    @IgnoreAuditFields
+    @IgnoreTenantAuditFields
     @Mapping(target = "name", source = "createDto.name")
     @Mapping(target = "address", source = "createDto.address")
     @Mapping(target = "googlePlaceId", source = "createDto.googlePlaceId")
@@ -31,6 +32,6 @@ public interface BranchMapper {
     Branch toEntity(BranchCreateDto createDto);
 
 
-    @IgnoreAuditFields
+    @IgnoreTenantAuditFields
     void updateEntity(@MappingTarget Branch branch, BranchUpdateDto updateDto);
 }

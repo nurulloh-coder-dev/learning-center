@@ -12,5 +12,6 @@ import java.lang.annotation.RetentionPolicy;
 @Mapping(target = "createdBy", ignore = true)
 @Mapping(target = "updatedBy", ignore = true)
 @Mapping(target = "deleted", ignore = true)
-public @interface IgnoreAuditFields {
+@Mapping(target = "organizationId", ignore = true)
+public @interface IgnoreTenantAuditFields {
 }
