@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.example.crm.entity.dto.group.*;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.enums.DayType;
+import org.example.crm.entity.model.UserOrganization;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.entity.model.TimeTable;
@@ -16,6 +17,7 @@ import org.example.crm.entity.model.Group;
 import org.example.crm.mapper.GroupMapper;
 import org.example.crm.repository.GroupRepository;
 import org.example.crm.repository.LessonRepository;
+import org.example.crm.repository.UserOrganizationRepository;
 import org.example.crm.repository.UserRepository;
 import org.example.crm.validator.GroupValidator;
 import org.example.crm.validator.UserValidator;
@@ -41,13 +43,15 @@ public class GroupService extends AbstractService<
     private final StudentService studentService;
     private final LessonRepository lessonRepository;
     final UserRepository userRepository;
+    private final UserOrganizationRepository userOrganizationRepository;
 
-    protected GroupService(GroupRepository repository, GroupMapper mapper, GroupValidator validator, UserValidator userValidator, StudentService studentService, LessonRepository lessonRepository, UserRepository userRepository) {
+    protected GroupService(GroupRepository repository, GroupMapper mapper, GroupValidator validator, UserValidator userValidator, StudentService studentService, LessonRepository lessonRepository, UserRepository userRepository, UserOrganizationRepository userOrganizationRepository) {
         super(repository, mapper, validator);
         this.userValidator = userValidator;
         this.studentService = studentService;
         this.lessonRepository = lessonRepository;
         this.userRepository = userRepository;
+        this.userOrganizationRepository = userOrganizationRepository;
     }
 
     @Override
@@ -79,9 +83,11 @@ public class GroupService extends AbstractService<
     @Override
     public GroupDto create(GroupCreateDto createDto) {
         validator.createValid(createDto);
-        String s = userValidator.authenticateAndGetId();
-        User currentUser = userRepository.findByIdAndDeletedFalse(s).orElseThrow(() -> new RestException(ErrorType.USER_NOT_FOUND, ErrorCodes.NotFound));
-        Group group = mapper.toEntity(createDto, currentUser.getBranch());
+        String userId = userValidator.authenticateAndGetId();
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        UserOrganization userOrganization = userOrganizationRepository.findByUserIdAndOrgId(userId, organizationId)
+                .orElseThrow(() -> new RestException(ErrorType.USER_ORGANIZATION_MISMATCH, ErrorCodes.AccessDenied));
+        Group group = mapper.toEntity(createDto, userOrganization.getBranch());
 
         Integer lessonsCount = lessonRepository.findLessonCountByGroupId(group.getId(), group.getLevel().getName()).orElse(0);
         return mapper.toDto(repository.save(group), lessonsCount);

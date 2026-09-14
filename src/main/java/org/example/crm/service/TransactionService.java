@@ -70,7 +70,7 @@ public class TransactionService extends AbstractService<
         String currentOrgId = userValidator.authenticateAndGetOrganizationId();
         Student student = studentRepository.findById(createDto.studentId())
                 .orElseThrow(() -> new RestException(ErrorType.STUDENT_NOT_FOUND, ErrorCodes.NotFound));
-        organizationValidator.validateOrganizationMatch(student.getUser().getOrganizationId(), currentOrgId);
+        organizationValidator.validateOrganizationMatch(student.getOrganizationId(), currentOrgId);
 
         Invoice invoice = resolveInvoiceIfRequired(createDto, currentOrgId);
 

@@ -53,74 +53,57 @@ public class DataInitializer implements CommandLineRunner {
         User developer = new User();
         developer.setPhone("0");
         developer.setPassword(encodedPassword);
-        developer.setRole(Role.DEVELOPER);
         developer.setFullName("developer");
-        developer.setPermissions(new ArrayList<>(Arrays.asList(AdministratorPermission.EMPLOYEE_MANAGEMENT, AdministratorPermission.INVOICE_MANAGEMENT,
-                AdministratorPermission.LEAD_MANAGEMENT,AdministratorPermission.STUDENT_MANAGEMENT,AdministratorPermission.TEACHER_MANAGEMENT)));
         userRepository.save(developer);
 
 
 
         User adminUser = new User();
-        adminUser.setOrganizationId(organization.getId());
         adminUser.setFullName("Admin John");
         adminUser.setPhone("1");
         adminUser.setPassword(encodedPassword);
-        adminUser.setRole(Role.ADMINISTRATOR);
         adminUser.setBirthDate(LocalDate.of(1990, 1, 1));
         userRepository.save(adminUser);
 
         User teacherUser1 = new User();
-        teacherUser1.setOrganizationId(organization.getId());
         teacherUser1.setFullName("Alice Teacher");
         teacherUser1.setPhone("2");
         teacherUser1.setPassword(encodedPassword);
-        teacherUser1.setRole(Role.TEACHER);
         teacherUser1.setBirthDate(LocalDate.of(1992, 5, 10));
         userRepository.save(teacherUser1);
 
         User teacherUser2 = new User();
-        teacherUser2.setOrganizationId(organization.getId());
         teacherUser2.setFullName("Bob Teacher");
         teacherUser2.setPhone("+998901234569");
         teacherUser2.setPassword(encodedPassword);
-        teacherUser2.setRole(Role.TEACHER);
         teacherUser2.setBirthDate(LocalDate.of(1988, 8, 20));
         userRepository.save(teacherUser2);
 
         User studentUser1 = new User();
-        studentUser1.setOrganizationId(organization.getId());
         studentUser1.setFullName("Charlie Student");
         studentUser1.setPhone("+998901234570");
         studentUser1.setPassword(encodedPassword);
-        studentUser1.setRole(Role.STUDENT);
         studentUser1.setBirthDate(LocalDate.of(2010, 3, 5));
         userRepository.save(studentUser1);
 
         User studentUser2 = new User();
-        studentUser2.setOrganizationId(organization.getId());
         studentUser2.setFullName("Diana Student");
         studentUser2.setPhone("+998901234571");
         studentUser2.setPassword(encodedPassword);
-        studentUser2.setRole(Role.STUDENT);
         studentUser2.setBirthDate(LocalDate.of(2011, 7, 15));
         userRepository.save(studentUser2);
 
         User studentUser3 = new User();
-        studentUser3.setOrganizationId(organization.getId());
         studentUser3.setFullName("Eve Student");
         studentUser3.setPhone("+998901234572");
         studentUser3.setPassword(encodedPassword);
-        studentUser3.setRole(Role.STUDENT);
         studentUser3.setBirthDate(LocalDate.of(2009, 11, 25));
         userRepository.save(studentUser3);
 
         User studentUser4 = new User();
-        studentUser4.setOrganizationId(organization.getId());
         studentUser4.setFullName("Frank Student");
         studentUser4.setPhone("+998901234573");
         studentUser4.setPassword(encodedPassword);
-        studentUser4.setRole(Role.STUDENT);
         studentUser4.setBirthDate(LocalDate.of(2012, 1, 30));
         userRepository.save(studentUser4);
 
