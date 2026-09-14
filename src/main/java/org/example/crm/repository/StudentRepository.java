@@ -38,8 +38,8 @@ public interface StudentRepository extends JpaRepository<Student, String> {
     @Query("""
                 select s from Student s
                 join s.user u
-                where u.organizationId= :orgId and u.deleted = false
-                and u.deleted = false
+                join UserOrganization o on u.id = o.user.id and o.organization.id = :orgId
+                where u.deleted = false
                 and (:search IS NULL OR :search = '' OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')))
             """)
     Page<StudentProjection> searchStudentsByOrganization(@Param("search") String search, @Param("orgId") String organizationId, Pageable pageable);
@@ -59,16 +59,18 @@ public interface StudentRepository extends JpaRepository<Student, String> {
                     ) as studentsAddedInPrevMonth
                 from Student e
                 join e.user u
-                where u.organizationId = :organizationId
-                  and u.deleted = false
+                join UserOrganization o on u.id = o.user.id and o.organization.id = :organizationId
+                where u.deleted = false
             """)
     AnalyticStudentProjection getAnalyticStudent(String organizationId,
                                                  LocalDateTime prev,
                                                  LocalDateTime month,
                                                  LocalDateTime nextMonth);
 
-    @Query("select count(s.id) from Student s where s.user.organizationId=:orgId and s.user.deleted = false")
+    @Query("select count(s.id) from Student s join s.user u " +
+            "join UserOrganization o on u.id = o.user.id and o.organization.id = :orgId where u.deleted = false")
     Long countStudentsByOrganizationId(@Param("orgId") String organizationId);
+
 
     @Modifying
     @Transactional

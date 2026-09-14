@@ -23,6 +23,7 @@ import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -82,10 +83,13 @@ public class StudentService extends AbstractService<
     }
 
     @Override
+    @Transactional
     public void delete(String id) {
         validator.validateId(id);
         String organizationId = userValidator.authenticateAndGetOrganizationId();
+        Student student = validator.validateIdAndGet(id);
         repository.softDelete(id, organizationId);
+        userService.softDeleteUserAndOrganization(student.getUser(), organizationId);
     }
 
     public Long getAllCount() {
