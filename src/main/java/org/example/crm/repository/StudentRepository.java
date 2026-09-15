@@ -126,5 +126,14 @@ public interface StudentRepository extends JpaRepository<Student, String> {
             """)
     List<OrganizationProjection> findAllStudentOrganizationsByUserId(@Param("userId") String userId);
 
+    @Query("""
+        select s
+        from Student s
+        join s.user u
+        join UserOrganization o on u.id = o.user.id and o.organization.id = :organizationId
+        where u.id = :userId
+          and u.deleted = false
+          and s.deleted = false
+""")
     Optional<Student> findStudentByOrganizationIdAndUserId(String organizationId, String userId);
 }

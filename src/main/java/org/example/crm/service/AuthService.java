@@ -74,7 +74,7 @@ public class AuthService {
 
         if (allByUserId.size() == 1) {
             UserOrganization userOrganization = allByUserId.get(0);
-            getLoginResponse(response, userOrganization);
+            return getLoginResponse(response, userOrganization);
         }
 
         List<OrganizationViewDto> organizationViewDtos = allByUserId.stream()
