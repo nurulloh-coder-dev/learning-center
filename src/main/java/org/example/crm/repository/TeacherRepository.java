@@ -23,17 +23,20 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
             SELECT COUNT(t.id)
             from Teacher t
             join t.user u
-            where u.organizationId =:organizationId and u.deleted = false""")
+            join UserOrganization o on u.id = o.user.id and o.organization.id = :organizationId
+            where u.deleted = false and t.deleted = false""")
+
     Long countTeachersByDeletedAndOrg(@Param("organizationId") String organizationId);
 
     @Query("""
                     select t from Teacher t
                     join t.user u
-                    where t.id =:id and u.organizationId=:organizationId
+                    join UserOrganization o on u.id = o.user.id and o.organization.id = :organizationId
+                    where t.id =:id and u.deleted = false and t.deleted = false
             """)
     Optional<Teacher> findTeacherByIdAndOrg(String id, String organizationId);
 
-    @Query("SELECT t from Teacher t join t.user u where (:search is null or u.fullName ilike :search) and u.organizationId= :orgId")
+    @Query("SELECT t from Teacher t join t.user u join UserOrganization o on u.id = o.user.id and o.organization.id = :orgId where (:search is null or u.fullName ilike :search) and u.deleted = false")
     Page<Teacher> findAllBySearch(@Param("orgId") String organizationId, @Param("search") String search, Pageable pageable);
 
     @Query("""
@@ -51,8 +54,8 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
                     ) as teachersAddedInPrevMonth
                 from Teacher e
                 join e.user u
-                where u.organizationId = :organizationId
-                  and u.deleted = false
+                join UserOrganization o on u.id = o.user.id and o.organization.id = :organizationId
+                where u.deleted = false and e.deleted=false
             """)
     AnalyticTeacherProjection getAnalyticTeacher(@Param("organizationId") String organizationId,
                                                  @Param("prev") LocalDateTime prev,
@@ -67,7 +70,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
     @Query("update Teacher t set t.deleted = true where t.id=:id")
     void softDelete(String id);
 
-    @Query("select exists(select t.id from Teacher t join t.user u where t.id=:id and u.deleted=false and u.organizationId=:organizationId)")
+    @Query("select exists(select t.id from Teacher t join t.user u join UserOrganization o on u.id = o.user.id and o.organization.id = :organizationId where t.id=:id and u.deleted=false)")
     Optional<Boolean> checkIdAndOrgId(String id, String organizationId);
 
     @Query("""

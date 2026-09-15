@@ -71,10 +71,12 @@ public class AuthService {
         if (allByUserId.isEmpty()) {
             throw new RestException(ErrorType.ORGANIZATION_NOT_FOUND, ErrorCodes.NotFound);
         }
+
         if (allByUserId.size() == 1) {
             UserOrganization userOrganization = allByUserId.get(0);
-            getLoginResponse(response, userOrganization);
+            return getLoginResponse(response, userOrganization);
         }
+
         List<OrganizationViewDto> organizationViewDtos = allByUserId.stream()
                 .map(u -> new OrganizationViewDto(u.getOrganization().getId(), u.getOrganization().getName(), u.getRole()))
                 .toList();

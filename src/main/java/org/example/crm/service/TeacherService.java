@@ -33,12 +33,14 @@ public class TeacherService extends AbstractService<
     final UserValidator userValidator;
     final UserRepository userRepository;
     final StudentService studentService;
+    final UserService userService;
 
-    protected TeacherService(TeacherRepository repository, TeacherMapper mapper, TeacherValidator validator, UserValidator userValidator, UserRepository userRepository, StudentService studentService) {
+    protected TeacherService(TeacherRepository repository, TeacherMapper mapper, TeacherValidator validator, UserValidator userValidator, UserRepository userRepository, StudentService studentService, UserService userService) {
         super(repository, mapper, validator);
         this.userValidator = userValidator;
         this.userRepository = userRepository;
         this.studentService = studentService;
+        this.userService = userService;
     }
 
     @Override
@@ -80,10 +82,12 @@ public class TeacherService extends AbstractService<
     }
 
     @Override
+    @Transactional
     public void delete(String id) {
         String organizationId = userValidator.authenticateAndGetOrganizationId();
-        validator.validateId(id, organizationId);
-        repository.softDelete(id);
+        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
+        repository.softDelete(teacher.getId());
+        userService.softDeleteUserAndOrganization(teacher.getUser(), organizationId);
     }
 
     public Long getAllCount() {
@@ -127,6 +131,7 @@ public class TeacherService extends AbstractService<
         Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
 
         repository.softDelete(teacher.getId());
+        userService.softDeleteUserAndOrganization(teacher.getUser(), organizationId);
     }
 
     public List<StudentDto> getMyGroup(String groupId) {
