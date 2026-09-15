@@ -1,0 +1,45 @@
+package org.example.crm.entity.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.example.crm.entity.base.BaseEntity;
+import org.example.crm.entity.enums.SubscriptionStatus;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Subscription extends BaseEntity {
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "organization_id", nullable = false)
+    private Organization organization;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id", nullable = false)
+    private Plan plan;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SubscriptionStatus status;
+
+    @Column(nullable = false)
+    private Instant startsAt;
+
+    @Column(nullable = false)
+    private Instant expiresAt;
+
+    // price actually charged — plan price may change later
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal paidAmount;
+
+    @Column(nullable = false)
+    private String currency;
+
+    private String activatedByUserId;     // which admin confirmed it
+    private String note;                  // "Humo transfer, ref JB-7K2M"
+}
