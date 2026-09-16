@@ -2,6 +2,7 @@ package org.example.crm.controller;
 
 import jakarta.validation.Valid;
 import org.example.crm.entity.dto.student.StudentCreateDto;
+import org.example.crm.entity.dto.student.StudentCreateResponseDto;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
 import org.example.crm.filters.StudentFilterDto;
@@ -63,8 +64,8 @@ public class StudentController {
 
     @PostMapping
     @PreAuthorize("hasRole('SUPER_ADMIN') or (hasRole('ADMINISTRATOR') and hasAuthority('STUDENT_MANAGEMENT'))")
-    public ResponseEntity<StudentDto> create(@Valid @RequestBody StudentCreateDto createDto) {
-        StudentDto createdStudent = studentService.create(createDto);
+    public ResponseEntity<StudentCreateResponseDto> create(@Valid @RequestBody StudentCreateDto createDto) {
+        StudentCreateResponseDto createdStudent = studentService.createStudent(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdStudent);
     }
 

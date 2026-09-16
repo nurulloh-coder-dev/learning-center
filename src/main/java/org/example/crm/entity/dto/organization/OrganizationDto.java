@@ -5,6 +5,7 @@ public record OrganizationDto(
         String name,
         String email,
         String phone,
-        String website
+        String website,
+        Integer daysBeforeDebt
 ) {
 }

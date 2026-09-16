@@ -29,10 +29,10 @@ public interface TeacherRepository extends JpaRepository<Teacher, String> {
     Long countTeachersByDeletedAndOrg(@Param("organizationId") String organizationId);
 
     @Query("""
-                    select t from Teacher t
-                    join t.user u
+                    select t from User u
+                    join Teacher t on t.user.id = u.id
                     join UserOrganization o on u.id = o.user.id and o.organization.id = :organizationId
-                    where t.id =:id and u.deleted = false and t.deleted = false
+                    where u.id =:id and u.deleted = false and t.deleted = false
             """)
     Optional<Teacher> findTeacherByIdAndOrg(String id, String organizationId);
 

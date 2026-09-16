@@ -11,7 +11,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +21,7 @@ import java.util.Arrays;
 @Component
 @RequiredArgsConstructor
 //
-public class DataInitializer implements CommandLineRunner {
+public class DataInitializer implements CommandLineRunner{
 
     final UserRepository userRepository;
     final TeacherRepository teacherRepository;
@@ -32,9 +34,10 @@ public class DataInitializer implements CommandLineRunner {
     final OrganizationRepository organizationRepository;
     final PasswordEncoder passwordEncoder;
     final BranchRepository branchRepository;
+    final UserOrganizationRepository userOrganizationRepository;
     final EntityManager entityManager;
-    Organization organization = new Organization("org", "phone", "email", "website");
-    Organization organization1 = new Organization("org1", "phone1", "email1", "website1");
+    Organization organization = new Organization("org", "phone", "email", "website", 3);
+    Organization organization1 = new Organization("org1", "phone1", "email1", "website1", 3);
 
 
 
@@ -118,6 +121,17 @@ public class DataInitializer implements CommandLineRunner {
         branch1.setGoogleMapsUrl("https://www.google.com/maps/place/123+Main+St");
         branch1.setGooglePlaceId("ChIJd8BlQ2BZwokRAFUEcm_qrcA");
         branchRepository.save(branch1);
+
+
+        // ============ USER ORGANIZATIONS ============
+        saveUserOrganization(developer, organization, Role.DEVELOPER);
+        saveUserOrganization(adminUser, organization, Role.ADMINISTRATOR);
+        saveUserOrganization(teacherUser1, organization, Role.TEACHER);
+        saveUserOrganization(teacherUser2, organization, Role.TEACHER);
+        saveUserOrganization(studentUser1, organization, Role.STUDENT);
+        saveUserOrganization(studentUser2, organization, Role.STUDENT);
+        saveUserOrganization(studentUser3, organization, Role.STUDENT);
+        saveUserOrganization(studentUser4, organization, Role.STUDENT);
 
 
         // ============ TEACHERS ============
@@ -296,6 +310,113 @@ public class DataInitializer implements CommandLineRunner {
         attendance2.addStudentAttendance(createAttendanceStudent(student3, AttendanceStatus.ABSENT));
         attendance2.addStudentAttendance(createAttendanceStudent(student4, AttendanceStatus.PRESENT));
         attendanceRepository.save(attendance2);
+
+        // ============ LOST STUDENTS (created this month + left the group) ============
+        Student student5 = new Student();
+        student5.setOrganizationId(organization.getId());
+        student5.setUser(studentUser2);
+        student5.setParentPhone("+998901234585");
+        studentRepository.save(student5);
+
+        User graceUser = new User();
+        graceUser.setFullName("Grace Student");
+        graceUser.setPhone("+998901234574");
+        graceUser.setPassword(encodedPassword);
+        userRepository.save(graceUser);
+        saveUserOrganization(graceUser, organization, Role.STUDENT);
+
+        Student student6 = new Student();
+        student6.setOrganizationId(organization.getId());
+        student6.setUser(graceUser);
+        student6.setParentPhone("+998901234586");
+        studentRepository.save(student6);
+
+        Enrollment lostEnrollment1 = new Enrollment();
+        lostEnrollment1.setOrganizationId(organization.getId());
+        lostEnrollment1.setStudent(student5);
+        lostEnrollment1.setGroup(group1);
+        lostEnrollment1.setLeavingReason("Withdrew");
+        lostEnrollment1.setDeleted(true);
+        entityManager.persist(lostEnrollment1);
+
+        Enrollment lostEnrollment2 = new Enrollment();
+        lostEnrollment2.setOrganizationId(organization.getId());
+        lostEnrollment2.setStudent(student6);
+        lostEnrollment2.setGroup(group1);
+        lostEnrollment2.setLeavingReason("Withdrew");
+        lostEnrollment2.setDeleted(true);
+        entityManager.persist(lostEnrollment2);
+
+        // ============ CONSECUTIVE ABSENT LESSONS (potential fail students) ============
+        Lesson lesson5 = new Lesson();
+        lesson5.setOrganizationId(organization.getId());
+        lesson5.setTitle("1.5");
+        lesson5.setTopic("Algebra Practice");
+        lesson5.setIsCompleted(true);
+        lesson5.setGroup(group1);
+        lesson5.setTeacher(teacher1);
+        lessonRepository.save(lesson5);
+
+        Lesson lesson6 = new Lesson();
+        lesson6.setOrganizationId(organization.getId());
+        lesson6.setTitle("1.6");
+        lesson6.setTopic("Algebra Quiz");
+        lesson6.setIsCompleted(true);
+        lesson6.setGroup(group1);
+        lesson6.setTeacher(teacher1);
+        lessonRepository.save(lesson6);
+
+        Lesson lesson7 = new Lesson();
+        lesson7.setOrganizationId(organization.getId());
+        lesson7.setTitle("1.7");
+        lesson7.setTopic("Algebra Review");
+        lesson7.setIsCompleted(true);
+        lesson7.setGroup(group1);
+        lesson7.setTeacher(teacher1);
+        lessonRepository.save(lesson7);
+
+        LocalDateTime now = LocalDateTime.now();
+        backdateLessonCreatedAt(lesson5, now.minusHours(3));
+        backdateLessonCreatedAt(lesson6, now.minusHours(2));
+        backdateLessonCreatedAt(lesson7, now.minusHours(1));
+
+        Attendance attendance3 = new Attendance();
+        attendance3.setOrganizationId(organization.getId());
+        attendance3.setLesson(lesson5);
+        attendance3.addStudentAttendance(createAttendanceStudent(student1, AttendanceStatus.ABSENT));
+        attendance3.addStudentAttendance(createAttendanceStudent(student2, AttendanceStatus.ABSENT));
+        attendanceRepository.save(attendance3);
+
+        Attendance attendance4 = new Attendance();
+        attendance4.setOrganizationId(organization.getId());
+        attendance4.setLesson(lesson6);
+        attendance4.addStudentAttendance(createAttendanceStudent(student1, AttendanceStatus.ABSENT));
+        attendance4.addStudentAttendance(createAttendanceStudent(student2, AttendanceStatus.ABSENT));
+        attendanceRepository.save(attendance4);
+
+        Attendance attendance5 = new Attendance();
+        attendance5.setOrganizationId(organization.getId());
+        attendance5.setLesson(lesson7);
+        attendance5.addStudentAttendance(createAttendanceStudent(student1, AttendanceStatus.ABSENT));
+        attendance5.addStudentAttendance(createAttendanceStudent(student2, AttendanceStatus.ABSENT));
+        attendanceRepository.save(attendance5);
+    }
+
+    private void saveUserOrganization(User user, Organization org, Role role) {
+        UserOrganization userOrganization = new UserOrganization();
+        userOrganization.setUser(user);
+        userOrganization.setOrganization(org);
+        userOrganization.setRole(role);
+        userOrganization.setActive(true);
+        userOrganizationRepository.save(userOrganization);
+    }
+
+    private void backdateLessonCreatedAt(Lesson lesson, LocalDateTime createdAt) {
+        entityManager.flush();
+        entityManager.createNativeQuery("update lessons set created_at = :createdAt where id = :id")
+                .setParameter("createdAt", Timestamp.valueOf(createdAt))
+                .setParameter("id", lesson.getId())
+                .executeUpdate();
     }
 
     private AttendanceStudent createAttendanceStudent(Student student, AttendanceStatus status) {

@@ -4,13 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.example.crm.entity.login.TokenDto;
-import org.example.crm.entity.model.User;
 import org.example.crm.entity.model.UserOrganization;
-import org.example.crm.exceptions.ErrorCodes;
-import org.example.crm.exceptions.ErrorType;
-import org.example.crm.exceptions.RestException;
-import org.example.crm.repository.StudentRepository;
-import org.example.crm.repository.TeacherRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,9 +16,6 @@ import java.util.Map;
 
 @Component
 public class JwtUtils {
-
-    private final StudentRepository studentRepository;
-    private final TeacherRepository teacherRepository;
     @Value("${jwt.access.token.expire.date:180}")
     private Long accessTokenExpiration;
 
@@ -36,12 +27,6 @@ public class JwtUtils {
 
     @Value("${jwt.refresh.token.secretKey}")
     private String refreshToken;
-
-    public JwtUtils(StudentRepository studentRepository, TeacherRepository teacherRepository) {
-        this.studentRepository = studentRepository;
-        this.teacherRepository = teacherRepository;
-    }
-
     public Claims extractClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSecretKey())

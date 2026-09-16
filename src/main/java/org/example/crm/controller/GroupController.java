@@ -76,4 +76,10 @@ public class GroupController {
         List<GroupDto> myGroups = service.getMyGroups();
         return ResponseEntity.ok(myGroups);
     }
+
+    @GetMapping("/stats")
+    public ResponseEntity<GroupStatsDto> getGroupStats() {
+        GroupStatsDto groupStats = service.getGroupStats();
+        return ResponseEntity.ok(groupStats);
+    }
 }
