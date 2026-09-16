@@ -64,12 +64,13 @@ public class TeacherService extends AbstractService<
     }
 
     @Override
+    @Transactional
     public TeacherDto create(TeacherCreateDto createDto) {
-
-
         validator.validate(createDto);
         Teacher entity = mapper.toEntity(createDto);
-        return mapper.toDto(repository.save(entity));
+        Teacher save = repository.save(entity);
+        userService.createUserOrganization(createDto.user().role(), createDto.user().permissions(), createDto.user().branchId(), save.getUser(), userValidator.authenticateAndGetOrganizationId());
+        return mapper.toDto(save);
     }
 
     @Override
@@ -104,6 +105,7 @@ public class TeacherService extends AbstractService<
         return mapper.toDto(teacher);
     }
 
+    @Transactional
     public TeacherDto create(@Valid TeacherCreateDto createDto, String organizationId) {
 
 
@@ -112,7 +114,9 @@ public class TeacherService extends AbstractService<
             throw new RestException(ErrorType.ORGANIZATION_ID_MISMATCH, ErrorCodes.BadRequest);
         }
         Teacher entity = mapper.toEntity(createDto);
-        return mapper.toDto(repository.save(entity));
+        Teacher save = repository.save(entity);
+        userService.createUserOrganization(createDto.user().role(), createDto.user().permissions(), createDto.user().branchId(), save.getUser(), organizationId);
+        return mapper.toDto(save);
     }
 
     @Transactional

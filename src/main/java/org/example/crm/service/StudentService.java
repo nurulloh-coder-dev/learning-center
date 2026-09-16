@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
 import org.example.crm.entity.dto.student.StudentCreateDto;
+import org.example.crm.entity.dto.user.UserCreateDto;
 import org.example.crm.entity.model.Invoice;
 import org.example.crm.entity.model.Student;
 import org.example.crm.entity.model.User;
@@ -65,12 +66,14 @@ public class StudentService extends AbstractService<
     }
 
     @Override
+    @Transactional
     public StudentDto create(StudentCreateDto createDto) {
-
-
         validator.validate(createDto);
         Student entity = mapper.toEntity(createDto);
-        return mapper.toDto(repository.save(entity));
+        Student save = repository.save(entity);
+        UserCreateDto userCreateDto = createDto.userCreateDto();
+        userService.createUserOrganization(userCreateDto.role(), userCreateDto.permissions(), userCreateDto.branchId(), save.getUser(), userValidator.authenticateAndGetOrganizationId());
+        return mapper.toDto(save);
     }
 
     @Override
