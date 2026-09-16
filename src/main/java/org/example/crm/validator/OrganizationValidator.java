@@ -38,4 +38,11 @@ public class OrganizationValidator {
             throw new RestException(ErrorType.FORBIDDEN, ErrorCodes.Unauthorized);
         }
     }
+
+    public void validateId(String organizationId) {
+        boolean exists = repository.checkId(organizationId);
+        if (!exists){
+            throw new RestException(ErrorType.ORGANIZATION_NOT_FOUND,ErrorCodes.NotFound);
+        }
+    }
 }

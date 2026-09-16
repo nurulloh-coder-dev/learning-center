@@ -7,7 +7,11 @@ import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.teacher.TeacherCreateDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.teacher.TeacherUpdateDto;
+import org.example.crm.entity.dto.user.UserCreateDto;
+import org.example.crm.entity.dto.user.UserCreatedResponseDto;
+import org.example.crm.entity.enums.Role;
 import org.example.crm.entity.model.Teacher;
+import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
@@ -63,19 +67,31 @@ public class TeacherService extends AbstractService<
         return mapper.toDto(teacher);
     }
 
+    @Transactional
     @Override
     public TeacherDto create(TeacherCreateDto createDto) {
-
-
         validator.validate(createDto);
-        Teacher entity = mapper.toEntity(createDto);
-        return mapper.toDto(repository.save(entity));
+
+        UserCreatedResponseDto userResponse = userService.createUser(new UserCreateDto(
+                createDto.user().fullName(),
+                createDto.user().phone(),
+                createDto.user().birthDate(),
+                Role.TEACHER,
+                createDto.user().branchId(),
+                null
+        ));
+
+        User user = userRepository.getReferenceById(userResponse.id());
+
+        Teacher teacher = mapper.toEntity(createDto);
+        teacher.setUser(user);
+
+        Teacher savedTeacher = repository.save(teacher);
+        return mapper.toDto(savedTeacher);
     }
 
     @Override
     public TeacherDto update(TeacherUpdateDto updateDto, String id) {
-
-
         Teacher teacher = validator.validateIdAndGet(id);
         mapper.mapUpdate(teacher, updateDto);
         return mapper.toDto(repository.save(teacher));
@@ -95,48 +111,5 @@ public class TeacherService extends AbstractService<
 
         String organizationId = userValidator.authenticateAndGetOrganizationId();
         return repository.countTeachersByDeletedAndOrg(organizationId);
-    }
-
-    public TeacherDto get(String id, String organizationId) {
-
-
-        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
-        return mapper.toDto(teacher);
-    }
-
-    public TeacherDto create(@Valid TeacherCreateDto createDto, String organizationId) {
-
-
-        String organization = userValidator.authenticateAndGetOrganizationId();
-        if (!organization.equals(organizationId)) {
-            throw new RestException(ErrorType.ORGANIZATION_ID_MISMATCH, ErrorCodes.BadRequest);
-        }
-        Teacher entity = mapper.toEntity(createDto);
-        return mapper.toDto(repository.save(entity));
-    }
-
-    @Transactional
-    public TeacherDto update(@Valid TeacherUpdateDto updateDto, String id, String organizationId) {
-
-
-        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
-        mapper.mapUpdate(teacher, updateDto);
-        return mapper.toDto(repository.save(teacher));
-    }
-
-    @Transactional
-    public void delete(String id, String organizationId) {
-
-
-        Teacher teacher = validator.validateIdAndGetOrg(id, organizationId);
-
-        repository.softDelete(teacher.getId());
-        userService.softDeleteUserAndOrganization(teacher.getUser(), organizationId);
-    }
-
-    public List<StudentDto> getMyGroup(String groupId) {
-        String userId = userValidator.authenticateAndGetId();
-        validator.validateGroupAndTeacher(userId, groupId);
-        return studentService.getStudentsByGroupId(groupId);
     }
 }

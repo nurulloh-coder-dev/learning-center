@@ -26,10 +26,11 @@ public interface StudentMapper {
 
 
     @IgnoreTenantAuditFields
-    @Mapping(source = "userCreateDto", target = "user")
+    @Mapping(target = "user", ignore = true)
     Student toEntity(StudentCreateDto studentDto);
 
     @IgnoreTenantAuditFields
+    @Mapping(target = "user", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void mapUpdate(@MappingTarget Student student, StudentUpdateDto updateDto);
 

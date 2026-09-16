@@ -1,6 +1,9 @@
 package org.example.crm.repository;
 
+import org.example.crm.entity.enums.Role;
 import org.example.crm.entity.model.UserOrganization;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,18 +17,39 @@ public interface UserOrganizationRepository extends JpaRepository<UserOrganizati
     @EntityGraph(attributePaths = {"user", "organization"})
     List<UserOrganization> findAllByUserIdAndDeletedFalse(String userId);
 
-    List<UserOrganization> findAllByUserId(String userId);
-
     @Query("select uo from UserOrganization uo where uo.organization.id=:orgId and uo.user.id=:userId and uo.deleted=false")
-    Optional<UserOrganization> findByUserIdAndOrgId(@Param("userId") String id,@Param("orgId") String organizationId);
+    Optional<UserOrganization> findByUserIdAndOrgId(@Param("userId") String id, @Param("orgId") String organizationId);
 
     @Query("""
-        select uo from UserOrganization uo
-        where uo.user.id = :userId
-        and uo.organization.id = :organizationId
-        and uo.deleted = false
-        and uo.organization.deleted = false
-        and uo.user.deleted = false
-""")
-    Optional<UserOrganization> findUserOrganizationByUserIdAndOrganization_Id(String userId, String organizationId);
+                    select uo from UserOrganization uo
+                    where uo.user.id = :userId
+                    and uo.organization.id = :organizationId
+                    and uo.deleted = false
+                    and uo.organization.deleted = false
+            """)
+    Optional<UserOrganization> findUserOrganizationByUserIdAndOrganizationId(String userId, String organizationId);
+
+    @Query("select uo from UserOrganization uo where uo.user.id=:userId and uo.deleted=false")
+    Optional<UserOrganization> findUserOrganizationByUserId(String userId);
+
+    @EntityGraph(attributePaths = {"user", "branch"})
+    @Query("""
+                SELECT uo FROM UserOrganization uo
+                JOIN uo.user u
+                WHERE uo.deleted = false
+                  AND uo.organization.id = :organizationId
+                  AND (
+                      CAST(:search AS string) IS NULL 
+                      OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', CAST(:search AS string), '%'))
+                      OR u.phone LIKE CONCAT('%', :search, '%')
+                  )
+            """)
+    Page<UserOrganization> findAllByOrganizationIdAndFilter(
+            @Param("organizationId") String organizationId,
+            @Param("search") String search,
+            Pageable pageable
+    );
+
+    @Query("select exists (select uo.id from UserOrganization uo where uo.user.id=:userId and uo.organization.id=:orgId and uo.deleted=false and uo.role=:role)")
+    boolean checkIfAlreadyInOrganization(@Param("orgId") String organizationId, @Param("orgId") String id,@Param("role") Role role);
 }

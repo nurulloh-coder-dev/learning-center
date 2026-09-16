@@ -68,10 +68,6 @@ public class UserValidator {
         }
     }
 
-    public void validateUserPermission(User entity) {
-
-    }
-
     public void validateIfCurrentUser(User user, String id) {
         if (!user.getId().equals(id)) {
             throw new RestException(ErrorType.FORBIDDEN, ErrorCodes.Forbidden);

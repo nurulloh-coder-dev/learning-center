@@ -11,6 +11,7 @@ import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.filters.UserFilterDto;
 import org.example.crm.mapper.UserMapper;
+import org.example.crm.mapper.UserOrganizationMapper;
 import org.example.crm.repository.BranchRepository;
 import org.example.crm.repository.UserOrganizationRepository;
 import org.example.crm.repository.UserRepository;
@@ -25,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class UserService extends AbstractService<
         UserRepository,
@@ -36,6 +39,7 @@ public class UserService extends AbstractService<
     final OrganizationValidator organizationValidator;
     final PasswordEncoder passwordEncoder;
     final UserOrganizationRepository userOrganizationRepository;
+    final UserOrganizationMapper userOrganizationMapper;
 
     private static final String CHARACTERS =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -44,25 +48,34 @@ public class UserService extends AbstractService<
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    protected UserService(UserRepository repository, UserMapper mapper, UserValidator validator, BranchRepository branchRepository, BranchValidator branchValidator, OrganizationValidator organizationValidator, PasswordEncoder passwordEncoder, UserOrganizationRepository userOrganizationRepository) {
+    protected UserService(UserRepository repository, UserMapper mapper, UserValidator validator, BranchRepository branchRepository, BranchValidator branchValidator, OrganizationValidator organizationValidator, PasswordEncoder passwordEncoder, UserOrganizationRepository userOrganizationRepository, UserOrganizationMapper userOrganizationMapper) {
         super(repository, mapper, validator);
         this.branchRepository = branchRepository;
         this.branchValidator = branchValidator;
         this.organizationValidator = organizationValidator;
         this.passwordEncoder = passwordEncoder;
         this.userOrganizationRepository = userOrganizationRepository;
+        this.userOrganizationMapper = userOrganizationMapper;
     }
 
     @Override
     public Page<UserDto> getAll(Pageable pageable, UserFilterDto filterDto) {
-        Page<User> all = repository.findAll(pageable, filterDto.search());
-        return all.map(mapper::toDto);
+        String organizationId = validator.authenticateAndGetOrganizationId();
+
+        Page<UserOrganization> memberships = userOrganizationRepository
+                .findAllByOrganizationIdAndFilter(organizationId, filterDto.search(), pageable);
+
+        return memberships.map(userOrganizationMapper::toUserDto);
     }
 
     @Override
-    public UserDto get(String id) {
-        User user = validator.validateIdAndGet(id);
-        return mapper.toDto(user);
+    public UserDto get(String userId) {
+        String organizationId = validator.authenticateAndGetOrganizationId();
+        UserOrganization membership = userOrganizationRepository
+                .findUserOrganizationByUserIdAndOrganizationId(userId, organizationId)
+                .orElseThrow(() -> new RestException(ErrorType.USER_ORGANIZATION_NOT_FOUND, ErrorCodes.NotFound));
+
+        return userOrganizationMapper.toUserDto(membership);
     }
 
     @Override
@@ -71,26 +84,47 @@ public class UserService extends AbstractService<
     }
 
 
+    @Transactional
     public UserCreatedResponseDto createUser(UserCreateDto createDto) {
-        User user = validator.authenticateAndGetUser();
         String organizationId = validator.authenticateAndGetOrganizationId();
-        validator.validate(createDto);
-        User entity = mapper.toEntity(createDto);
-        validator.validateUserPermission(entity);
-        String password = generatePassword(10);
-        entity.setPassword(passwordEncoder.encode(password));
 
+        Optional<User> existingUser = repository.findByPhoneAndDeletedFalse(createDto.phone());
+        User targetUser;
+        String generatedPassword = null;
 
-        User save = repository.save(entity);
+        if (existingUser.isPresent()) {
+            targetUser = existingUser.get();
+            boolean alreadyHasRole = userOrganizationRepository
+                    .checkIfAlreadyInOrganization(
+                            targetUser.getId(),
+                            organizationId,
+                            createDto.role()
+                    );
 
+            if (alreadyHasRole) {
+                throw new RestException(ErrorType.USER_ALREADY_EXISTS, ErrorCodes.AlreadyExists);
+            }
+        } else {
+            validator.validate(createDto);
+            targetUser = mapper.toEntity(createDto);
+            generatedPassword = generatePassword(10);
+            targetUser.setPassword(passwordEncoder.encode(generatedPassword));
+            targetUser = repository.save(targetUser);
+        }
 
-        createUserOrganization(createDto.role(), createDto.permissions(), createDto.branchId(), save, organizationId);
+        createUserOrganization(
+                createDto.role(),
+                createDto.permissions(),
+                createDto.branchId(),
+                targetUser,
+                organizationId
+        );
 
         return new UserCreatedResponseDto(
-                save.getId(),
-                save.getFullName(),
-                save.getPhone(),
-                password
+                targetUser.getId(),
+                targetUser.getFullName(),
+                targetUser.getPhone(),
+                generatedPassword
         );
     }
 
@@ -111,7 +145,6 @@ public class UserService extends AbstractService<
     @Override
     public UserDto update(UserUpdateDto updateDto, String id) {
         User user = validator.authenticateAndGetUser();
-        String organizationId = validator.authenticateAndGetOrganizationId();
         validator.validateIfCurrentUser(user, id);
         mapper.mapUpdate(user, updateDto);
         return mapper.toDto(repository.save(user));
@@ -120,17 +153,16 @@ public class UserService extends AbstractService<
     @Override
     @Transactional
     public void delete(String id) {
-        User user = validator.validateIdAndGet(id);
-        softDeleteUserAndOrganizations(user);
+        validator.validateId(id);
+        softDeleteOrganizations(id);
     }
 
-    public void softDeleteUserAndOrganizations(User user) {
-        List<UserOrganization> userOrganizations = userOrganizationRepository.findAllByUserId(user.getId());
-        userOrganizations.forEach(userOrganization -> userOrganization.setDeleted(true));
-        userOrganizationRepository.saveAll(userOrganizations);
-
-        user.setDeleted(true);
-        repository.save(user);
+    public void softDeleteOrganizations(String id) {
+        String organizationId = validator.authenticateAndGetOrganizationId();
+        UserOrganization userOrganization = userOrganizationRepository.findUserOrganizationByUserIdAndOrganizationId(id, organizationId)
+                .orElseThrow(() -> new RestException(ErrorType.USER_ORGANIZATION_NOT_FOUND, ErrorCodes.NotFound));
+        userOrganization.setDeleted(true);
+        userOrganizationRepository.save(userOrganization);
     }
 
     public static String generatePassword(int length) {
@@ -145,19 +177,11 @@ public class UserService extends AbstractService<
     }
 
     public UserDto createSuperAdmin(String organizationId, AdminUserCreateDto userCreateDto) {
-
-        String userOrganization = validator.authenticateAndGetOrganizationId();
-        organizationValidator.validateAndGetId(organizationId);
-
-        if (!userOrganization.equals(organizationId)) {
-            throw new RestException(ErrorType.USER_ORGANIZATION_MISMATCH, ErrorCodes.BadRequest);
-        }
-
+        organizationValidator.validateId(organizationId);
         validator.validate(userCreateDto);
         User entity = mapper.toEntity(userCreateDto);
         entity.setPassword(passwordEncoder.encode(userCreateDto.password()));
         User save = repository.save(entity);
-
         createUserOrganization(Role.SUPER_ADMIN, null, userCreateDto.branchId(), save, organizationId);
         return new UserDto(
                 save.getId(),
@@ -171,11 +195,8 @@ public class UserService extends AbstractService<
     }
 
     public void softDeleteUserAndOrganization(User user, String organizationId) {
-        UserOrganization organization = userOrganizationRepository.findUserOrganizationByUserIdAndOrganization_Id(user.getId(), organizationId).orElseThrow(() -> new RestException(ErrorType.USER_ORGANIZATION_MISMATCH, ErrorCodes.BadRequest));
+        UserOrganization organization = userOrganizationRepository.findUserOrganizationByUserIdAndOrganizationId(user.getId(), organizationId).orElseThrow(() -> new RestException(ErrorType.USER_ORGANIZATION_MISMATCH, ErrorCodes.BadRequest));
         organization.setDeleted(true);
         userOrganizationRepository.save(organization);
-
-        user.setDeleted(true);
-        repository.save(user);
     }
 }

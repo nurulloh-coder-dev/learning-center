@@ -73,7 +73,8 @@ public enum ErrorType {
     PLAN_ALREADY_EXISTS("plan.already.exists"),
     PLAN_NOT_FOUND("plan.not.found"),
     PLAN_IN_USE("plan.in.use"),
-    SUBSCRIPTION_NOT_FOUND("subscription.not.found");
+    SUBSCRIPTION_NOT_FOUND("subscription.not.found"),
+    USER_ORGANIZATION_NOT_FOUND("user-organization.not.found");
 
 
     private final String key;

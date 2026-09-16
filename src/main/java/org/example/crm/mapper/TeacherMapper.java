@@ -13,9 +13,11 @@ public interface TeacherMapper {
     TeacherDto toDto(Teacher teacher);
 
     @IgnoreTenantAuditFields
+    @Mapping(target = "user", ignore = true)
     Teacher toEntity(TeacherCreateDto createDto);
 
     @IgnoreTenantAuditFields
+    @Mapping(target = "user", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void mapUpdate(@MappingTarget Teacher teacher, TeacherUpdateDto teacherUpdateDto);
 }
