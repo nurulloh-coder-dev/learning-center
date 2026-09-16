@@ -6,6 +6,8 @@ import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
 import org.example.crm.entity.dto.student.StudentCreateDto;
 import org.example.crm.entity.dto.user.UserCreateDto;
+import org.example.crm.entity.dto.user.UserCreatedResponseDto;
+import org.example.crm.entity.enums.Role;
 import org.example.crm.entity.model.Invoice;
 import org.example.crm.entity.model.Student;
 import org.example.crm.entity.model.User;
@@ -19,6 +21,7 @@ import org.example.crm.projection.StudentProjection;
 import org.example.crm.projection.StudentShowProjection;
 import org.example.crm.repository.EnrollmentRepository;
 import org.example.crm.repository.StudentRepository;
+import org.example.crm.repository.UserRepository;
 import org.example.crm.validator.StudentValidator;
 import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
@@ -39,13 +42,15 @@ public class StudentService extends AbstractService<
     private final UserValidator userValidator;
     final EnrollmentRepository enrollmentRepository;
     final UserMapper userMapper;
+    private final UserRepository userRepository;
 
-    protected StudentService(StudentRepository repository, StudentMapper mapper, StudentValidator validator, UserService userService, UserValidator userValidator, EnrollmentRepository enrollmentRepository, UserMapper userMapper) {
+    protected StudentService(StudentRepository repository, StudentMapper mapper, StudentValidator validator, UserService userService, UserValidator userValidator, EnrollmentRepository enrollmentRepository, UserMapper userMapper, UserRepository userRepository) {
         super(repository, mapper, validator);
         this.userService = userService;
         this.userValidator = userValidator;
         this.enrollmentRepository = enrollmentRepository;
         this.userMapper = userMapper;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -66,14 +71,22 @@ public class StudentService extends AbstractService<
     }
 
     @Override
-    @Transactional
     public StudentDto create(StudentCreateDto createDto) {
         validator.validate(createDto);
+
+
+        UserCreatedResponseDto userResponse = userService.createUser(new UserCreateDto(
+                createDto.userCreateDto().fullName(),
+                createDto.userCreateDto().phone(),
+                createDto.userCreateDto().birthDate(),
+                Role.STUDENT,
+                createDto.userCreateDto().branchId(),
+                null
+        ));
+        User user = userRepository.getReferenceById(userResponse.id());
         Student entity = mapper.toEntity(createDto);
-        Student save = repository.save(entity);
-        UserCreateDto userCreateDto = createDto.userCreateDto();
-        userService.createUserOrganization(userCreateDto.role(), userCreateDto.permissions(), userCreateDto.branchId(), save.getUser(), userValidator.authenticateAndGetOrganizationId());
-        return mapper.toDto(save);
+        entity.setUser(user);
+        return mapper.toDto(repository.save(entity));
     }
 
     @Override

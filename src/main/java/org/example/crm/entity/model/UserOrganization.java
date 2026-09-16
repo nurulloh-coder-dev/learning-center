@@ -10,9 +10,13 @@ import org.example.crm.entity.enums.Role;
 import java.util.List;
 
 @Entity
-@Table(name = "user_organizations", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"user_id", "organization_id", "role"})
-})
+@Table(
+        name = "user_organizations",
+        indexes = {
+                @Index(name = "idx_user_org_tenant", columnList = "organization_id, deleted"),
+                @Index(name = "idx_user_org_branch", columnList = "branch_id")
+        }
+)
 @Getter
 @Setter
 public class UserOrganization extends BaseEntity {

@@ -15,7 +15,8 @@ public enum ErrorCodes {
     InternalServerError(500),
     AlreadyExists(409),
     TooManyRequests(429),
-    AccessDenied(403);
+    AccessDenied(403),
+    Conflict(409);
 
     private final int statusCode;
 }

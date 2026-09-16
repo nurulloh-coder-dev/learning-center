@@ -19,4 +19,8 @@ public interface OrganizationRepository extends JpaRepository<Organization,Strin
     @Transactional
     @Query("UPDATE Organization o set o.deleted = true where o.id=:id")
     void softDelete(@Param("id") String id);
+
+    @Query("select exists (select o.id from Organization o where o.id=:orgId and o.deleted=false)")
+    boolean checkId(@Param("orgId") String organizationId);
+
 }

@@ -69,7 +69,12 @@ public enum ErrorType {
     INVOICE_ALREADY_PAID("invoice.already.paid"),
     INVOICE_REQUIRED("invoice.required"),
     USER_ORGANIZATION_MISMATCH("user.organization.mismatch"),
-    GROUP_IS_NOT_STARTED("group.is.not.started");
+    GROUP_IS_NOT_STARTED("group.is.not.started"),
+    PLAN_ALREADY_EXISTS("plan.already.exists"),
+    PLAN_NOT_FOUND("plan.not.found"),
+    PLAN_IN_USE("plan.in.use"),
+    SUBSCRIPTION_NOT_FOUND("subscription.not.found"),
+    USER_ORGANIZATION_NOT_FOUND("user-organization.not.found");
 
 
     private final String key;
