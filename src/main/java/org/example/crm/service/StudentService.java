@@ -2,6 +2,7 @@ package org.example.crm.service;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.example.crm.entity.dto.student.StudentCreateResponseDto;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.student.StudentUpdateDto;
 import org.example.crm.entity.dto.student.StudentCreateDto;
@@ -72,6 +73,11 @@ public class StudentService extends AbstractService<
 
     @Override
     public StudentDto create(StudentCreateDto createDto) {
+        return null;
+    }
+
+    @Transactional
+    public StudentCreateResponseDto createStudent(StudentCreateDto createDto) {
         validator.validate(createDto);
 
 
@@ -86,7 +92,12 @@ public class StudentService extends AbstractService<
         User user = userRepository.getReferenceById(userResponse.id());
         Student entity = mapper.toEntity(createDto);
         entity.setUser(user);
-        return mapper.toDto(repository.save(entity));
+        return new StudentCreateResponseDto(
+                entity.getId(),
+                userResponse,
+                entity.getParentPhone(),
+                entity.getBalance()
+        );
     }
 
     @Override

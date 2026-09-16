@@ -6,6 +6,7 @@ public record OrganizationUpdateDto(
         @Nonnull String name,
         String email,
         String phone,
-        String website
+        String website,
+        Integer daysBeforeDebt
 ) {
 }

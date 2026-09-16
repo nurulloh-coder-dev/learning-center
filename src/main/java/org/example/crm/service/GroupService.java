@@ -1,24 +1,20 @@
 package org.example.crm.service;
 
 import jakarta.transaction.Transactional;
+import org.example.crm.config.JwtUtils;
 import org.example.crm.entity.dto.group.*;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.enums.DayType;
-import org.example.crm.entity.model.UserOrganization;
+import org.example.crm.entity.model.*;
 import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
-import org.example.crm.entity.model.TimeTable;
-import org.example.crm.entity.model.User;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.filters.GroupFilterDto;
 import org.example.crm.projection.GroupNameProjection;
 import org.example.crm.projection.GroupProjection;
-import org.example.crm.entity.model.Group;
 import org.example.crm.mapper.GroupMapper;
-import org.example.crm.repository.GroupRepository;
-import org.example.crm.repository.LessonRepository;
-import org.example.crm.repository.UserOrganizationRepository;
-import org.example.crm.repository.UserRepository;
+import org.example.crm.projection.GroupStatsProjection;
+import org.example.crm.repository.*;
 import org.example.crm.validator.GroupValidator;
 import org.example.crm.validator.UserValidator;
 import org.springframework.data.domain.Page;
@@ -26,10 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -45,13 +38,15 @@ public class GroupService extends AbstractService<
     private final StudentService studentService;
     final UserRepository userRepository;
     private final UserOrganizationRepository userOrganizationRepository;
+    final TeacherRepository teacherRepository;
 
-    protected GroupService(GroupRepository repository, GroupMapper mapper, GroupValidator validator, UserValidator userValidator, StudentService studentService, LessonRepository lessonRepository, UserRepository userRepository, UserOrganizationRepository userOrganizationRepository) {
+    protected GroupService(GroupRepository repository, GroupMapper mapper, GroupValidator validator, UserValidator userValidator, StudentService studentService, LessonRepository lessonRepository, UserRepository userRepository, UserOrganizationRepository userOrganizationRepository, TeacherRepository teacherRepository) {
         super(repository, mapper, validator);
         this.userValidator = userValidator;
         this.studentService = studentService;
         this.userRepository = userRepository;
         this.userOrganizationRepository = userOrganizationRepository;
+        this.teacherRepository = teacherRepository;
     }
 
     @Override
@@ -174,5 +169,33 @@ public class GroupService extends AbstractService<
         return myGroups.stream()
                 .map(mapper::toDto)
                 .toList();
+    }
+
+    public GroupStatsDto getGroupStats() {
+        String organizationId = userValidator.authenticateAndGetOrganizationId();
+        User user = userValidator.authenticateAndGetUser();
+        Teacher teacher = teacherRepository.findTeacherByIdAndOrg(user.getId(), organizationId)
+                .orElseThrow(() -> new RestException(ErrorType.TEACHER_NOT_FOUND, ErrorCodes.NotFound));
+        List<Group> allGroupsByTeacherId = repository.findAllGroupsByTeacherId(user.getId(), organizationId);
+        List<String> groupIdList = allGroupsByTeacherId.stream()
+                .map(Group::getId)
+                .toList();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime monthAgo = now.minusMonths(1);
+
+        if (groupIdList.isEmpty()){
+            return new GroupStatsDto(0L,0L,0L,0L,0L,0L,0L);
+        }
+        GroupStatsProjection projection = repository.getGroupStats(groupIdList,monthAgo,now);
+
+        return new GroupStatsDto(
+                projection.getTotalStudents(),
+                projection.getActiveStudents(),
+                projection.getNewStudents(),
+                projection.getLostStudents(),
+                projection.getPotentialFailStudents(),
+                projection.getRedList(),
+                projection.getBlackList()
+        );
     }
 }

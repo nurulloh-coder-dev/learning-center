@@ -128,7 +128,7 @@ public class UserService extends AbstractService<
         );
     }
 
-    private void createUserOrganization(Role role, List<AdministratorPermission> permissions, String branchId, User save, String organizationId) {
+    public void createUserOrganization(Role role, List<AdministratorPermission> permissions, String branchId, User save, String organizationId) {
         Organization organization = organizationValidator.validateAndGetId(organizationId);
         UserOrganization userOrganization = new UserOrganization();
         userOrganization.setUser(save);

@@ -2,6 +2,7 @@ package org.example.crm.controller;
 
 import jakarta.validation.Valid;
 import org.example.crm.entity.dto.teacher.TeacherCreateDto;
+import org.example.crm.entity.dto.teacher.TeacherCreateResponseDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.teacher.TeacherUpdateDto;
 import org.example.crm.filters.TeacherFilterDto;
@@ -49,8 +50,8 @@ public class TeacherController {
 
     @PreAuthorize("hasAuthority('TEACHER_MANAGEMENT')")
     @PostMapping
-    public ResponseEntity<TeacherDto> create(@Valid @RequestBody TeacherCreateDto createDto) {
-        TeacherDto createdTeacher = teacherService.create(createDto);
+    public ResponseEntity<TeacherCreateResponseDto> create(@Valid @RequestBody TeacherCreateDto createDto) {
+        TeacherCreateResponseDto createdTeacher = teacherService.createTeacher(createDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTeacher);
     }
 

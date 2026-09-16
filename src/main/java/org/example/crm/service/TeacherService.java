@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.example.crm.entity.dto.student.StudentDto;
 import org.example.crm.entity.dto.teacher.TeacherCreateDto;
+import org.example.crm.entity.dto.teacher.TeacherCreateResponseDto;
 import org.example.crm.entity.dto.teacher.TeacherDto;
 import org.example.crm.entity.dto.teacher.TeacherUpdateDto;
 import org.example.crm.entity.dto.user.UserCreateDto;
@@ -67,9 +68,13 @@ public class TeacherService extends AbstractService<
         return mapper.toDto(teacher);
     }
 
-    @Transactional
     @Override
     public TeacherDto create(TeacherCreateDto createDto) {
+        return null;
+    }
+
+    @Transactional
+    public TeacherCreateResponseDto createTeacher(TeacherCreateDto createDto) {
         validator.validate(createDto);
 
         UserCreatedResponseDto userResponse = userService.createUser(new UserCreateDto(
@@ -87,7 +92,13 @@ public class TeacherService extends AbstractService<
         teacher.setUser(user);
 
         Teacher savedTeacher = repository.save(teacher);
-        return mapper.toDto(savedTeacher);
+
+        return new TeacherCreateResponseDto(
+                savedTeacher.getId(),
+                userResponse,
+                savedTeacher.getTotalTeachingExp(),
+                savedTeacher.getCurrPlaceTeachingExp()
+        );
     }
 
     @Override

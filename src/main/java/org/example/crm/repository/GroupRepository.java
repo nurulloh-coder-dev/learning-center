@@ -5,6 +5,7 @@ import org.example.crm.entity.model.Enrollment;
 import org.example.crm.projection.GroupNameProjection;
 import org.example.crm.projection.GroupProjection;
 import org.example.crm.entity.model.Group;
+import org.example.crm.projection.GroupStatsProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -133,4 +135,58 @@ public interface GroupRepository extends JpaRepository<Group, String> {
                   AND s.user.deleted = false
 """)
     List<Enrollment> findAllEnrollmentsByGroupId(String groupDd);
+
+    @Query("""
+                SELECT g
+                FROM Group g
+                JOIN g.teacher t
+                JOIN t.user u
+                join UserOrganization uo on uo.user.id = u.id and uo.organization.id = :organizationId
+                WHERE u.id = :id
+                  AND g.deleted = false
+                  and uo.deleted = false
+            """)
+    List<Group> findAllGroupsByTeacherId(String id, String organizationId);
+
+
+    @Query(value = """
+    SELECT
+        COUNT(DISTINCT s.id) AS totalStudents,
+        COUNT(DISTINCT CASE WHEN en.deleted = false THEN s.id END) AS activeStudents,
+        COUNT(DISTINCT CASE WHEN s.created_at BETWEEN :monthAgo AND :now THEN s.id END)AS newStudents,
+        COUNT(DISTINCT CASE WHEN s.created_at BETWEEN :monthAgo AND :now
+                                 AND en.leaving_reason IS NOT NULL AND en.deleted = true THEN s.id END) AS lostStudents,
+(
+                    SELECT COUNT(DISTINCT failing.student_id)
+                    FROM (
+                        SELECT island.student_id
+                        FROM (
+                            SELECT
+                                ats.student_id,
+                                ats.status,
+                                ROW_NUMBER() OVER (PARTITION BY ats.student_id, l.group_id ORDER BY l.created_at)
+                                    - ROW_NUMBER() OVER (PARTITION BY ats.student_id, l.group_id,
+                                                         CASE WHEN ats.status = 'ABSENT' THEN 1 ELSE 0 END
+                                                         ORDER BY l.created_at) AS grp
+                            FROM attendance_students ats
+                            JOIN attendances a ON a.id = ats.attendance_id AND a.deleted = false
+                            JOIN lessons l ON l.id = a.lesson_id AND l.deleted = false
+                            JOIN enrollments en ON en.student_id = ats.student_id
+                                               AND en.group_id = l.group_id AND en.deleted = false
+                            WHERE l.group_id IN (:groupIdList)
+                              AND l.created_at BETWEEN :monthAgo AND :now
+                        ) AS island
+                        WHERE island.status = 'ABSENT'
+                        GROUP BY island.student_id, island.grp
+                        HAVING COUNT(*) >= 3
+                    ) AS failing
+                ) AS potentialFailStudents,
+        CAST(0 AS BIGINT) AS redList,
+        CAST(0 AS BIGINT) AS blackList
+    FROM students s
+    JOIN enrollments en ON en.student_id = s.id
+                        AND en.group_id IN (:groupIdList)
+                        AND s.deleted = false
+    """, nativeQuery = true)
+    GroupStatsProjection getGroupStats(List<String> groupIdList, LocalDateTime monthAgo, LocalDateTime now);
 }
