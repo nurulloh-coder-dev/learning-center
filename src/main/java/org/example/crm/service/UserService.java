@@ -199,4 +199,10 @@ public class UserService extends AbstractService<
         organization.setDeleted(true);
         userOrganizationRepository.save(organization);
     }
+
+    public UserDto getByPhone(String phone) {
+        User user = repository.findByPhone(phone)
+                .orElse(null);
+        return mapper.toDto(user);
+    }
 }

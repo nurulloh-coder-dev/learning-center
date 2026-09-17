@@ -29,7 +29,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 
     @Query("select u from User u where u.phone=:phone")
-    Optional<User> findByPhone(@Param("phone") String subject);
+    Optional<User> findByPhone(@Param("phone") String phone);
 
     @Query("""
                     select u

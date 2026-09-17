@@ -80,7 +80,6 @@ public class StudentService extends AbstractService<
     public StudentCreateResponseDto createStudent(StudentCreateDto createDto) {
         validator.validate(createDto);
 
-
         UserCreatedResponseDto userResponse = userService.createUser(new UserCreateDto(
                 createDto.userCreateDto().fullName(),
                 createDto.userCreateDto().phone(),

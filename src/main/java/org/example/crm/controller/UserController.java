@@ -64,4 +64,10 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/phone")
+    public ResponseEntity<UserDto> byPhone(@RequestParam String phone){
+        UserDto byPhone = userService.getByPhone(phone);
+        return ResponseEntity.ok(byPhone);
+    }
+
 }
