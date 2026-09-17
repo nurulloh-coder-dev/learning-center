@@ -123,7 +123,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
     List<Group> getMyGroups(@Param("userId") String userId);
 
     @Query("select g.currentMonth from Group g where g.id=:id and g.deleted=false")
-    Optional<Integer> checkAndGetCurrentMonth(String groupId);
+    Optional<Integer> checkAndGetCurrentMonth(@Param("id") String groupId);
 
 
     @Query("""
