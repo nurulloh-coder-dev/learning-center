@@ -11,39 +11,46 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/api/plans")
+@RequestMapping("/api/v1/plans")
 @RequiredArgsConstructor
 public class PlanController {
 
     private final PlanService service;
 
     @GetMapping
-    public Page<PlanDto> getAll(Pageable pageable, PlanFilterDto filterDto) {
-        return service.getAll(pageable, filterDto);
+    public ResponseEntity<Page<PlanDto>> getAll(Pageable pageable, PlanFilterDto filterDto) {
+        return ResponseEntity.ok(service.getAll(pageable, filterDto));
     }
 
     @GetMapping("/{id}")
-    public PlanDto get(@PathVariable String id) {
-        return service.get(id);
+    public ResponseEntity<PlanDto> get(@PathVariable String id) {
+        return ResponseEntity.ok(service.get(id));
     }
 
+
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public PlanDto create(@Valid @RequestBody PlanCreateDto createDto) {
-        return service.create(createDto);
+    @PreAuthorize("hasRole('DEVELOPER')")
+    public ResponseEntity<PlanDto> create(@Valid @RequestBody PlanCreateDto createDto) {
+        PlanDto created = service.create(createDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    public PlanDto update(@PathVariable String id, @Valid @RequestBody PlanUpdateDto updateDto) {
-        return service.update(updateDto, id);
+    @PreAuthorize("hasRole('DEVELOPER')")
+    public ResponseEntity<PlanDto> update(@PathVariable String id, @Valid @RequestBody PlanUpdateDto updateDto) {
+        return ResponseEntity.ok(service.update(updateDto, id));
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable String id) {
+    @PreAuthorize("hasRole('DEVELOPER')")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

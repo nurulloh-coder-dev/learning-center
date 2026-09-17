@@ -74,7 +74,8 @@ public enum ErrorType {
     PLAN_NOT_FOUND("plan.not.found"),
     PLAN_IN_USE("plan.in.use"),
     SUBSCRIPTION_NOT_FOUND("subscription.not.found"),
-    USER_ORGANIZATION_NOT_FOUND("user-organization.not.found");
+    USER_ORGANIZATION_NOT_FOUND("user-organization.not.found"),
+    ACTIVE_SUBSCRIPTION_NOT_FOUND("active.subscription.not.found");
 
 
     private final String key;

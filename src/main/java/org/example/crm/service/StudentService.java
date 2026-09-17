@@ -89,6 +89,7 @@ public class StudentService extends AbstractService<
                 createDto.userCreateDto().branchId(),
                 null
         ));
+
         User user = userRepository.getReferenceById(userResponse.id());
         Student entity = mapper.toEntity(createDto);
         entity.setUser(user);

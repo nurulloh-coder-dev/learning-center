@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.crm.config.JwtUtils;
 import org.example.crm.entity.dto.organization.OrganizationViewDto;
 import org.example.crm.entity.dto.user.UserDto;
+import org.example.crm.entity.enums.SubscriptionStatus;
 import org.example.crm.entity.login.LoginRequest;
 import org.example.crm.entity.login.LoginResponse;
 import org.example.crm.entity.login.TokenDto;
@@ -20,10 +21,7 @@ import org.example.crm.exceptions.ErrorCodes;
 import org.example.crm.exceptions.ErrorType;
 import org.example.crm.exceptions.RestException;
 import org.example.crm.mapper.UserMapper;
-import org.example.crm.repository.OrganizationRepository;
-import org.example.crm.repository.StudentRepository;
-import org.example.crm.repository.UserOrganizationRepository;
-import org.example.crm.repository.UserRepository;
+import org.example.crm.repository.*;
 import org.example.crm.validator.UserValidator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -50,6 +48,7 @@ public class AuthService {
     final OrganizationRepository organizationRepository;
     final StudentRepository studentRepository;
     final UserOrganizationRepository userOrganizationRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     @Value("${jwt.refresh.token.expire.date:86400}")
     private Long refreshTokenExpiration;
@@ -74,11 +73,23 @@ public class AuthService {
 
         if (allByUserId.size() == 1) {
             UserOrganization userOrganization = allByUserId.get(0);
+            subscriptionRepository.findByOrganizationId(userOrganization.getOrganization().getId())
+                    .ifPresentOrElse(s -> {
+                        if (s.getStatus() == SubscriptionStatus.EXPIRED || s.getStatus() == SubscriptionStatus.CANCELED) {
+                            throw new RestException(ErrorType.ACTIVE_SUBSCRIPTION_NOT_FOUND, ErrorCodes.NotFound);
+                        }
+                    }, () -> {
+                        throw new RestException(ErrorType.SUBSCRIPTION_NOT_FOUND, ErrorCodes.NotFound);
+                    });
             return getLoginResponse(response, userOrganization);
         }
-
         List<OrganizationViewDto> organizationViewDtos = allByUserId.stream()
-                .map(u -> new OrganizationViewDto(u.getOrganization().getId(), u.getOrganization().getName(), u.getRole()))
+                .map(u -> {
+                    String organizationId = u.getOrganization().getId();
+                    SubscriptionStatus subscriptionStatus = subscriptionRepository.findByOrganizationIdAndGetStatus(organizationId)
+                            .orElse(null);
+                    return new OrganizationViewDto(organizationId, u.getOrganization().getName(), u.getRole(), subscriptionStatus);
+                })
                 .toList();
 
         return LoginResponse.builder()
@@ -171,6 +182,14 @@ public class AuthService {
         UserOrganization userOrganization = userOrganizationRepository.findByUserIdAndOrgId(user.getId(), organizationId)
                 .orElseThrow(() -> new RestException(ErrorType.USER_ORGANIZATION_MISMATCH, ErrorCodes.AccessDenied));
 
+        subscriptionRepository.findByOrganizationIdAndGetStatus(organizationId)
+                .ifPresentOrElse(s -> {
+                    if (s == SubscriptionStatus.EXPIRED || s == SubscriptionStatus.CANCELED) {
+                        throw new RestException(ErrorType.ACTIVE_SUBSCRIPTION_NOT_FOUND, ErrorCodes.NotFound);
+                    }
+                }, () -> {
+                    throw new RestException(ErrorType.SUBSCRIPTION_NOT_FOUND, ErrorCodes.NotFound);
+                });
 
         return getLoginResponse(response, userOrganization);
     }

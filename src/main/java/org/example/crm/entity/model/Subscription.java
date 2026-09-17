@@ -6,7 +6,7 @@ import org.example.crm.entity.base.BaseEntity;
 import org.example.crm.entity.enums.SubscriptionStatus;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -28,18 +28,17 @@ public class Subscription extends BaseEntity {
     private SubscriptionStatus status;
 
     @Column(nullable = false)
-    private Instant startsAt;
+    private LocalDate startDate;
 
     @Column(nullable = false)
-    private Instant expiresAt;
+    private LocalDate expiryDate;
 
-    // price actually charged — plan price may change later
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal paidAmount;
 
     @Column(nullable = false)
     private String currency;
 
-    private String activatedByUserId;     // which admin confirmed it
-    private String note;                  // "Humo transfer, ref JB-7K2M"
+    private String activatedByUserId;
+    private String note;
 }
