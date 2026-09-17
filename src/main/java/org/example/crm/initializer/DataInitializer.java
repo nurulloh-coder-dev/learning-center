@@ -20,8 +20,8 @@ import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
-//
-public class DataInitializer implements CommandLineRunner{
+// implements CommandLineRunner
+public class DataInitializer{
 
     final UserRepository userRepository;
     final TeacherRepository teacherRepository;
@@ -41,7 +41,7 @@ public class DataInitializer implements CommandLineRunner{
 
 
 
-    @Override
+//    @Override
     @Transactional
     public void run(String... args) {
 

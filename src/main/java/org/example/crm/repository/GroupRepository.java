@@ -153,8 +153,8 @@ public interface GroupRepository extends JpaRepository<Group, String> {
     SELECT
         COUNT(DISTINCT s.id) AS totalStudents,
         COUNT(DISTINCT CASE WHEN en.deleted = false THEN s.id END) AS activeStudents,
-        COUNT(DISTINCT CASE WHEN s.created_at BETWEEN :monthAgo AND :now THEN s.id END)AS newStudents,
-        COUNT(DISTINCT CASE WHEN s.created_at BETWEEN :monthAgo AND :now
+        COUNT(DISTINCT CASE WHEN en.created_at BETWEEN :monthAgo AND :now THEN en.id END)AS newStudents,
+        COUNT(DISTINCT CASE WHEN en.created_at BETWEEN :monthAgo AND :now
                                  AND en.leaving_reason IS NOT NULL AND en.deleted = true THEN s.id END) AS lostStudents,
 (
                     SELECT COUNT(DISTINCT failing.student_id)
