@@ -93,11 +93,12 @@ public class StudentService extends AbstractService<
         User user = userRepository.getReferenceById(userResponse.id());
         Student entity = mapper.toEntity(createDto);
         entity.setUser(user);
+        Student save = repository.save(entity);
         return new StudentCreateResponseDto(
-                entity.getId(),
+                save.getId(),
                 userResponse,
-                entity.getParentPhone(),
-                entity.getBalance()
+                save.getParentPhone(),
+                save.getBalance()
         );
     }
 
