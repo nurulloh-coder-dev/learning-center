@@ -56,7 +56,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, String> 
                    where l.group.id= :groupId and l.title like concat(:IntendedMonth,'.%')
                    order by a.createdAt asc
             """)
-    List<AttendanceProjection> findAllByGroupIdAndMonth(@Param("groupId") String groupId, String intendedMonth, @Param("minusMonths") Integer previousMonths);
+    List<AttendanceProjection> findAllByGroupIdAndMonth(@Param("groupId") String groupId, String intendedMonth, @Param("intendedMonth") Integer previousMonths);
 
     @Query("""
              select s.id as studentId,
