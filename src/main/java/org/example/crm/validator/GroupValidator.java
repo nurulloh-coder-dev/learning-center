@@ -47,7 +47,7 @@ public class GroupValidator {
             throw new RestException(ErrorType.GROUP_NOT_FOUND,ErrorCodes.NotFound);
         }
         Integer currentMonth = month.get();
-        if (currentMonth-previousMonths<=0){
+        if (currentMonth-previousMonths<0){
             throw new RestException(ErrorType.BAD_REQUEST,ErrorCodes.BadRequest);
         }
         return currentMonth-previousMonths;
